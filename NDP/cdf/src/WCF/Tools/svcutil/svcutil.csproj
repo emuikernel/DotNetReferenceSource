@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{23684258-8c83-477c-982b-ee3a67c0e878}</ProjectGuid>
+    <OutputPath>.</OutputPath>
+    <OutputType>Library</OutputType>
+    <AssemblyName>svcutil</AssemblyName>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
+    <NoStdLib>True</NoStdLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <DefineConstants>CODE_ANALYSIS_BASELINE;SM_TOOL;SERVICEMODEL_DEPENDENT;TRACE;RETAIL;WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\clr\src\bcl\mscorlib.csproj">
+      <Project>{edd76f80-29f6-4590-a3ef-f885b38da1b0}</Project>
+      <Name>mscorlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\fx\src\System.csproj">
+      <Project>{e4fae737-f889-49a8-8db5-92488fc98c22}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\fx\src\Configuration\System.Configuration.csproj">
+      <Project>{d0e5c1bb-46f1-4fbe-9d9b-4d089d88ae09}</Project>
+      <Name>System.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\fx\src\Core\System.Core.csproj">
+      <Project>{39be40c7-445f-4b45-869c-b23a2e23fde2}</Project>
+      <Name>System.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\fx\src\data\System.Data.csproj">
+      <Project>{9840a00f-f4ef-456f-9bab-d2f2d41fe20c}</Project>
+      <Name>System.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Serialization\System.Runtime.Serialization.csproj">
+      <Project>{68a96ebf-269e-4f3f-9dbf-6238c2c42699}</Project>
+      <Name>System.Runtime.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ServiceModel\System.ServiceModel.csproj">
+      <Project>{6f4c0ed5-7678-495b-bc35-1d78d582539d}</Project>
+      <Name>System.ServiceModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\NetFx20\System.Web.Services\System.Web.Services.csproj">
+      <Project>{4cd44674-f3f4-4f30-ab64-a7f4b0439151}</Project>
+      <Name>System.Web.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\fx\src\Xml\System.Xml.csproj">
+      <Project>{cfe60703-bdf5-402e-b545-c675c65ae9c8}</Project>
+      <Name>System.Xml</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.JScript" />
+    <Reference Include="System.Design" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\WcfCommonResStrings\CommonResStrings.cs" />
+    <Compile Include="CommandLineParser.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

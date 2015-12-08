@@ -2,159 +2,161 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComSvcConfig", "ndp\cdf\src\wcf\tools\ComSvcConfig.csproj", "{a5a186fb-9633-44aa-a237-112eb9155fb8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComSvcConfig", "ndp\cdf\src\WCF\Tools\comsvcutil\ComSvcConfig.csproj", "{22c49e63-619d-4710-b669-4fa1d9dcd2f0}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Microsoft.VisualBasic", "vb\runtime\msvbalib\Microsoft.VisualBasic.vbproj", "{ff532938-6fbb-4601-8131-728188fccf52}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Microsoft.VisualBasic", "vb\runtime\msvbalib\Microsoft.VisualBasic.vbproj", "{2d7b8592-96d8-4e1b-864c-278fb1f60e1b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mscorlib", "ndp\clr\src\BCL\mscorlib.csproj", "{a72657be-225c-4239-956e-ee2a30893b41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mscorlib", "ndp\clr\src\bcl\mscorlib.csproj", "{edd76f80-29f6-4590-a3ef-f885b38da1b0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationBuildTasks", "wpf\PresentationBuildTasks.csproj", "{3e9c55f1-71a4-4531-bc65-daba9397a1c7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationBuildTasks", "wpf\src\PresentationBuildTasks.csproj", "{dc5421f5-fe7f-453a-ae93-ccefebff2ad1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationCore", "wpf\PresentationCore.csproj", "{25bd24d1-968d-4797-96cf-5e2895e16510}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationCore", "wpf\src\PresentationCore.csproj", "{84f8befd-0dca-4ca2-9da0-7c53db1ff832}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework", "wpf\PresentationFramework.csproj", "{b5b08386-66f4-42ed-8387-304cf7980fb7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework", "wpf\src\PresentationFramework.csproj", "{40489127-2da6-4a1e-b78f-9b9b4a0e4280}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Aero", "wpf\PresentationFramework.Aero.csproj", "{db1259b1-f0ad-4d28-8745-fb355e4e3ac8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Aero", "wpf\src\Themes\Aero\PresentationFramework.Aero.csproj", "{93d2d7b8-4d3f-49ff-ba4f-c701b3f9fd22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Classic", "wpf\PresentationFramework.Classic.csproj", "{28de026b-b605-492c-9667-53185b48cf69}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Classic", "wpf\src\Themes\Classic\PresentationFramework.Classic.csproj", "{b5c88dac-f88f-4f90-9e1f-9f38158ebebf}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Luna", "wpf\PresentationFramework.Luna.csproj", "{5bf9f774-7ce6-46c2-8309-f262cb9b61fd}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Luna", "wpf\src\Themes\Luna\PresentationFramework.Luna.csproj", "{f62afe68-a461-4c71-be88-807694c4eaeb}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Royale", "wpf\PresentationFramework.Royale.csproj", "{6c03f8bb-74a4-41a7-844e-6558a8907717}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationFramework.Royale", "wpf\src\Themes\Royale\PresentationFramework.Royale.csproj", "{25a70776-fd6a-44d7-add2-e3b24379088c}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMDiagnostics", "ndp\cdf\src\WCF\SMDiagnostics\System\ServiceModel\Diagnostics\SMDiagnostics.csproj", "{627ffd4a-226e-4ed6-bea5-a26b7aabd9f3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMDiagnostics", "ndp\cdf\src\WCF\SMDiagnostics\SMDiagnostics.csproj", "{40431cae-dd74-48fd-bfe3-d2b35e27b863}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSvcHost", "ndp\cdf\src\WCF\SMSvcHost\SMSvcHost.csproj", "{ff8fa9d9-32df-42bd-ac7a-df8907097be8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSvcHost", "ndp\cdf\src\WCF\SMSvcHost\SMSvcHost.csproj", "{20cd2a01-7dea-47c2-b111-2848f8428bb5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "svcutil", "ndp\cdf\src\wcf\tools\svcutil.csproj", "{9b263cc0-063a-4eb1-8efb-916be90f4b63}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "svcutil", "ndp\cdf\src\WCF\Tools\svcutil\svcutil.csproj", "{23684258-8c83-477c-982b-ee3a67c0e878}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System", "NDP\fx\src\System.csproj", "{20c75c70-c8b6-4dfb-a4e5-16d09099776d}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System", "ndp\fx\src\System.csproj", "{e4fae737-f889-49a8-8db5-92488fc98c22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities", "ndp\cdf\src\NetFx40\System.Activities\System.Activities.csproj", "{6010f867-c68f-414e-be79-ffa94093695c}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities", "ndp\cdf\src\NetFx40\System.Activities\System.Activities.csproj", "{1586cbee-11c0-4681-8351-9b68abc0cb67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.Core.Presentation", "ndp\cdf\src\NetFx40\Tools\System.Activities.Core.Presentation\System.Activities.Core.Presentation.csproj", "{0dcccfeb-39c6-4467-b72a-473bf6d0a766}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.Core.Presentation", "ndp\cdf\src\NetFx40\Tools\System.Activities.Core.Presentation\System.Activities.Core.Presentation.csproj", "{ccce00e4-e5a7-49a1-ad9a-0f16a7d209a2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.DurableInstancing", "ndp\cdf\src\NetFx40\System.Activities.DurableInstancing\System.Activities.DurableInstancing.csproj", "{2bcfaf99-f0ae-4715-bc86-94b7b76c3cf2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.DurableInstancing", "ndp\cdf\src\NetFx40\System.Activities.DurableInstancing\System.Activities.DurableInstancing.csproj", "{99f89926-c2e0-44d7-b90d-0c2d6c12719c}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.Presentation", "ndp\cdf\src\NetFx40\Tools\System.Activities.Presentation.csproj", "{7004bebc-0564-45e8-8133-fc076fb6536b}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Activities.Presentation", "ndp\cdf\src\NetFx40\Tools\System.Activities.Presentation.csproj", "{e4056f0c-7bb8-4671-93c9-4f72b294274a}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.AddIn", "ndp\fx\src\AddIn\AddIn\System.AddIn.csproj", "{b7325700-e3b5-42dd-ac08-c7bad4a3e05d}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.AddIn", "ndp\fx\src\AddIn\AddIn\System.AddIn.csproj", "{a487f158-b9d1-4951-b2c2-b51a000c1b42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.AddIn.Contract", "ndp\fx\src\AddIn\Contract\System.AddIn.Contract.csproj", "{dfed5b61-ccc9-4afd-ae01-57b032894f2c}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.AddIn.Contract", "ndp\fx\src\AddIn\Contract\System.AddIn.Contract.csproj", "{18d3d22e-e1e0-43c6-b2df-8c3492f6e734}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ComponentModel.DataAnnotations", "ndp\fx\src\xsp\system\DataAnnotations\System.ComponentModel.DataAnnotations.csproj", "{dbb748ad-fc93-41e1-9403-55669b56d6cd}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ComponentModel.DataAnnotations", "ndp\fx\src\xsp\system\DataAnnotations\System.ComponentModel.DataAnnotations.csproj", "{1a76ad9e-8c1c-43e1-8ed8-47b7e14d0bbb}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Configuration", "ndp\fx\src\System.Configuration.csproj", "{62fc083e-241c-4b38-affd-03374c75097c}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Configuration", "ndp\fx\src\Configuration\System.Configuration.csproj", "{d0e5c1bb-46f1-4fbe-9d9b-4d089d88ae09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Core", "ndp\fx\src\Core\System.Core.csproj", "{4514f831-ec02-41cd-a45f-0bfc17e6a086}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Core", "ndp\fx\src\Core\System.Core.csproj", "{39be40c7-445f-4b45-869c-b23a2e23fde2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data", "ndp\fx\src\System.Data.csproj", "{b7cf7b06-93cb-4212-8b4c-b3ae4bdf1408}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data", "ndp\fx\src\data\System.Data.csproj", "{9840a00f-f4ef-456f-9bab-d2f2d41fe20c}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.DataSetExtensions", "ndp\fx\src\DataSet\System.Data.DataSetExtensions.csproj", "{85a14887-5a1d-4414-81b9-16673c563c1d}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.DataSetExtensions", "ndp\fx\src\DataSet\System.Data.DataSetExtensions.csproj", "{763b489f-45c5-4d7e-9b66-9ea5ca5e489c}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Entity", "ndp\fx\src\System.Data.Entity.csproj", "{2d7f2de5-8c6c-4c92-b618-3579151d7de1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Entity", "ndp\fx\src\DataEntity\System.Data.Entity.csproj", "{a490eb50-3633-470a-87bf-b0c849557c30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Entity.Design", "ndp\fx\src\DataEntityDesign\Design\System\Data\System.Data.Entity.Design.csproj", "{2bf5930e-980e-41da-8b6b-16c59819c1cc}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Entity.Design", "ndp\fx\src\DataEntityDesign\Design\System.Data.Entity.Design.csproj", "{4bde1dc5-2486-498b-bde7-33f76f1b68ee}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Linq", "ndp\fx\src\System.Data.Linq.csproj", "{dd86c122-a8ae-474b-ae7e-18f932130ab8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Linq", "ndp\fx\src\DLinq\Dlinq\System.Data.Linq.csproj", "{49014ae7-4e87-4d86-9eb1-d5bc3681533b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services", "ndp\fx\src\DataWeb\System.Data.Services.csproj", "{712e9786-c463-4588-bde0-5c3645adf616}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services", "ndp\fx\src\DataWeb\Server\System.Data.Services.csproj", "{b9f2448d-2db9-434b-851c-53a09734cbdb}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services.Client", "ndp\fx\src\DataWeb\System.Data.Services.Client.csproj", "{95be2218-e0b0-4aa4-bb46-5461792ae4da}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services.Client", "ndp\fx\src\DataWeb\System.Data.Services.Client.csproj", "{5a57ea99-2f5d-4d05-b116-9249901001ad}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services.Design", "ndp\fx\src\DataWeb\System.Data.Services.Design.csproj", "{5a86e764-ba38-4e20-b6f3-32dd0dbc69b7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.Services.Design", "ndp\fx\src\DataWeb\Design\System.Data.Services.Design.csproj", "{f8b42c60-e19f-4093-af94-ff9491baf71e}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.SqlXml", "ndp\fx\src\XmlUtils\System\Xml\Xsl\System.Data.SqlXml.csproj", "{b1075072-2dbb-4364-b1c5-c4dfefd5dbde}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.SqlXml", "ndp\fx\src\XmlUtils\System.Data.SqlXml.csproj", "{f9d0886f-4db6-4eb0-b600-3ee27729dda5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Drawing", "ndp\fx\src\System.Drawing.csproj", "{2defc6a9-7eda-4106-b78e-1f3f5a439dd7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Drawing", "ndp\fx\src\System.Drawing.csproj", "{d5c689ab-f8f6-43bd-aa96-6bea230fdb80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IdentityModel", "ndp\cdf\src\WCF\IdentityModel\System.IdentityModel.csproj", "{e702efbd-2021-4507-addc-9bf3644b9a30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IdentityModel", "ndp\cdf\src\WCF\IdentityModel\System.IdentityModel.csproj", "{3802c9c2-d063-4618-a4eb-32d22d9ea962}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IdentityModel.Selectors", "ndp\cdf\src\WCF\System.IdentityModel.Selectors.csproj", "{037dd638-49ff-4fe6-9a6d-1c4633702013}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IdentityModel.Selectors", "ndp\cdf\src\WCF\System.IdentityModel.Selectors.csproj", "{0af47e22-0506-4f91-96e1-2306ea199431}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Management", "ndp\fx\src\wmi\managed\System\Management\System.Management.csproj", "{43242aed-132d-4300-a169-0fa37cc5dd16}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.Log", "ndp\cdf\src\NetFx35\System.IO.Log\System.IO.Log.csproj", "{644cb7e2-9554-40e4-89ae-f32eee52e9ba}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Messaging", "ndp\cdf\src\System.Messaging.csproj", "{e14b1e5e-fe7c-468b-ac37-038e9e4dfcf4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Management", "ndp\fx\src\wmi\managed\System\Management\System.Management.csproj", "{58d401d6-da57-457f-ad95-ca2365a2d271}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Net", "ndp\fx\src\SystemNet\System.Net.csproj", "{89c08b3c-f28e-4a90-95b8-68b8dce93bd1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Messaging", "ndp\cdf\src\NetFx20\System.Messaging\System.Messaging.csproj", "{7b393a86-4978-4a39-a643-691a00ba8f5b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Numerics", "ndp\fx\src\Numerics\System.Numerics.csproj", "{12d0207e-d90e-4ca8-bc13-362d7c92bb58}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Net", "ndp\fx\src\SystemNet\System.Net.csproj", "{fbbfa60d-8a38-4ea1-a6fa-d869f0aaaf8b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Caching", "ndp\fx\src\Caching\System.Runtime.Caching.csproj", "{f70d836e-2e04-4b24-89c8-4f60fd82840f}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Numerics", "ndp\fx\src\Numerics\System.Numerics.csproj", "{2852424c-b5ef-4641-bab5-20be2a1a4a7a}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.DurableInstancing", "ndp\cdf\src\NetFx40\System.Runtime.DurableInstancing\System.Runtime.DurableInstancing.csproj", "{4f561819-62d0-40c7-b906-6b1930709aeb}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Caching", "ndp\fx\src\Caching\System.Runtime.Caching.csproj", "{94833606-4765-4c09-a6fb-2eb4f3da6b62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Remoting", "ndp\clr\src\managedlibraries\remoting\System.Runtime.Remoting.csproj", "{3848aeee-a670-44c0-bc44-de800e7f1e43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.DurableInstancing", "ndp\cdf\src\NetFx40\System.Runtime.DurableInstancing\System.Runtime.DurableInstancing.csproj", "{8d9c4a8f-8f5d-4cb9-a471-83811236198d}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Serialization", "ndp\cdf\src\WCF\Serialization\System.Runtime.Serialization.csproj", "{764e8d76-0734-41ee-9aa6-6d506b3faaf6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Remoting", "ndp\clr\src\managedlibraries\remoting\System.Runtime.Remoting.csproj", "{56b6c67a-2846-49cc-8742-5fd72b47fdef}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Security", "ndp\clr\src\managedlibraries\security\system\security\System.Security.csproj", "{c18b4728-33a6-4e6f-84bd-0df1f3e89de8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Runtime.Serialization", "ndp\cdf\src\WCF\Serialization\System.Runtime.Serialization.csproj", "{68a96ebf-269e-4f3f-9dbf-6238c2c42699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel", "ndp\cdf\src\WCF\System.ServiceModel.csproj", "{7ff0a4b0-55ab-4a70-a79c-292085c66526}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Security", "ndp\clr\src\managedlibraries\security\System.Security.csproj", "{07cda927-7d1e-472e-b3b7-a07277345f84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Activation", "ndp\cdf\src\WCF\System.ServiceModel.Activation\System.ServiceModel.Activation.csproj", "{bf83283c-ab60-4d7f-b711-de554132ea90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel", "ndp\cdf\src\WCF\ServiceModel\System.ServiceModel.csproj", "{6f4c0ed5-7678-495b-bc35-1d78d582539d}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Activities", "ndp\cdf\src\NetFx40\System.ServiceModel.Activities\System.ServiceModel.Activities.csproj", "{eb3ff1e6-c2e6-4daf-b2a0-c8ecda84c2e0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Activation", "ndp\cdf\src\WCF\System.ServiceModel.Activation\System.ServiceModel.Activation.csproj", "{44ac822a-f6f1-4723-a37b-7a535426b137}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Channels", "ndp\cdf\src\NetFx40\System.ServiceModel.Channels\System.ServiceModel.Channels.csproj", "{bb483d98-ba0e-4598-8b3b-bad4b6457316}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Activities", "ndp\cdf\src\NetFx40\System.ServiceModel.Activities\System.ServiceModel.Activities.csproj", "{43dda1de-2fce-437b-a818-5a95d6198147}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Discovery", "ndp\cdf\src\NetFx40\System.ServiceModel.Discovery\System.ServiceModel.Discovery.csproj", "{76f233c7-4a42-48ab-a42f-b6b8cf8dd24b}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Channels", "ndp\cdf\src\NetFx40\System.ServiceModel.Channels\System.ServiceModel.Channels.csproj", "{0d5fd5b9-1a03-4081-8f8d-296aacf6d349}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Internals", "ndp\cdf\src\System.ServiceModel.Internals\System.ServiceModel.Internals.csproj", "{13d63794-0ab7-472b-a040-b08a7b97ad15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Discovery", "ndp\cdf\src\NetFx40\System.ServiceModel.Discovery\System.ServiceModel.Discovery.csproj", "{10f9691a-3bd9-4640-8980-2ee7331b64d6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Routing", "ndp\cdf\src\NetFx40\System.ServiceModel.Routing\System.ServiceModel.Routing.csproj", "{5cf3926f-601a-4004-802b-46048282d397}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Internals", "ndp\cdf\src\System.ServiceModel.Internals\System.ServiceModel.Internals.csproj", "{623f4031-ab77-4f86-8dd2-41700138c932}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.WasHosting", "ndp\cdf\src\WCF\WasHosting\System\ServiceModel\WasHosting\System.ServiceModel.WasHosting.csproj", "{4ce87bc2-e771-44f2-969f-8a9c84791da7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Routing", "ndp\cdf\src\NetFx40\System.ServiceModel.Routing\System.ServiceModel.Routing.csproj", "{8f471c84-c33e-46db-aa81-769dcf685e6b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Web", "ndp\cdf\src\NetFx35\System.ServiceModel.Web\System.ServiceModel.Web.csproj", "{c9e5a990-39f0-4fa8-b09b-d049e942435b}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.WasHosting", "ndp\cdf\src\WCF\WasHosting\System.ServiceModel.WasHosting.csproj", "{09d9b122-da84-4341-be9b-24718b46cc64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Transactions", "ndp\cdf\src\System.Transactions.csproj", "{2a95b55e-3b5a-4e1e-a431-aee5e94f1015}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.ServiceModel.Web", "ndp\cdf\src\NetFx35\System.ServiceModel.Web\System.ServiceModel.Web.csproj", "{bbe461a1-3f38-48ac-9d7e-8b74d84d315d}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web", "ndp\fx\src\System.Web.csproj", "{9c1ad991-3020-4f50-bb83-db98edfb5982}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Transactions", "ndp\cdf\src\NetFx20\System.Transactions\System.Transactions.csproj", "{bffc8405-8662-4c8f-becf-d11c9d868a35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.ApplicationServices", "ndp\fx\src\xsp\system\ApplicationServices\System.Web.ApplicationServices.csproj", "{f1d57055-7688-4e13-b0f0-6e876a2edde7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web", "ndp\fx\src\xsp\system\Web\System.Web.csproj", "{08ebc8e2-b653-4d46-989f-633abab8ebdf}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.DynamicData", "ndp\fx\src\xsp\system\DynamicData\System.Web.DynamicData.csproj", "{d7cdab6f-467d-41b3-b793-a19554d04203}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.ApplicationServices", "ndp\fx\src\xsp\system\ApplicationServices\System.Web.ApplicationServices.csproj", "{dc16f369-d47a-4c5a-a415-fc69e1b7e389}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Entity", "ndp\fx\src\DataWebControls\System.Web.Entity.csproj", "{2ac81f9f-935a-4f41-adad-ad08249e6c85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.DynamicData", "ndp\fx\src\xsp\system\DynamicData\System.Web.DynamicData.csproj", "{a96aea02-d8b8-474d-a07c-938372d25b85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Entity.Design", "ndp\fx\src\DataWebControlsDesign\System.Web.Entity.Design.csproj", "{c58b69ad-e573-42de-ba6d-52720853f6b4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Entity", "ndp\fx\src\DataWebControls\System.Web.Entity.csproj", "{57f73830-5e4c-414a-83ab-d3258b84c606}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Extensions", "ndp\fx\src\xsp\system\Extensions\System.Web.Extensions.csproj", "{708bb3f5-e8af-49cf-b23e-a6db9aeafb51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Entity.Design", "ndp\fx\src\DataWebControlsDesign\System.Web.Entity.Design.csproj", "{dda1f107-2780-47a7-8e95-be5dc95c2923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Mobile", "ndp\fx\src\mit\System\Web\System.Web.Mobile.csproj", "{4cf218ed-db7b-4ade-ab81-1d522e3b8214}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Extensions", "ndp\fx\src\xsp\system\Extensions\System.Web.Extensions.csproj", "{a632c7da-9cbd-4838-a1fc-b0d23b594fd7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Routing", "ndp\fx\src\xsp\system\Routing\Properties\System.Web.Routing.csproj", "{d3bc49ea-e9f6-4f45-b21b-1b7732ff790b}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Mobile", "ndp\fx\src\mit\System\Web\System.Web.Mobile.csproj", "{d402e643-ac92-477d-9548-3bf6fd3c5529}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Services", "ndp\cdf\src\System.Web.Services.csproj", "{6a85b512-53f5-4d4f-a7a2-10f5d452bd05}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Routing", "ndp\fx\src\xsp\system\Routing\System.Web.Routing.csproj", "{f0054212-f5c4-4238-a3c0-f593a26b292a}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Windows.Forms", "System.Windows.Forms.csproj", "{926ce2ed-23a2-43c6-9a33-68786a6ffab6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Web.Services", "ndp\cdf\src\NetFx20\System.Web.Services\System.Web.Services.csproj", "{4cd44674-f3f4-4f30-ab64-a7f4b0439151}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.Activities", "ndp\cdf\src\WF\Activities\System.Workflow.Activities.csproj", "{2b01fc0d-cd0c-4a3c-bdf0-e6793c9461cb}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Windows.Forms", "ndp\fx\src\System.Windows.Forms.csproj", "{ae480217-2183-48b8-ae7d-3142891cab50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.ComponentModel", "ndp\cdf\src\WF\Common\System.Workflow.ComponentModel.csproj", "{6eebf2ea-816a-4962-b0c7-83675142134c}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.Activities", "ndp\cdf\src\WF\Activities\System.Workflow.Activities.csproj", "{00f33ce6-16c7-4a62-8036-dff67de6a7dc}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.Runtime", "ndp\cdf\src\WF\System.Workflow.Runtime.csproj", "{e1df5ca8-04b1-4c5b-bd8b-13bb1f9555ca}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.ComponentModel", "ndp\cdf\src\WF\Common\System.Workflow.ComponentModel.csproj", "{f2f943b7-1217-4c98-9297-4b7382fb521c}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.WorkflowServices", "ndp\cdf\src\NetFx35\System.WorkflowServices\System.WorkflowServices.csproj", "{75641e77-b5b0-4266-8579-832d23421d57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Workflow.Runtime", "ndp\cdf\src\WF\RunTime\System.Workflow.Runtime.csproj", "{f2723a7c-0cd5-46c2-83b9-01959bfd603b}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xaml.Hosting", "ndp\cdf\src\NetFx40\System.Xaml.Hosting\System.Xaml.Hosting.csproj", "{cdd2a9ff-bf41-42a3-86fd-2938eec61058}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.WorkflowServices", "ndp\cdf\src\NetFx35\System.WorkflowServices\System.WorkflowServices.csproj", "{70c88411-c4c6-427a-b76d-0da6e1600921}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml", "ndp\fx\src\System.Xml.csproj", "{328d1889-8b13-460e-908d-cbb168675ec2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xaml.Hosting", "ndp\cdf\src\NetFx40\System.Xaml.Hosting\System.Xaml.Hosting.csproj", "{7212aed1-50e3-49c9-b31b-4629acbc7d5a}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml.Linq", "ndp\fx\src\XLinq\System\Xml\Linq\System.Xml.Linq.csproj", "{42dfc134-9941-47ae-a039-49891b505d99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml", "ndp\fx\src\Xml\System.Xml.csproj", "{cfe60703-bdf5-402e-b545-c675c65ae9c8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIAutomationClient", "wpf\UIAutomationClient.csproj", "{1c68f13d-9d2d-4eb4-b809-caf848ceff62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml.Linq", "ndp\fx\src\XLinq\System.Xml.Linq.csproj", "{87f1dcdc-561c-4632-a51f-2cb068ecbb88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIAutomationClientsideProviders", "wpf\UIAutomationClientsideProviders.csproj", "{0a3d46b3-a287-46f4-b1d2-d4d979a0a2bd}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIAutomationClient", "wpf\src\UIAutomation\UIAutomationClient\UIAutomationClient.csproj", "{73c0a066-9213-4198-95fc-9719b3824429}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsBase", "wpf\WindowsBase.csproj", "{e8cc5cf6-6385-40cd-b97a-23ad52c4e9e8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UIAutomationClientsideProviders", "wpf\src\UIAutomation\Win32Providers\UIAutomationClientsideProviders.csproj", "{c970985c-07af-4d26-84e0-ddf2799995d9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WsatConfig", "ndp\cdf\src\wcf\tools\WsatConfig.csproj", "{d4a2c575-872e-4fb1-8b9e-b56e2587d7ba}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsBase", "wpf\src\WindowsBase.csproj", "{3df87ee5-d19e-4cdc-bf4e-527c7858ff70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WsatUI", "ndp\cdf\src\WCF\Tools\WsatConfig\Configuration\WsatUI.csproj", "{1078498e-5e5d-47dd-ab0b-d988a9b602db}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WsatConfig", "ndp\cdf\src\WCF\Tools\WsatConfig\WsatConfig.csproj", "{b52faf75-1433-4b45-bd42-3890ea9c55b9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamlBuildTask", "ndp\cdf\src\NetFx40\XamlBuildTask\XamlBuildTask.csproj", "{698c5755-9bf7-40b9-a62e-6e61778703ef}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WsatUI", "ndp\cdf\src\WCF\Tools\WsatConfig\WsatUI.csproj", "{d22c9569-b3ff-4c31-9a82-89926480d7a2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XamlBuildTask", "ndp\cdf\src\NetFx40\XamlBuildTask\XamlBuildTask.csproj", "{b0a55432-bc6e-40a0-884a-8d9cdfa32298}"
 EndProject
 Global
     GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{44ac822a-f6f1-4723-a37b-7a535426b137}</ProjectGuid>
+    <OutputPath>.</OutputPath>
+    <OutputType>Library</OutputType>
+    <AssemblyName>System.ServiceModel.Activation</AssemblyName>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
+    <NoStdLib>True</NoStdLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <DefineConstants>CODE_ANALYSIS_BASELINE;TRACE;RETAIL;WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\clr\src\bcl\mscorlib.csproj">
+      <Project>{edd76f80-29f6-4590-a3ef-f885b38da1b0}</Project>
+      <Name>mscorlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SMDiagnostics\SMDiagnostics.csproj">
+      <Project>{40431cae-dd74-48fd-bfe3-d2b35e27b863}</Project>
+      <Name>SMDiagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\System.csproj">
+      <Project>{e4fae737-f889-49a8-8db5-92488fc98c22}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx40\System.Activities\System.Activities.csproj">
+      <Project>{1586cbee-11c0-4681-8351-9b68abc0cb67}</Project>
+      <Name>System.Activities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\Configuration\System.Configuration.csproj">
+      <Project>{d0e5c1bb-46f1-4fbe-9d9b-4d089d88ae09}</Project>
+      <Name>System.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\Core\System.Core.csproj">
+      <Project>{39be40c7-445f-4b45-869c-b23a2e23fde2}</Project>
+      <Name>System.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IdentityModel\System.IdentityModel.csproj">
+      <Project>{3802c9c2-d063-4618-a4eb-32d22d9ea962}</Project>
+      <Name>System.IdentityModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx40\System.Runtime.DurableInstancing\System.Runtime.DurableInstancing.csproj">
+      <Project>{8d9c4a8f-8f5d-4cb9-a471-83811236198d}</Project>
+      <Name>System.Runtime.DurableInstancing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\clr\src\managedlibraries\security\System.Security.csproj">
+      <Project>{07cda927-7d1e-472e-b3b7-a07277345f84}</Project>
+      <Name>System.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceModel\System.ServiceModel.csproj">
+      <Project>{6f4c0ed5-7678-495b-bc35-1d78d582539d}</Project>
+      <Name>System.ServiceModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx40\System.ServiceModel.Activities\System.ServiceModel.Activities.csproj">
+      <Project>{43dda1de-2fce-437b-a818-5a95d6198147}</Project>
+      <Name>System.ServiceModel.Activities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\System.ServiceModel.Internals\System.ServiceModel.Internals.csproj">
+      <Project>{623f4031-ab77-4f86-8dd2-41700138c932}</Project>
+      <Name>System.ServiceModel.Internals</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx20\System.Transactions\System.Transactions.csproj">
+      <Project>{bffc8405-8662-4c8f-becf-d11c9d868a35}</Project>
+      <Name>System.Transactions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\xsp\system\Web\System.Web.csproj">
+      <Project>{08ebc8e2-b653-4d46-989f-633abab8ebdf}</Project>
+      <Name>System.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx20\System.Web.Services\System.Web.Services.csproj">
+      <Project>{4cd44674-f3f4-4f30-ab64-a7f4b0439151}</Project>
+      <Name>System.Web.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\NetFx40\System.Xaml.Hosting\System.Xaml.Hosting.csproj">
+      <Project>{7212aed1-50e3-49c9-b31b-4629acbc7d5a}</Project>
+      <Name>System.Xaml.Hosting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\Xml\System.Xml.csproj">
+      <Project>{cfe60703-bdf5-402e-b545-c675c65ae9c8}</Project>
+      <Name>System.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\XLinq\System.Xml.Linq.csproj">
+      <Project>{87f1dcdc-561c-4632-a51f-2cb068ecbb88}</Project>
+      <Name>System.Xml.Linq</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web.RegularExpressions" />
+    <Reference Include="System.Xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="System\ServiceModel\Activation\ApplyHostConfigurationBehavior.cs" />
+    <Compile Include="System\ServiceModel\Activation\AspNetPartialTrustHelpers.cs" />
+    <Compile Include="System\ServiceModel\Activation\AspNetRouteServiceHttpHandler.cs" />
+    <Compile Include="System\ServiceModel\Activation\CollectibleLRUCache.cs" />
+    <Compile Include="System\ServiceModel\Activation\Configuration\AppSettings.cs" />
+    <Compile Include="System\ServiceModel\Activation\Diagnostics\TraceCode.cs" />
+    <Compile Include="System\ServiceModel\Activation\Diagnostics\TraceUtility.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedAspNetEnvironment.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedBindingBehavior.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedHttpContext.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedHttpRequestAsyncResult.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedHttpTransportManager.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedImpersonationContext.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedNamedPipeTransportManager.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedTcpTransportManager.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedTransportConfigurationBase.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostedTransportConfigurationManager.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostingEnvironmentWrapper.cs" />
+    <Compile Include="System\ServiceModel\Activation\HostingMessageProperty.cs" />
+    <Compile Include="System\ServiceModel\Activation\HttpHandler.cs" />
+    <Compile Include="System\ServiceModel\Activation\HttpHostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activation\HttpModule.cs" />
+    <Compile Include="System\ServiceModel\Activation\HttpRequestTraceRecord.cs" />
+    <Compile Include="System\ServiceModel\Activation\HttpsHostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activation\Interop\SafeCloseHandleCritical.cs" />
+    <Compile Include="System\ServiceModel\Activation\Interop\SafeHGlobalHandleCritical.cs" />
+    <Compile Include="System\ServiceModel\Activation\Interop\SafeNativeMethods.cs" />
+    <Compile Include="System\ServiceModel\Activation\IServiceModelActivationHandler.cs" />
+    <Compile Include="System\ServiceModel\Activation\MetabaseReader.cs" />
+    <Compile Include="System\ServiceModel\Activation\MetabaseSettings.cs" />
+    <Compile Include="System\ServiceModel\Activation\MSAdminBase.cs" />
+    <Compile Include="System\ServiceModel\Activation\MsmqHostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activation\NamedPipeHostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceActivationBuildProviderAttribute.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceBuildProvider.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceDeploymentInfo.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceHostFactory.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceHttpHandlerFactory.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceHttpModule.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceMemoryGates.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceParser.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceRoute.cs" />
+    <Compile Include="System\ServiceModel\Activation\ServiceRouteHandler.cs" />
+    <Compile Include="System\ServiceModel\Activation\TcpHostedTransportConfiguration.cs" />
+    <Compile Include="System\ServiceModel\Activities\Activation\ServiceModelActivitiesActivationHandler.cs" />
+    <Compile Include="System\ServiceModel\Activities\Activation\ServiceModelActivitiesActivationHandlerAsync.cs" />
+    <Compile Include="System\ServiceModel\Activities\Activation\WorkflowServiceHostFactory.cs" />
+    <Compile Include="System\ServiceModel\Activities\Activation\XamlBuildProviderExtension.cs" />
+    <Compile Include="System\ServiceModel\Channels\MsmqHostedTransportManager.cs" />
+    <Compile Include="System\ServiceModel\ServiceHostingEnvironment.cs" />
+    <Compile Include="TD.Designer.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

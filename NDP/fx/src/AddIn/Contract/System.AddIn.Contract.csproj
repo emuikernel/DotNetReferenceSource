@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{18d3d22e-e1e0-43c6-b2df-8c3492f6e734}</ProjectGuid>
+    <OutputPath>.</OutputPath>
+    <OutputType>Library</OutputType>
+    <AssemblyName>System.AddIn.Contract</AssemblyName>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
+    <NoStdLib>True</NoStdLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <DefineConstants>CODE_ANALYSIS_BASELINE;FEATURE_LEGACYSURFACEAREA;FEATURE_UTF32;FEATURE_UTF7;PRODUCTION_BUILD;TRACE;RETAIL;WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\clr\src\bcl\mscorlib.csproj">
+      <Project>{edd76f80-29f6-4590-a3ef-f885b38da1b0}</Project>
+      <Name>mscorlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\System.csproj">
+      <Project>{e4fae737-f889-49a8-8db5-92488fc98c22}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyAttributes.cs" />
+    <Compile Include="System\Addin\Contract\AddInContractAttribute.cs" />
+    <Compile Include="System\Addin\Contract\assemblyattribs.cs" />
+    <Compile Include="System\Addin\Contract\Collections.cs" />
+    <Compile Include="System\Addin\Contract\GenericCollections.cs" />
+    <Compile Include="System\Addin\Contract\IContract.cs" />
+    <Compile Include="System\Addin\Contract\IEnumeratorContract.cs" />
+    <Compile Include="System\Addin\Contract\IExecutorExtensionContract.cs" />
+    <Compile Include="System\Addin\Contract\IListContract.cs" />
+    <Compile Include="System\Addin\Contract\INativeHandleContract.cs" />
+    <Compile Include="System\Addin\Contract\ISerializableObjectContract.cs" />
+    <Compile Include="System\Addin\Contract\QualificationDataAttribute.cs" />
+    <Compile Include="System\Addin\Contract\ReflectionContracts.cs" />
+    <Compile Include="System\Addin\Contract\RemoteArgument.cs" />
+    <Compile Include="System\Addin\Contract\ServiceContracts.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

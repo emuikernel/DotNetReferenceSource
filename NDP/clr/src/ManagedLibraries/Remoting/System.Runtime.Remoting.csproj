@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{56b6c67a-2846-49cc-8742-5fd72b47fdef}</ProjectGuid>
+    <OutputPath>.</OutputPath>
+    <OutputType>Library</OutputType>
+    <AssemblyName>System.Runtime.Remoting</AssemblyName>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
+    <NoStdLib>True</NoStdLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <DefineConstants>CODE_ANALYSIS_BASELINE;CODE_ANALYSIS;FEATURE_APPDOMAINMANAGER_INITOPTIONS;FEATURE_APPDOMAIN_RESOURCE_MONITORING;FEATURE_APPX;FEATURE_APTCA;FEATURE_ASCII;FEATURE_ASYNC_IO;FEATURE_BCL_FORMATTING;FEATURE_CAS_POLICY;FEATURE_CLASSIC_COMINTEROP;FEATURE_CLICKONCE;FEATURE_CODEPAGES_FILE;FEATURE_COLLECTIBLE_TYPES;FEATURE_COMINTEROP;FEATURE_COMINTEROP_APARTMENT_SUPPORT;FEATURE_COMINTEROP_MANAGED_ACTIVATION;FEATURE_COMINTEROP_UNMANAGED_ACTIVATION;FEATURE_COMINTEROP_WINRT_DESKTOP_HOST;FEATURE_COMPRESSEDSTACK;FEATURE_CORRUPTING_EXCEPTIONS;FEATURE_CRYPTO;FEATURE_DISPLAY_CULTURE_INFO;FEATURE_DISPLAY_REGION_INFO;FEATURE_ENCODINGNLS;FEATURE_EXCEPTIONDISPATCHINFO;FEATURE_EXCEPTION_NOTIFICATIONS;FEATURE_FUSION;FEATURE_HOSTED_BINDER;FEATURE_HOSTING;FEATURE_IDENTITY_REFERENCE;FEATURE_IMPERSONATION;FEATURE_INCLUDE_ALL_INTERFACES;FEATURE_ISOLATED_STORAGE_QUOTA_ENFORCEMENT;FEATURE_ISOSTORE;FEATURE_LATIN1;FEATURE_LEAK_CULTURE_INFO;FEATURE_LEGACYSURFACEAREA;FEATURE_LIST_PREDICATES;FEATURE_LOADER_OPTIMIZATION;FEATURE_MACL;FEATURE_MANAGED_ETW;FEATURE_METHOD_RENTAL;FEATURE_MULTIMODULE_ASSEMBLIES;FEATURE_MULTIPLATFORM;FEATURE_NONGENERIC_COLLECTIONS;FEATURE_PERFMON;FEATURE_PLS;FEATURE_RANDOMIZED_STRING_HASHING;FEATURE_REFLECTION_ONLY_LOAD;FEATURE_REMOTING;FEATURE_RWLOCK;FEATURE_SERIALIZATION;FEATURE_SORT_TABLES;FEATURE_STRONGNAME_MIGRATION;FEATURE_SYNCHRONIZATIONCONTEXT;FEATURE_SYNCHRONIZATIONCONTEXT_WAIT;FEATURE_SYNTHETIC_CULTURES;FEATURE_TYPEEQUIVALENCE;FEATURE_USE_INSTANCE_TAGGED_SEH_CODES;FEATURE_USE_LCID;FEATURE_UTF32;FEATURE_UTF7;FEATURE_VALIDATOR;FEATURE_WIN32_REGISTRY;FEATURE_X509;FEATURE_X509_SECURESTRINGS;PROFILING_SUPPORTED;FEATURE_MULTICOREJIT;FEATURE_USE_ASM_GC_WRITE_BARRIERS;FEATURE_SYMDIFF;FEATURE_WIN_DB_APPCOMPAT;TRACE;RETAIL;WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\bcl\mscorlib.csproj">
+      <Project>{edd76f80-29f6-4590-a3ef-f885b38da1b0}</Project>
+      <Name>mscorlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\System.csproj">
+      <Project>{e4fae737-f889-49a8-8db5-92488fc98c22}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\data\System.Data.csproj">
+      <Project>{9840a00f-f4ef-456f-9bab-d2f2d41fe20c}</Project>
+      <Name>System.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\xsp\system\Web\System.Web.csproj">
+      <Project>{08ebc8e2-b653-4d46-989f-633abab8ebdf}</Project>
+      <Name>System.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\fx\src\Xml\System.Xml.csproj">
+      <Project>{cfe60703-bdf5-402e-b545-c675c65ae9c8}</Project>
+      <Name>System.Xml</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="channels\core\basetransportheaders.cs" />
+    <Compile Include="channels\core\basicasyncresult.cs" />
+    <Compile Include="channels\core\bytebufferpool.cs" />
+    <Compile Include="channels\core\chunkedmemorystream.cs" />
+    <Compile Include="channels\core\commonchannelkeys.cs" />
+    <Compile Include="channels\core\corechannel.cs" />
+    <Compile Include="channels\core\exclusivetcplistener.cs" />
+    <Compile Include="channels\core\nativemethods.cs" />
+    <Compile Include="channels\core\remotingauthentication.cs" />
+    <Compile Include="channels\core\requestqueue.cs" />
+    <Compile Include="channels\core\socketcache.cs" />
+    <Compile Include="channels\core\socketmanager.cs" />
+    <Compile Include="channels\core\socketstream.cs" />
+    <Compile Include="channels\core\streamhelper.cs" />
+    <Compile Include="channels\core\stringhelper.cs" />
+    <Compile Include="channels\http\combinedhttpchannel.cs" />
+    <Compile Include="channels\http\httpchannelhelper.cs" />
+    <Compile Include="channels\http\httpclientchannel.cs" />
+    <Compile Include="channels\http\httpremotinghandler.cs" />
+    <Compile Include="channels\http\httpserverchannel.cs" />
+    <Compile Include="channels\http\httpsocketmanager.cs" />
+    <Compile Include="channels\http\httpstreams.cs" />
+    <Compile Include="channels\ipc\ipcchannel.cs" />
+    <Compile Include="channels\ipc\ipcchannelhelper.cs" />
+    <Compile Include="channels\ipc\ipcclientchannel.cs" />
+    <Compile Include="channels\ipc\ipcclientmanager.cs" />
+    <Compile Include="channels\ipc\ipcmanager.cs" />
+    <Compile Include="channels\ipc\ipcport.cs" />
+    <Compile Include="channels\ipc\ipcserverchannel.cs" />
+    <Compile Include="channels\ipc\pipestream.cs" />
+    <Compile Include="channels\ipc\portcache.cs" />
+    <Compile Include="channels\ipc\win32namedpipes.cs" />
+    <Compile Include="channels\sinks\binaryformattersinks.cs" />
+    <Compile Include="channels\sinks\soapformattersinks.cs" />
+    <Compile Include="channels\tcp\combinedtcpchannel.cs" />
+    <Compile Include="channels\tcp\tcpchannelhelper.cs" />
+    <Compile Include="channels\tcp\tcpclientchannel.cs" />
+    <Compile Include="channels\tcp\tcpclientsocketmanager.cs" />
+    <Compile Include="channels\tcp\tcpserverchannel.cs" />
+    <Compile Include="channels\tcp\tcpsocketmanager.cs" />
+    <Compile Include="channels\tcp\tcpstreams.cs" />
+    <Compile Include="channels\tcp\tcpwireprotocol.cs" />
+    <Compile Include="Configuration\AppSettings.cs" />
+    <Compile Include="maindll\SuppressMessages.cs" />
+    <Compile Include="metadata\metadata.cs" />
+    <Compile Include="metadata\sdlchannelsink.cs" />
+    <Compile Include="metadata\sudscommon.cs" />
+    <Compile Include="metadata\sudsparser.cs" />
+    <Compile Include="metadata\sudswriter.cs" />
+    <Compile Include="metadata\wsdlparser.cs" />
+    <Compile Include="metadata\wsdlwriter.cs" />
+    <Compile Include="services\remotingclientproxy.cs" />
+    <Compile Include="services\remotingservice.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

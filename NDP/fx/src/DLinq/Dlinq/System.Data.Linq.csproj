@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
+    <ProjectGuid>{49014ae7-4e87-4d86-9eb1-d5bc3681533b}</ProjectGuid>
+    <OutputPath>.</OutputPath>
+    <OutputType>Library</OutputType>
+    <AssemblyName>System.Data.Linq</AssemblyName>
+    <UseVSHostingProcess>False</UseVSHostingProcess>
+    <NoStdLib>True</NoStdLib>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <DefineConstants>CODE_ANALYSIS_BASELINE;FEATURE_LEGACYSURFACEAREA;FEATURE_UTF32;FEATURE_UTF7;ILGEN;SYSTEM_DATA_LINQ;TRACE;RETAIL;WIN32</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " >
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\clr\src\bcl\mscorlib.csproj">
+      <Project>{edd76f80-29f6-4590-a3ef-f885b38da1b0}</Project>
+      <Name>mscorlib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\System.csproj">
+      <Project>{e4fae737-f889-49a8-8db5-92488fc98c22}</Project>
+      <Name>System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AddIn\Contract\System.AddIn.Contract.csproj">
+      <Project>{18d3d22e-e1e0-43c6-b2df-8c3492f6e734}</Project>
+      <Name>System.AddIn.Contract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\System.Core.csproj">
+      <Project>{39be40c7-445f-4b45-869c-b23a2e23fde2}</Project>
+      <Name>System.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\data\System.Data.csproj">
+      <Project>{9840a00f-f4ef-456f-9bab-d2f2d41fe20c}</Project>
+      <Name>System.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\cdf\src\WCF\Serialization\System.Runtime.Serialization.csproj">
+      <Project>{68a96ebf-269e-4f3f-9dbf-6238c2c42699}</Project>
+      <Name>System.Runtime.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\clr\src\managedlibraries\security\System.Security.csproj">
+      <Project>{07cda927-7d1e-472e-b3b7-a07277345f84}</Project>
+      <Name>System.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\cdf\src\NetFx20\System.Transactions\System.Transactions.csproj">
+      <Project>{bffc8405-8662-4c8f-becf-d11c9d868a35}</Project>
+      <Name>System.Transactions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Xml\System.Xml.csproj">
+      <Project>{cfe60703-bdf5-402e-b545-c675c65ae9c8}</Project>
+      <Name>System.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\XLinq\System.Xml.Linq.csproj">
+      <Project>{87f1dcdc-561c-4632-a51f-2cb068ecbb88}</Project>
+      <Name>System.Xml.Linq</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\misc\SecurityUtils.cs" />
+    <Compile Include="..\DbmlShared\Mapping.cs" />
+    <Compile Include="ChangeConflicts.cs" />
+    <Compile Include="ChangeDirector.cs" />
+    <Compile Include="ChangeProcessor.cs" />
+    <Compile Include="ChangeTracker.cs" />
+    <Compile Include="CompiledQuery.cs" />
+    <Compile Include="DataBindingList.cs" />
+    <Compile Include="DataContext.cs" />
+    <Compile Include="DataQuery.cs" />
+    <Compile Include="DataServices.cs" />
+    <Compile Include="DataShape.cs" />
+    <Compile Include="DbConvert.cs" />
+    <Compile Include="EntitySetDataBindingList.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="FunctionResults.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IdentityManager.cs" />
+    <Compile Include="Mapping\Accessors.cs" />
+    <Compile Include="Mapping\AttributedMetaModel.cs" />
+    <Compile Include="Mapping\Attributes.cs" />
+    <Compile Include="Mapping\MappedMetaModel.cs" />
+    <Compile Include="Mapping\MappingSource.cs" />
+    <Compile Include="Mapping\MetaModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\IDataServices.cs" />
+    <Compile Include="Provider\IProvider.cs" />
+    <Compile Include="SortableBindingList.cs" />
+    <Compile Include="SqlClient\Common\DbFormatter.cs" />
+    <Compile Include="SqlClient\Common\Expressions.cs" />
+    <Compile Include="SqlClient\Common\IConnectionManager.cs" />
+    <Compile Include="SqlClient\Common\InheritanceRules.cs" />
+    <Compile Include="SqlClient\Common\SqlFactory.cs" />
+    <Compile Include="SqlClient\Common\SqlNode.cs" />
+    <Compile Include="SqlClient\Common\SqlNodeAnnotation.cs" />
+    <Compile Include="SqlClient\Common\SqlNodeAnnotations.cs" />
+    <Compile Include="SqlClient\Common\SqlNodeTypeOperators.cs" />
+    <Compile Include="SqlClient\Common\SqlServer2KCompatibilityAnnotation.cs" />
+    <Compile Include="SqlClient\Common\SqlServer2KCompatibilityCheck.cs" />
+    <Compile Include="SqlClient\Common\SqlVisitor.cs" />
+    <Compile Include="SqlClient\Common\TypeSystem.cs" />
+    <Compile Include="SqlClient\Common\TypeSystemProvider.cs" />
+    <Compile Include="SqlClient\Error.cs" />
+    <Compile Include="SqlClient\OptimizationFlags.cs" />
+    <Compile Include="SqlClient\PerfTimer.cs" />
+    <Compile Include="SqlClient\Query\ContainsRowNumberChecker.cs" />
+    <Compile Include="SqlClient\Query\Funcletizer.cs" />
+    <Compile Include="SqlClient\Query\LongTypeConverter.cs" />
+    <Compile Include="SqlClient\Query\MethodCallConverter.cs" />
+    <Compile Include="SqlClient\Query\QueryConverter.cs" />
+    <Compile Include="SqlClient\Query\SimpleExpression.cs" />
+    <Compile Include="SqlClient\Query\SqlAggregateChecker.cs" />
+    <Compile Include="SqlClient\Query\SqlAliaser.cs" />
+    <Compile Include="SqlClient\Query\SqlAliasesReferenced.cs" />
+    <Compile Include="SqlClient\Query\SqlBinder.cs" />
+    <Compile Include="SqlClient\Query\SqlBooleanizer.cs" />
+    <Compile Include="SqlClient\Query\SqlBooleanMismatchVisitor.cs" />
+    <Compile Include="SqlClient\Query\SqlCaseSimplifier.cs" />
+    <Compile Include="SqlClient\Query\SqlColumnizer.cs" />
+    <Compile Include="SqlClient\Query\SqlComparer.cs" />
+    <Compile Include="SqlClient\Query\SqlCrossApplyToCrossJoin.cs" />
+    <Compile Include="SqlClient\Query\SqlDeflator.cs" />
+    <Compile Include="SqlClient\Query\SqlDuplicator.cs" />
+    <Compile Include="SqlClient\Query\SqlExpander.cs" />
+    <Compile Include="SqlClient\Query\SqlExpressionNullability.cs" />
+    <Compile Include="SqlClient\Query\SqlFlattener.cs" />
+    <Compile Include="SqlClient\Query\SqlFormatter.cs" />
+    <Compile Include="SqlClient\Query\SqlGatherConsumedAliases.cs" />
+    <Compile Include="SqlClient\Query\SqlGatherProducedAliases.cs" />
+    <Compile Include="SqlClient\Query\SqlIdentifier.cs" />
+    <Compile Include="SqlClient\Query\SqlLiftIndependentRowExpressions.cs" />
+    <Compile Include="SqlClient\Query\SqlLiftWhereClauses.cs" />
+    <Compile Include="SqlClient\Query\SqlMethodCallConverter.cs" />
+    <Compile Include="SqlClient\Query\SqlMethodTransformer.cs" />
+    <Compile Include="SqlClient\Query\SqlMultiplexer.cs" />
+    <Compile Include="SqlClient\Query\SqlNamer.cs" />
+    <Compile Include="SqlClient\Query\SqlOuterApplyReducer.cs" />
+    <Compile Include="SqlClient\Query\SqlParameterizer.cs" />
+    <Compile Include="SqlClient\Query\SqlRemoveConstantOrderBy.cs" />
+    <Compile Include="SqlClient\Query\SqlReorderer.cs" />
+    <Compile Include="SqlClient\Query\SqlResolver.cs" />
+    <Compile Include="SqlClient\Query\SqlRetyper.cs" />
+    <Compile Include="SqlClient\Query\SqlRewriteScalarSubqueries.cs" />
+    <Compile Include="SqlClient\Query\SqlSupersetValidator.cs" />
+    <Compile Include="SqlClient\Query\SqlTopReducer.cs" />
+    <Compile Include="SqlClient\Query\SqlTypeConverter.cs" />
+    <Compile Include="SqlClient\Query\SqlUnionizer.cs" />
+    <Compile Include="SqlClient\Query\Translator.cs" />
+    <Compile Include="SqlClient\Query\TypeSource.cs" />
+    <Compile Include="SqlClient\Reader\ObjectReader.cs" />
+    <Compile Include="SqlClient\Reader\ObjectReaderCompiler.cs" />
+    <Compile Include="SqlClient\SqlBuilder.cs" />
+    <Compile Include="SqlClient\SqlConnectionManager.cs" />
+    <Compile Include="SqlClient\SqlMethods.cs" />
+    <Compile Include="SqlClient\SqlProvider.cs" />
+    <Compile Include="SqlClient\SqlTypeSystemProvider.cs" />
+    <Compile Include="SubqueryRules.cs" />
+    <Compile Include="Types.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
