@@ -517,11 +517,11 @@ namespace System.Resources {
             // if the stream is private and we're trying to access it from another
             // assembly (ie, ResMgr in mscorlib accessing anything else), we 
             // require Reflection TypeInformation permission to be able to read 
-            // this.  <STRIP>This meaning of private in satellite assemblies is a really
-            // odd concept, and is orthogonal to the ResourceManager.  
-            // We should not assume we can skip this security check,
-            // which means satellites must always use public manifest resources
-            // if you want to support semi-trusted code.  </STRIP>
+            // this.  <
+
+
+
+
 #if !FEATURE_CORECLR
             if (s!=null) {
                 if (FrameworkEventSource.IsInitialized)

@@ -1053,13 +1053,13 @@ HRESULT ImportTypeRef(
         {
             // TypeRef resolved to the import module in which its defined.
 
-            // <STRIP>This is a work around for 1421 integration to enable IJW linker scenario.
-            // We are encountering a problem while compiling ISymWrapper where _GUID is locally
-            // defined in the ISymWrapper.obj file and CoCreateInstance MemberRef has a reference to it.
-            // When IJW comes in and try to do translateSigWithScope, we create a new TypeRef with ModuleRef
-            // record which module ref name is to an empty string!! Upon merger, these two TypeRefs do not
-            // seem to be identical to Merger!! This breaks our build!
-            //</STRIP>
+            // <
+
+
+
+
+
+
             if (pMiniMdAssemEmit == NULL && pCommonAssemImport == NULL)
             {
                 tkOuterEmitRes = TokenFromRid(1, mdtModule);

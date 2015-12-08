@@ -1282,13 +1282,26 @@ namespace System.Data.SqlClient {
         virtual internal int GetLocaleId(int i) {
             _SqlMetaData sqlMetaData = MetaData[i];
             int lcid;
-            
-            if (sqlMetaData.collation != null) {
-                lcid = sqlMetaData.collation.LCID;
+
+            if (sqlMetaData.cipherMD != null) {
+                // If this column is encrypted, get the collation from baseTI
+                //
+                if (sqlMetaData.baseTI.collation != null) {
+                    lcid = sqlMetaData.baseTI.collation.LCID;
+                }
+                else {
+                    lcid = 0;
+                }
             }
             else {
-                lcid = 0;
+                if (sqlMetaData.collation != null) {
+                    lcid = sqlMetaData.collation.LCID;
+                }
+                else {
+                    lcid = 0;
+                }
             }
+
             return lcid;
         }
         

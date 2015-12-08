@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{4b1674a0-aacf-4314-bae2-87a5452bfbd6}</ProjectGuid>
+    <ProjectGuid>{bbae9edd-7b31-42a1-98e6-94156da834af}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Data.Services.Client</AssemblyName>
@@ -20,27 +20,27 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{6538482d-4508-40f8-b03b-f91a1edaac0f}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{c7b08254-c599-4cab-863e-5392300bd642}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Core\System.Core.csproj">
-      <Project>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</Project>
+      <Project>{22be18cd-1045-48c0-9585-cf4d753d6b69}</Project>
       <Name>System.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\data\System.Data.csproj">
-      <Project>{43a395d8-b07e-4166-a2ec-54449a6112aa}</Project>
+      <Project>{6e7390f9-40fb-4df0-b1e3-0464594ba167}</Project>
       <Name>System.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Xml\System.Xml.csproj">
-      <Project>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</Project>
+      <Project>{d730716b-d7b5-4b3e-a7cb-2944203d2238}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\XLinq\System.Xml.Linq.csproj">
-      <Project>{b2264e1e-916e-43cf-9880-7fbc48493ee4}</Project>
+      <Project>{c61aeea9-f4a2-4e92-a5d7-21aa0b0c6e40}</Project>
       <Name>System.Xml.Linq</Name>
     </ProjectReference>
   </ItemGroup>

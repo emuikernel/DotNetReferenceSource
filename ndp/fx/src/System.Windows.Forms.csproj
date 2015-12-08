@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{09e79805-e450-4d79-96d0-f9e426c6652e}</ProjectGuid>
+    <ProjectGuid>{81ab4a01-276f-4b4f-8e1a-8791127bea7b}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Windows.Forms</AssemblyName>
@@ -20,35 +20,35 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="Configuration\System.Configuration.csproj">
-      <Project>{c8acffc3-9a67-4b99-b153-3456d8d6a9e2}</Project>
+      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
       <Name>System.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="Core\System.Core.csproj">
-      <Project>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</Project>
+      <Project>{027422eb-9e92-49f3-b8bb-ee9b97985138}</Project>
       <Name>System.Core</Name>
     </ProjectReference>
     <ProjectReference Include="System.Drawing.csproj">
-      <Project>{25f1569b-f36d-466e-8854-89f1b79cd829}</Project>
+      <Project>{56c1ebe4-7318-40f7-a6b3-eced5deb84a0}</Project>
       <Name>System.Drawing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\clr\src\managedlibraries\remoting\System.Runtime.Remoting.csproj">
-      <Project>{23b8549b-9507-47a0-a621-2efa88ea82f3}</Project>
+      <Project>{f480b357-4856-41cc-b431-3236089a07a6}</Project>
       <Name>System.Runtime.Remoting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\clr\src\managedlibraries\security\System.Security.csproj">
-      <Project>{fbc0d97a-d604-4806-aa26-4fb7c017f571}</Project>
+      <Project>{7537e9c3-586c-4cf6-87d5-791a0e795cbb}</Project>
       <Name>System.Security</Name>
     </ProjectReference>
     <ProjectReference Include="Xml\System.Xml.csproj">
-      <Project>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</Project>
+      <Project>{de666f01-fb7c-4239-a4b1-91741ed0c421}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
   </ItemGroup>
@@ -58,6 +58,8 @@
     <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\InternalApis\Clr\inc\AppContextDefaultValues.cs" />
+    <Compile Include="..\..\..\InternalApis\Clr\inc\LocalAppContext.cs" />
     <Compile Include="..\..\..\InternalApis\NDP_FX\inc\BitmapSelector.cs" />
     <Compile Include="..\..\..\public\Internal\NDP\Inc\cdf.cs" />
     <Compile Include="..\..\..\public\Internal\NDP\Inc\CmsInterop.cs" />
@@ -71,15 +73,21 @@
     <Compile Include="misc\DbgUtil.cs" />
     <Compile Include="misc\DebugHandleTracker.cs" />
     <Compile Include="misc\DpiHelper.cs" />
+    <Compile Include="misc\ExternDll.cs" />
+    <Compile Include="misc\GDI\ApplyGraphicsProperties.cs" />
     <Compile Include="misc\GDI\DeviceCapabilities.cs" />
     <Compile Include="misc\GDI\DeviceContext.cs" />
     <Compile Include="misc\GDI\DeviceContext2.cs" />
     <Compile Include="misc\GDI\DeviceContextBackgroundMode.cs" />
+    <Compile Include="misc\GDI\DeviceContextGraphicsMode.cs" />
     <Compile Include="misc\GDI\DeviceContextLayout.cs" />
     <Compile Include="misc\GDI\DeviceContextMapMode.cs" />
     <Compile Include="misc\GDI\DeviceContextRasterOperationFlags.cs" />
     <Compile Include="misc\GDI\DeviceContexts.cs" />
     <Compile Include="misc\GDI\DeviceContextTextAlignment.cs" />
+    <Compile Include="misc\GDI\DeviceContextType.cs" />
+    <Compile Include="misc\GDI\FxCopSuppression.cs" />
+    <Compile Include="misc\GDI\GdiObjectType.cs" />
     <Compile Include="misc\GDI\MeasurementDCInfo.cs" />
     <Compile Include="misc\GDI\NativeMethods.cs" />
     <Compile Include="misc\GDI\SafeNativeMethods.cs" />
@@ -95,6 +103,7 @@
     <Compile Include="misc\GDI\WindowsPen.cs" />
     <Compile Include="misc\GDI\WindowsPenStyle.cs" />
     <Compile Include="misc\GDI\WindowsRegion.cs" />
+    <Compile Include="misc\GDI\WindowsRegionCombineMode.cs" />
     <Compile Include="misc\GDI\WindowsSolidBrush.cs" />
     <Compile Include="misc\HandleCollector.cs" />
     <Compile Include="misc\ImageListUtils.cs" />
@@ -119,6 +128,7 @@
     <Compile Include="winforms\Managed\System\WinForms\AlphaSortedEnumConverter.cs" />
     <Compile Include="winforms\Managed\System\WinForms\AmbientProperties.cs" />
     <Compile Include="winforms\Managed\System\WinForms\AnchorStyles.cs" />
+    <Compile Include="winforms\Managed\System\WinForms\AppContextDefaultValues.Defaults.cs" />
     <Compile Include="winforms\Managed\System\WinForms\Appearance.cs" />
     <Compile Include="winforms\Managed\System\WinForms\Application.cs" />
     <Compile Include="winforms\Managed\System\WinForms\ApplicationContext.cs" />
@@ -589,6 +599,7 @@
     <Compile Include="winforms\Managed\System\WinForms\ListViewItemState.cs" />
     <Compile Include="winforms\Managed\System\WinForms\ListViewVirtualItemsSelectionRangeChangedEvent.cs" />
     <Compile Include="winforms\Managed\System\WinForms\ListViewVirtualItemsSelectionRangeChangedEventHandler.cs" />
+    <Compile Include="winforms\Managed\System\WinForms\LocalAppContextSwitches.cs" />
     <Compile Include="winforms\Managed\System\WinForms\MainMenu.cs" />
     <Compile Include="winforms\Managed\System\WinForms\MaskedTextBox.cs" />
     <Compile Include="winforms\Managed\System\WinForms\MaskFormat.cs" />

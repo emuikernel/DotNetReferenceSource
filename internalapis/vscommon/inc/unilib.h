@@ -18,11 +18,11 @@
 #ifndef __UNILIB_H__
 #define __UNILIB_H__
 
-// <STRIP>
-// Inclusions of awconv.h, regex.h, codepage.h, and w4char.h ifdefed out for
-// FEATURE_PAL since the Coriolis version of unilib doesn't require them, and
-// they would require changes to be made portable.
-// </STRIP>
+// <
+
+
+
+
 
 #ifndef FEATURE_PAL
 #include "awconv.h"     // Ansi/Unicode conversions and string duplication

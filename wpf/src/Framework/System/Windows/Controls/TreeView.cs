@@ -227,6 +227,7 @@ namespace System.Windows.Controls
                         _selectedContainer.UpdateContainsSelection(false);
                         _selectedContainer = null;
                         SetSelectedItem(null);
+                        UpdateSelectedValue(null);
 
                         oldValue = data;
                         changed = true;
@@ -317,7 +318,7 @@ namespace System.Windows.Controls
             {
                 // create the binding
                 binding = new Binding();
-                binding.Source = item;
+                binding.Source = null;
 
                 if (useXml)
                 {

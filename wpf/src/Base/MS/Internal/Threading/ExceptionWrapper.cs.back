@@ -36,7 +36,7 @@ namespace System.Windows.Threading
             {
                 result = InternalRealCall(callback, args, numArgs);
             }
-            catch (Exception e) if (FilterException(source, e))
+            catch (Exception e) when (FilterException(source, e))
             {
                 if (!CatchException(source, e, catchHandler))
                 {

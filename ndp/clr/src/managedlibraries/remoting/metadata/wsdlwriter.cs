@@ -383,9 +383,9 @@ namespace System.Runtime.Remoting.MetadataServices
         {
             Util.Log("WsdlGenerator.AddType "+type+" ns "+xns.Namespace);                      
             //  System.Array says that it has element type, but returns null
-            //         when asked for the element type.<STRIP> IMO, System.Array should not
-            //         say that it has an element type. I have already pointed this
-            //         out to David Mortenson</STRIP>
+            //         when asked for the element type.<
+
+
 
 
             // Need to get underlying element type

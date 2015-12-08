@@ -1421,6 +1421,19 @@ namespace Printing
             void
             );
 
+        [FriendAccessAllowed]
+        static
+        unsigned
+        GetDpiX(
+            ILegacyDevice ^legacyDevice
+            );
+
+        [FriendAccessAllowed]
+        static
+        unsigned
+        GetDpiY(
+            ILegacyDevice ^legacyDevice
+            );
 
         protected:
 

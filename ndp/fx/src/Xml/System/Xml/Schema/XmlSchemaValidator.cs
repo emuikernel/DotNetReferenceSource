@@ -1971,8 +1971,15 @@ namespace System.Xml.Schema {
                             }
                             else {
                                 // for element, Reader.Value = "";
-                                if(typedValue != null && stringValue.Length != 0) {
-                                    laxis.Ks[laxis.Column] = new TypedObject(typedValue, stringValue, datatype);
+                                if (LocalAppContextSwitches.IgnoreEmptyKeySequences) {
+                                    if (typedValue != null && stringValue.Length != 0) {
+                                        laxis.Ks[laxis.Column] = new TypedObject(typedValue, stringValue, datatype);
+                                    }
+                                }
+                                else {
+                                    if (typedValue != null) {
+                                        laxis.Ks[laxis.Column] = new TypedObject(typedValue, stringValue, datatype);
+                                    }
                                 }
                             }
                         }
@@ -2006,10 +2013,8 @@ namespace System.Xml.Schema {
                             break;
 
                         case CompiledIdentityConstraint.ConstraintRole.Unique:
-                            if (LocalAppContextSwitches.IgnoreEmptyKeySequences) {
-                                if (!ks.IsQualified()) {
-                                    continue;
-                                }
+                            if (!ks.IsQualified()) {
+                                continue;
                             }
                             if (constraints[i].qualifiedTable.Contains (ks)) {
                                 // unique or key checking confliction

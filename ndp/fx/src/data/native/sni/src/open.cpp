@@ -142,6 +142,12 @@ DWORD MakeProtocolList( 	__inout const ConnectParameter * pConnectParams,
 					{
 						pProtElem->Tcp.fParallel = true;
 					}
+
+					if (pConnectParams->m_TransparentNetworkResolution != TransparentNetworkResolutionMode::DisabledMode)
+					{
+						pProtElem->Tcp.transparentNetworkIPResolution = pConnectParams->m_TransparentNetworkResolution;
+						pProtElem->Tcp.totalTimeout = pConnectParams->m_TotalTimeout;
+					}
 				}else
 					goto ErrorExit;
 				
@@ -678,7 +684,7 @@ DWORD SNIOpenSyncEx( __inout SNI_CLIENT_CONSUMER_INFO * pClientConsumerInfo,
 		goto ExitFunc;
 	}
 	
-	dwRet = pConnectParams->ParseConnectionString( wszConnect, !!(pClientConsumerInfo->fParallel) );
+	dwRet = pConnectParams->ParseConnectionString(wszConnect, !!(pClientConsumerInfo->fParallel), pClientConsumerInfo->transparentNetworkResolution, pClientConsumerInfo->totalTimeout);
 
 	if( ERROR_SUCCESS != dwRet)
 	{
@@ -850,6 +856,12 @@ DWORD SNIOpenSyncEx( __inout SNI_CLIENT_CONSUMER_INFO * pClientConsumerInfo,
 			BidTraceU1( SNI_BID_TRACE_ON, SNI_TAG _T("timeout(2): %d\n"), timeleft);
 		}
 		
+		if (pProtElem->GetProviderNum() == TCP_PROV)
+		{
+			pProtElem->Tcp.transparentNetworkIPResolution = pConnectParams->m_TransparentNetworkResolution;
+			pProtElem->Tcp.totalTimeout = pConnectParams->m_TotalTimeout;
+		}
+
 		dwRet = Connect( pConnectParams, 
 						 pClientConsumerInfo, 
 						 pProtElem, 
@@ -969,6 +981,7 @@ ExitFunc:
 				int ret = WideCharToMultiByte(CP_ACP, 0, pConnectParams->m_wszInstanceName, cchInstanceName, NULL, 0, NULL, NULL);
 				if (ret >= MAX_NAME_SIZE - 1 || ret <= 0)
 				{
+
 					dwRet = GetLastError();
 					return dwRet;
 				}
@@ -976,6 +989,7 @@ ExitFunc:
 				ret = WideCharToMultiByte(CP_ACP, 0, pConnectParams->m_wszInstanceName, cchInstanceName, pClientConsumerInfo->szInstanceName, cchInstanceName, NULL, NULL);
 				if (ret >= MAX_NAME_SIZE - 1 || ret <= 0)
 				{
+
 					dwRet = GetLastError();
 					return dwRet;
 				}

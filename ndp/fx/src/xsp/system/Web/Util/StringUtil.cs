@@ -422,12 +422,12 @@ internal static class StringUtil {
             }
         }
 #else
-        // <STRIP>This is Peter Sollich's faster memcpy implementation, from 
-        // COMString.cpp.  For our strings, this beat the processor's 
-        // repeat & move single byte instruction, which memcpy expands into.  
-        // (You read that correctly.)
-        // This is 3x faster than a simple while loop copying byte by byte, 
-        // for large copies.</STRIP>
+        // <
+
+
+
+
+
         if (len >= 16) {
             do {
 #if AMD64

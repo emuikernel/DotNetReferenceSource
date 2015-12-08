@@ -909,7 +909,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(UIElement.IsEnabledChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -1010,7 +1010,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(IsHitTestVisibleChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -1138,7 +1138,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(IsVisibleChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -1297,7 +1297,7 @@ namespace System.Windows
         }
 
 
-        // Called by automation peer, when called this element will be the listening element for synchronized input.   
+        // Called by automation peer, when called this element will be the listening element for synchronized input.
         internal bool StartListeningSynchronizedInput(SynchronizedInputType inputType)
         {
             if (InputManager.IsSynchronizedInput)
@@ -1315,8 +1315,8 @@ namespace System.Windows
         internal void CancelSynchronizedInput()
         {
             InputManager.CancelSynchronizedInput();
-        }  
-                 
+        }
+
         // Helper method to retrieve and fire Clr Event handlers for DependencyPropertyChanged event
         private void RaiseDependencyPropertyChanged(EventPrivateKey key, DependencyPropertyChangedEventArgs args)
         {
@@ -1422,11 +1422,11 @@ namespace System.Windows
                         // We have to "walk through" non-UIElement visuals.
                         if (vChild is Visual)
                         {
-                            UIElement.InvalidateForceInheritPropertyOnChildren((Visual)vChild, property);
+                            ((Visual)vChild).InvalidateForceInheritPropertyOnChildren(property);
                         }
                         else
                         {
-                            InvalidateForceInheritPropertyOnChildren((Visual3D)vChild, property);
+                            ((Visual3D)vChild).InvalidateForceInheritPropertyOnChildren(property);
                         }
                     }
                 }

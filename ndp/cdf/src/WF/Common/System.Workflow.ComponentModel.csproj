@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{4e1031a7-7044-40cb-b258-09a6eedc6188}</ProjectGuid>
+    <ProjectGuid>{0564edf1-d5f4-4029-8403-2206e1396719}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Workflow.ComponentModel</AssemblyName>
@@ -20,39 +20,39 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\Configuration\System.Configuration.csproj">
-      <Project>{c8acffc3-9a67-4b99-b153-3456d8d6a9e2}</Project>
+      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
       <Name>System.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\Core\System.Core.csproj">
-      <Project>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</Project>
+      <Project>{027422eb-9e92-49f3-b8bb-ee9b97985138}</Project>
       <Name>System.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\System.Drawing.csproj">
-      <Project>{25f1569b-f36d-466e-8854-89f1b79cd829}</Project>
+      <Project>{56c1ebe4-7318-40f7-a6b3-eced5deb84a0}</Project>
       <Name>System.Drawing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\NetFx20\System.Transactions\System.Transactions.csproj">
-      <Project>{3b5bed98-862f-47aa-b3c7-f3b8879a3d07}</Project>
+      <Project>{ab276eb2-3ae1-4c4b-b273-c1e321fa056d}</Project>
       <Name>System.Transactions</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\NetFx20\System.Web.Services\System.Web.Services.csproj">
-      <Project>{d475f02b-f7e2-467f-9553-e1ae2b0a7bab}</Project>
+      <Project>{168d19b6-593a-40bd-91b9-190cbc64d3d0}</Project>
       <Name>System.Web.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\System.Windows.Forms.csproj">
-      <Project>{09e79805-e450-4d79-96d0-f9e426c6652e}</Project>
+      <Project>{81ab4a01-276f-4b4f-8e1a-8791127bea7b}</Project>
       <Name>System.Windows.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\fx\src\Xml\System.Xml.csproj">
-      <Project>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</Project>
+      <Project>{de666f01-fb7c-4239-a4b1-91741ed0c421}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
   </ItemGroup>

@@ -57,6 +57,12 @@ namespace System.Windows.Controls
         private static readonly DependencyProperty ContainerSizeProperty = DependencyProperty.Register("ContainerSize", typeof(Size), typeof(VirtualizingStackPanel));
 
         //
+        // DependencyProperty used by ItemValueStorage to store both the PixelSize and LogicalSize of a
+        // UIElement when it is a virtualized container. For item-scrolling we need both.
+        //
+        private static readonly DependencyProperty ContainerSizeDualProperty = DependencyProperty.Register("ContainerSizeDual", typeof(ContainerSizeDual), typeof(VirtualizingStackPanel));
+
+        //
         // DependencyProperty used by ItemValueStorage to store the flag that says if the containers
         // of this panel are all uniformly sized.
         //
@@ -70,6 +76,16 @@ namespace System.Windows.Controls
         // been realized yet.
         //
         private static readonly DependencyProperty UniformOrAverageContainerSizeProperty = DependencyProperty.Register("UniformOrAverageContainerSize", typeof(double), typeof(VirtualizingStackPanel));
+
+        //
+        // DependencyProperty used by ItemValueStorage to store the uniform size of the containers
+        // of this panel if they are indeed uniformly sized. If they aren't uniformly sized then
+        // this index is used to store the average of the realized container sizes in this panel
+        // as a way of approximating the sizes of other containers of this panel that haven't
+        // been realized yet.  For item-scrolling we need this quantity expressed in both
+        // pixels and in items.
+        //
+        private static readonly DependencyProperty UniformOrAverageContainerSizeDualProperty = DependencyProperty.Register("UniformOrAverageContainerSizeDual", typeof(UniformOrAverageContainerSizeDual), typeof(VirtualizingStackPanel));
 
         // DependencyProperty used by ItemValueStorage to store the inset of an
         // inner ItemsHost - the distance from the ItemsHost to the outer boundary
@@ -89,8 +105,10 @@ namespace System.Windows.Controls
             {
                 _indicesStoredInItemValueStorage = new int[]
                     {   ContainerSizeProperty.GlobalIndex,
+                        ContainerSizeDualProperty.GlobalIndex,
                         AreContainersUniformlySizedProperty.GlobalIndex,
                         UniformOrAverageContainerSizeProperty.GlobalIndex,
+                        UniformOrAverageContainerSizeDualProperty.GlobalIndex,
                         ItemsHostInsetProperty.GlobalIndex
                     };
             }
@@ -123,8 +141,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.LineUp);
             }
 
-            SetVerticalOffsetImpl(VerticalOffset - ((Orientation == Orientation.Vertical && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset - ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, -1.0, fromFirst:true);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -139,8 +161,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.LineDown);
             }
 
-            SetVerticalOffsetImpl(VerticalOffset + ((Orientation == Orientation.Vertical && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset + ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, 1.0, fromFirst:false);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -155,8 +181,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.LineLeft);
             }
 
-            SetHorizontalOffsetImpl(HorizontalOffset - ((Orientation == Orientation.Horizontal && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset - ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, -1.0, fromFirst:true);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -171,8 +201,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.LineRight);
             }
 
-            SetHorizontalOffsetImpl(HorizontalOffset + ((Orientation == Orientation.Horizontal && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset + ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, 1.0, fromFirst:false);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -187,13 +221,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.PageUp);
             }
 
-            double delta = ViewportHeight;
-            if (!IsPixelBased && (Orientation == Orientation.Vertical) && DoubleUtil.IsZero(delta))
-            {
-                delta = 1;
-            }
-            SetVerticalOffsetImpl(VerticalOffset - delta,
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset - ViewportHeight
+                : NewItemOffset(isHorizontal, -ViewportHeight, fromFirst:true);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -208,13 +241,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.PageDown);
             }
 
-            double delta = ViewportHeight;
-            if (!IsPixelBased && (Orientation == Orientation.Vertical) && DoubleUtil.IsZero(delta))
-            {
-                delta = 1;
-            }
-            SetVerticalOffsetImpl(VerticalOffset + delta,
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset + ViewportHeight
+                : NewItemOffset(isHorizontal, ViewportHeight, fromFirst:true);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -229,13 +261,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.PageLeft);
             }
 
-            double delta = ViewportWidth;
-            if (!IsPixelBased && (Orientation == Orientation.Horizontal) && DoubleUtil.IsZero(delta))
-            {
-                delta = 1;
-            }
-            SetHorizontalOffsetImpl(HorizontalOffset - delta,
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset - ViewportWidth
+                : NewItemOffset(isHorizontal, -ViewportWidth, fromFirst:true);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -250,13 +281,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.PageRight);
             }
 
-            double delta = ViewportWidth;
-            if (!IsPixelBased && (Orientation == Orientation.Horizontal) && DoubleUtil.IsZero(delta))
-            {
-                delta = 1;
-            }
-            SetHorizontalOffsetImpl(HorizontalOffset + delta,
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset + ViewportWidth
+                : NewItemOffset(isHorizontal, ViewportWidth, fromFirst:true);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -271,8 +301,13 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.MouseWheelUp);
             }
 
-            SetVerticalOffsetImpl(VerticalOffset - SystemParameters.WheelScrollLines * ((Orientation == Orientation.Vertical && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            int lines = SystemParameters.WheelScrollLines;
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset - lines * ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, (double)-lines, fromFirst:true);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -287,8 +322,13 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.MouseWheelDown);
             }
 
-            SetVerticalOffsetImpl(VerticalOffset + SystemParameters.WheelScrollLines * ((Orientation == Orientation.Vertical && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            int lines = SystemParameters.WheelScrollLines;
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || isHorizontal)
+                ? VerticalOffset + lines * ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, (double)lines, fromFirst:false);
+
+            SetVerticalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -303,8 +343,12 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.MouseWheelLeft);
             }
 
-            SetHorizontalOffsetImpl(HorizontalOffset - 3.0 * ((Orientation == Orientation.Horizontal && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset - 3.0 * ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, -3.0, fromFirst:true);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
         }
 
         /// <summary>
@@ -319,8 +363,91 @@ namespace System.Windows.Controls
                 ScrollTracer.Trace(this, ScrollTraceOp.MouseWheelRight);
             }
 
-            SetHorizontalOffsetImpl(HorizontalOffset + 3.0 * ((Orientation == Orientation.Horizontal && !IsPixelBased) ? 1.0 : ScrollViewer._scrollLineDelta),
-                setAnchorInformation:true);
+            bool isHorizontal = (Orientation == Orientation.Horizontal);
+            double newOffset = (IsPixelBased || !isHorizontal)
+                ? HorizontalOffset + 3.0 * ScrollViewer._scrollLineDelta
+                : NewItemOffset(isHorizontal, 3.0, fromFirst:false);
+
+            SetHorizontalOffsetImpl(newOffset, setAnchorInformation:true);
+        }
+
+        /// <summary>
+        ///     Return the new offset when item-scrolling along the principal axis.
+        ///     This method handles the case where more than one container lies
+        ///     at the top of the viewport - we want to compute the new offset
+        ///     relative to the first or last of the "top" containers, not relative
+        ///     to the current offset.
+        ///
+        ///     This can arise if an app declares a custom layout for TreeViewItem
+        ///     (or GroupItem) that puts the ItemsHost for the children at the top
+        ///     of the layout, e.g. a "side-by-side" layout.  See DevDiv2 1126786.
+        ///     It can also arise if there are invisible containers at the top
+        ///     of the viewport.
+        /// </summary>
+        /// <param name="isHorizontal">direction of the principal axis</param>
+        /// <param name="delta">desired amount to change the offset</param>
+        /// <param name="fromFirst">whether the delta should be added to the
+        ///     offset of the first (shallowest) or last (deepest) of the "top" containers
+        /// </param>
+        private double NewItemOffset(bool isHorizontal, double delta, bool fromFirst)
+        {
+            Debug.Assert(!IsPixelBased && IsScrolling &&
+                            (isHorizontal==(Orientation == Orientation.Horizontal)),
+                "this method is only for use when item-scrolling along the principal axis");
+
+            if (DoubleUtil.IsZero(delta))
+            {
+                delta = 1.0;        // scroll by at least one item
+            }
+
+            if (IsVSP45Compat)
+            {
+                // 4.5 computed the answer the simple way
+                return (isHorizontal ? HorizontalOffset : VerticalOffset) + delta;
+            }
+
+            // find the top container(s)
+            double firstContainerOffsetFromViewport;
+            FrameworkElement deepestTopContainer = ComputeFirstContainerInViewport(
+                this,   /* viewportElement */
+                isHorizontal ? FocusNavigationDirection.Right : FocusNavigationDirection.Down,
+                this,   /* itemsHost */
+                null,   /* action callback */
+                true,   /* findTopContainer */
+                out firstContainerOffsetFromViewport);
+
+            // there are two cases where we can still use the simple approach:
+            //  a. first container can't be found - fallback to using current offset
+            //  b. there's only one top container - no ambiguity, so no need to work hard
+            if (deepestTopContainer == null || DoubleUtil.IsZero(firstContainerOffsetFromViewport))
+            {
+                return (isHorizontal ? HorizontalOffset : VerticalOffset) + delta;
+            }
+
+            // get the scroll offset of the deepest top container
+            double startingOffset = FindScrollOffset(deepestTopContainer);
+
+            // the shallowest top container's offset differs from the deepest's by
+            // the offset-from-viewport.  This only works for item-scrolling,
+            // where the top of the viewport is always at an item boundary.
+            if (fromFirst)
+            {
+                startingOffset -= firstContainerOffsetFromViewport;
+            }
+
+            // reset the computed offset to agree with the new starting offset,
+            // so as not to confuse anchoring calculations.
+            if (isHorizontal)
+            {
+                _scrollData._computedOffset.X = startingOffset;
+            }
+            else
+            {
+                _scrollData._computedOffset.Y = startingOffset;
+            }
+
+            // return the desired offset
+            return (startingOffset + delta);
         }
 
         /// <summary>
@@ -371,8 +498,6 @@ namespace System.Windows.Controls
                         double delta = Math.Abs(scrollX - oldViewportOffset.X);
                         if (DoubleUtil.LessThanOrClose(delta, ViewportWidth))
                         {
-                            setAnchorInformation = true;
-
                             // When item-scrolling, the scroll offset is effectively
                             // an integer.  But certain operations (scroll-to-here,
                             // drag the thumb) can put fractional values into
@@ -394,6 +519,31 @@ namespace System.Windows.Controls
                                 _scrollData._offset.X = UIElement.RoundLayoutValue(_scrollData._offset.X, FrameworkElement.DpiScaleX);
                                 _scrollData._computedOffset.X = UIElement.RoundLayoutValue(_scrollData._computedOffset.X, FrameworkElement.DpiScaleX);
                             }
+
+                            // resolve any ambiguity due to multiple top containers
+                            // (this has already been done in NewItemOffset for
+                            // most anchored scrolls, only small item-scrolls remain)
+                            if (!setAnchorInformation && !IsPixelBased)
+                            {
+                                double topContainerOffset;
+                                FrameworkElement deepestTopContainer = ComputeFirstContainerInViewport(
+                                    this,   /* viewportElement */
+                                    FocusNavigationDirection.Right,
+                                    this,   /* itemsHost */
+                                    null,   /* action callback */
+                                    true,   /* findTopContainer */
+                                    out topContainerOffset);
+
+                                if (topContainerOffset > 0.0)
+                                {
+                                    // if there are multiple top containers, reset
+                                    // the current offset to agree with the last one
+                                    double startingOffset = FindScrollOffset(deepestTopContainer);
+                                    _scrollData._computedOffset.X = startingOffset;
+                                }
+                            }
+
+                            setAnchorInformation = true;
                         }
                     }
                 }
@@ -470,8 +620,6 @@ namespace System.Windows.Controls
                         double delta = Math.Abs(scrollY - oldViewportOffset.Y);
                         if (DoubleUtil.LessThanOrClose(delta, ViewportHeight))
                         {
-                            setAnchorInformation = true;
-
                             // When item-scrolling, the scroll offset is effectively
                             // an integer.  But certain operations (scroll-to-here,
                             // drag the thumb) can put fractional values into
@@ -493,6 +641,31 @@ namespace System.Windows.Controls
                                 _scrollData._offset.Y = UIElement.RoundLayoutValue(_scrollData._offset.Y, FrameworkElement.DpiScaleY);
                                 _scrollData._computedOffset.Y = UIElement.RoundLayoutValue(_scrollData._computedOffset.Y, FrameworkElement.DpiScaleY);
                             }
+
+                            // resolve any ambiguity due to multiple top containers
+                            // (this has already been done in NewItemOffset for
+                            // most anchored scrolls, only small item-scrolls remain)
+                            if (!setAnchorInformation && !IsPixelBased)
+                            {
+                                double topContainerOffset;
+                                FrameworkElement deepestTopContainer = ComputeFirstContainerInViewport(
+                                    this,   /* viewportElement */
+                                    FocusNavigationDirection.Down,
+                                    this,   /* itemsHost */
+                                    null,   /* action callback */
+                                    true,   /* findTopContainer */
+                                    out topContainerOffset);
+
+                                if (topContainerOffset > 0.0)
+                                {
+                                    // if there are multiple top containers, reset
+                                    // the current offset to agree with the last one
+                                    double startingOffset = FindScrollOffset(deepestTopContainer);
+                                    _scrollData._computedOffset.Y = startingOffset;
+                                }
+                            }
+
+                            setAnchorInformation = true;
                         }
                     }
                 }
@@ -595,6 +768,7 @@ namespace System.Windows.Controls
                                             // the leaf container that will serve as an anchor for the current scroll operation.
                                             d.SetCurrentValue(VirtualizingPanel.IsContainerVirtualizableProperty, false);
                                         },
+                                        false,  /* findTopContainer */
                                         out _firstContainerOffsetFromViewport);
 
                                     if (_firstContainerInViewport != null)
@@ -688,6 +862,7 @@ namespace System.Windows.Controls
                 isHorizontal ? FocusNavigationDirection.Right : FocusNavigationDirection.Down,
                 this,
                 null,
+                false,   /* findTopContainer */
                 out currFirstContainerOffsetFromViewport);
             Debug.Assert(currFirstContainerInViewport != null, "Cannot find container in viewport");
             double currFirstContainerOffset = FindScrollOffset(currFirstContainerInViewport);
@@ -695,7 +870,57 @@ namespace System.Windows.Controls
             double actualDistanceBetweenViewports = (currFirstContainerOffset - currFirstContainerOffsetFromViewport) -
                                                     (prevFirstContainerOffset - prevFirstContainerOffsetFromViewport);
 
-            if (LayoutDoubleUtil.AreClose(_expectedDistanceBetweenViewports, actualDistanceBetweenViewports))
+            bool success = (LayoutDoubleUtil.AreClose(_expectedDistanceBetweenViewports, actualDistanceBetweenViewports));
+
+            // if the simple test for success fails, check some more complex cases
+            if (!success && !isVSP45Compat)
+            {
+                if (!IsPixelBased)
+                {
+                    // if item-scrolling to a position with more than one "top container",
+                    // success is when any of the top containers match the expected distance
+                    double topContainerOffset;
+                    FrameworkElement deepestTopContainer = ComputeFirstContainerInViewport(
+                        this,
+                        isHorizontal ? FocusNavigationDirection.Right : FocusNavigationDirection.Down,
+                        this,
+                        null,
+                        true,   /* findTopContainer*/
+                        out topContainerOffset);
+                    double diff = actualDistanceBetweenViewports - _expectedDistanceBetweenViewports;
+                    success = (!LayoutDoubleUtil.LessThan(diff, 0.0) &&
+                                !LayoutDoubleUtil.LessThan(topContainerOffset, diff));
+
+                    if (success)
+                    {
+                        // adjust the offset from viewport by the top-container size,
+                        // so that we reset the computed offset (below) to agree with
+                        // the most recent measure pass
+                        currFirstContainerOffsetFromViewport += topContainerOffset;
+                    }
+
+                    // item-scrolling to the last page should be treated as a success,
+                    // regardless of the distance between viewports (there's 4.5rtm code
+                    // farther down that tries to check this, but it use the previous
+                    // offset and the current viewport size, which doesn't work in
+                    // situations where the viewport size has changed)
+                    if (!success)
+                    {
+                        if (isHorizontal)
+                        {
+                            success = DoubleUtil.GreaterThanOrClose(_scrollData._computedOffset.X,
+                                                                _scrollData._extent.Width - _scrollData._viewport.Width);
+                        }
+                        else
+                        {
+                            success = DoubleUtil.GreaterThanOrClose(_scrollData._computedOffset.Y,
+                                                                _scrollData._extent.Height - _scrollData._viewport.Height);
+                        }
+                    }
+                }
+            }
+
+            if (success)
             {
                 if (isHorizontal)
                 {
@@ -845,9 +1070,27 @@ namespace System.Windows.Controls
             FocusNavigationDirection direction,
             Panel itemsHost,
             Action<DependencyObject> action,
+            bool findTopContainer,
             out double firstContainerOffsetFromViewport)
         {
+            bool foundTopContainer;
+            return ComputeFirstContainerInViewport(
+                viewportElement, direction, itemsHost, action, findTopContainer,
+                out firstContainerOffsetFromViewport, out foundTopContainer);
+        }
+
+        private FrameworkElement ComputeFirstContainerInViewport(
+            FrameworkElement viewportElement,
+            FocusNavigationDirection direction,
+            Panel itemsHost,
+            Action<DependencyObject> action,
+            bool findTopContainer,
+            out double firstContainerOffsetFromViewport,
+            out bool foundTopContainer)
+        {
+            Debug.Assert(!IsPixelBased || !findTopContainer, "find 'top' container only makes sense when item-scrolling");
             firstContainerOffsetFromViewport = 0;
+            foundTopContainer = false;
 
             if (itemsHost == null)
             {
@@ -878,24 +1121,56 @@ namespace System.Windows.Controls
             if (children != null)
             {
                 int count = children.Count;
+                int invisibleContainers = 0;
                 int i = (itemsHost is VirtualizingStackPanel ? ((VirtualizingStackPanel)itemsHost)._firstItemInExtendedViewportChildIndex : 0);
                 for (; i<count; i++)
                 {
                     FrameworkElement fe = children[i] as FrameworkElement;
-                    if (fe != null && fe.IsVisible)
+                    if (fe == null)
+                        continue;
+
+                    if (fe.IsVisible)
                     {
                         Rect elementRect;
 
+                        // get the vp-position of the element, ignoring the secondary axis
+                        // (DevDiv2 1136036, 1203626 show two different cases why we
+                        // ignore the secondary axis - both involving searches that
+                        // miss the desired container merely because it's off-screen
+                        // horizontally, in a vertically scrolling panel)
                         ElementViewportPosition elementPosition = ItemsControl.GetElementViewportPosition(
                             viewportElement,
                             fe,
                             direction,
                             false /*fullyVisible*/,
+                            !isVSP45Compat /*ignorePerpendicularAxis*/,
                             out elementRect);
 
                         if (elementPosition == ElementViewportPosition.PartiallyInViewport ||
                             elementPosition == ElementViewportPosition.CompletelyInViewport)
                         {
+                            bool isTopContainer = false;
+
+                            if (!IsPixelBased)
+                            {
+                                double startPosition = (direction == FocusNavigationDirection.Down)
+                                    ? elementRect.Y : elementRect.X;
+                                if (findTopContainer)
+                                {
+                                    // when looking for a "top" container, break as soon
+                                    // as we find a child that's positioned after the start
+                                    // of the viewport
+
+                                    if (DoubleUtil.GreaterThan(startPosition, 0.0))
+                                    {
+                                        break;
+                                    }
+                                }
+
+                                // determine if this is a top container
+                                isTopContainer = DoubleUtil.IsZero(startPosition);
+                            }
+
                             if (action != null)
                             {
                                 action(fe);
@@ -908,7 +1183,7 @@ namespace System.Windows.Controls
                                 {
                                     if (itemsControl.ItemsHost != null && itemsControl.ItemsHost.IsVisible)
                                     {
-                                        result = ComputeFirstContainerInViewport(viewportElement, direction, itemsControl.ItemsHost, action, out firstContainerOffsetFromViewport);
+                                        result = ComputeFirstContainerInViewport(viewportElement, direction, itemsControl.ItemsHost, action, findTopContainer, out firstContainerOffsetFromViewport);
                                     }
                                 }
                                 else
@@ -916,7 +1191,7 @@ namespace System.Windows.Controls
                                     GroupItem groupItem = fe as GroupItem;
                                     if (groupItem != null && groupItem.ItemsHost != null && groupItem.ItemsHost.IsVisible)
                                     {
-                                        result = ComputeFirstContainerInViewport(viewportElement, direction, groupItem.ItemsHost, action, out firstContainerOffsetFromViewport);
+                                        result = ComputeFirstContainerInViewport(viewportElement, direction, groupItem.ItemsHost, action, findTopContainer, out firstContainerOffsetFromViewport);
                                     }
                                 }
                             }
@@ -942,13 +1217,14 @@ namespace System.Windows.Controls
 
                                 if (innerPanel != null && innerPanel.IsVisible)
                                 {
-                                    result = ComputeFirstContainerInViewport(viewportElement, direction, innerPanel, action, out firstContainerOffsetFromViewport);
+                                    result = ComputeFirstContainerInViewport(viewportElement, direction, innerPanel, action, findTopContainer, out firstContainerOffsetFromViewport, out foundTopContainer);
                                 }
                             }
 
                             if (result == null)
                             {
                                 result = fe;
+                                foundTopContainer = isTopContainer;
 
                                 if (IsPixelBased)
                                 {
@@ -968,6 +1244,12 @@ namespace System.Windows.Controls
                                             firstContainerOffsetFromViewport -= fe.Margin.Left;
                                         }
                                     }
+                                }
+                                else if (findTopContainer && isTopContainer)
+                                {
+                                    // when looking for a top-container, invisible
+                                    // containers contribute to the offset,
+                                    firstContainerOffsetFromViewport += invisibleContainers;
                                 }
                             }
                             else if (!IsPixelBased)
@@ -997,13 +1279,23 @@ namespace System.Windows.Controls
                                         // If the current container's item is considered
                                         // to be displayed before the subitems,
                                         // it contributes 1 to the offset.
+                                        // Exception - If findTopContainer is false,
+                                        // ignore the contribution of "top" containers
+                                        // when 'result' is also a top container - so
+                                        // that its offset is always reported as 0;
+                                        // this simplifies the anchoring logic.
                                         Thickness inset = GetItemsHostInsetForChild(virtualizingElement);
                                         if (direction == FocusNavigationDirection.Down)
                                         {
                                             if (IsHeaderBeforeItems(false, fe, ref inset) &&
                                                 DoubleUtil.GreaterThanOrClose(elementRect.Y, 0))
                                             {
-                                                firstContainerOffsetFromViewport += 1;
+                                                if (findTopContainer ||
+                                                    !foundTopContainer ||                       // already found a non-top container
+                                                    DoubleUtil.GreaterThan(elementRect.Y, 0))   // this container is non-top
+                                                {
+                                                    firstContainerOffsetFromViewport += 1;
+                                                }
                                             }
                                         }
                                         else // (direction == FocusNavigationDirection.Right)
@@ -1011,7 +1303,12 @@ namespace System.Windows.Controls
                                             if (IsHeaderBeforeItems(true, fe, ref inset) &&
                                                 DoubleUtil.GreaterThanOrClose(elementRect.X, 0))
                                             {
-                                                firstContainerOffsetFromViewport += 1;
+                                                if (findTopContainer ||
+                                                    !foundTopContainer ||                       // already found a non-top container
+                                                    DoubleUtil.GreaterThan(elementRect.X, 0))   // this container is non-top
+                                                {
+                                                    firstContainerOffsetFromViewport += 1;
+                                                }
                                             }
                                         }
                                     }
@@ -1025,6 +1322,13 @@ namespace System.Windows.Controls
                             // We've gone too far
                             break;
                         }
+
+                        invisibleContainers = 0;
+                    }
+                    else
+                    {
+                        // accumulate the size of the region of invisible containers
+                        ++invisibleContainers;
                     }
                 }
             }
@@ -1870,8 +2174,14 @@ namespace System.Windows.Controls
                     bool areContainersUniformlySized = GetAreContainersUniformlySized(uniformSizeItemStorageProvider, parentItem);
                     bool computedAreContainersUniformlySized = areContainersUniformlySized;
                     bool hasUniformOrAverageContainerSizeBeenSet;
-                    double uniformOrAverageContainerSize = GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem, out hasUniformOrAverageContainerSizeBeenSet);
+                    double uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize;
+                    GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem,
+                        IsPixelBased || isVSP45Compat,
+                        out uniformOrAverageContainerSize,
+                        out uniformOrAverageContainerPixelSize,
+                        out hasUniformOrAverageContainerSizeBeenSet);
                     double computedUniformOrAverageContainerSize = uniformOrAverageContainerSize;
+                    double computedUniformOrAverageContainerPixelSize = uniformOrAverageContainerPixelSize;
 
                     if (ScrollTracer.IsEnabled && ScrollTracer.IsTracing(this))
                     {
@@ -2046,6 +2356,7 @@ namespace System.Windows.Controls
                                                 ref parentItem,
                                                 ref hasUniformOrAverageContainerSizeBeenSet,
                                                 ref computedUniformOrAverageContainerSize,
+                                                ref computedUniformOrAverageContainerPixelSize,
                                                 ref computedAreContainersUniformlySized,
                                                 ref items,
                                                 ref item,
@@ -2090,19 +2401,40 @@ namespace System.Windows.Controls
                                                 //
                                                 // Re-compute index and offset of first item in the viewport
                                                 //
-                                                SyncUniformSizeFlags(parentItem,
-                                                    parentItemStorageProvider,
-                                                    children,
-                                                    items,
-                                                    itemStorageProvider,
-                                                    itemCount,
-                                                    computedAreContainersUniformlySized,
-                                                    computedUniformOrAverageContainerSize,
-                                                    ref areContainersUniformlySized,
-                                                    ref uniformOrAverageContainerSize,
-                                                    ref hasAverageContainerSizeChanged,
-                                                    isHorizontal,
-                                                    false /* evaluateAreContainersUniformlySized */);
+                                                if (isVSP45Compat)
+                                                {
+                                                    SyncUniformSizeFlags(parentItem,
+                                                        parentItemStorageProvider,
+                                                        children,
+                                                        items,
+                                                        itemStorageProvider,
+                                                        itemCount,
+                                                        computedAreContainersUniformlySized,
+                                                        computedUniformOrAverageContainerSize,
+                                                        ref areContainersUniformlySized,
+                                                        ref uniformOrAverageContainerSize,
+                                                        ref hasAverageContainerSizeChanged,
+                                                        isHorizontal,
+                                                        false /* evaluateAreContainersUniformlySized */);
+                                                }
+                                                else
+                                                {
+                                                    SyncUniformSizeFlags(parentItem,
+                                                        parentItemStorageProvider,
+                                                        children,
+                                                        items,
+                                                        itemStorageProvider,
+                                                        itemCount,
+                                                        computedAreContainersUniformlySized,
+                                                        computedUniformOrAverageContainerSize,
+                                                        computedUniformOrAverageContainerPixelSize,
+                                                        ref areContainersUniformlySized,
+                                                        ref uniformOrAverageContainerSize,
+                                                        ref uniformOrAverageContainerPixelSize,
+                                                        ref hasAverageContainerSizeChanged,
+                                                        isHorizontal,
+                                                        false /* evaluateAreContainersUniformlySized */);
+                                                }
 
                                                 ComputeFirstItemInViewportIndexAndOffset(items, itemCount, itemStorageProvider, viewport, cacheSize,
                                                     isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize,
@@ -2121,6 +2453,7 @@ namespace System.Windows.Controls
                                                             ref parentItem,
                                                             ref hasUniformOrAverageContainerSizeBeenSet,
                                                             ref computedUniformOrAverageContainerSize,
+                                                            ref computedUniformOrAverageContainerPixelSize,
                                                             ref computedAreContainersUniformlySized,
                                                             ref items,
                                                             ref item,
@@ -2209,6 +2542,7 @@ namespace System.Windows.Controls
                                 while (adjustToChangeInFirstItem);
 
                                 ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, 0, _firstItemInExtendedViewportIndex, out _firstItemInExtendedViewportOffset);
+
                             }
 
                             if (foundFirstItemInViewport &&
@@ -2255,6 +2589,7 @@ namespace System.Windows.Controls
                                             ref parentItem,
                                             ref hasUniformOrAverageContainerSizeBeenSet,
                                             ref computedUniformOrAverageContainerSize,
+                                            ref computedUniformOrAverageContainerPixelSize,
                                             ref computedAreContainersUniformlySized,
                                             ref items,
                                             ref item,
@@ -2340,6 +2675,7 @@ namespace System.Windows.Controls
                                 ref parentItem,
                                 ref hasUniformOrAverageContainerSizeBeenSet,
                                 ref computedUniformOrAverageContainerSize,
+                                ref computedUniformOrAverageContainerPixelSize,
                                 ref computedAreContainersUniformlySized,
                                 ref items,
                                 ref children,
@@ -2388,6 +2724,7 @@ namespace System.Windows.Controls
                                 ref parentItem,
                                 ref hasUniformOrAverageContainerSizeBeenSet,
                                 ref computedUniformOrAverageContainerSize,
+                                ref computedUniformOrAverageContainerPixelSize,
                                 ref computedAreContainersUniformlySized,
                                 ref items,
                                 ref children,
@@ -2410,19 +2747,40 @@ namespace System.Windows.Controls
                         }
                     }
 
-                    SyncUniformSizeFlags(parentItem,
-                        parentItemStorageProvider,
-                        children,
-                        items,
-                        itemStorageProvider,
-                        itemCount,
-                        computedAreContainersUniformlySized,
-                        computedUniformOrAverageContainerSize,
-                        ref areContainersUniformlySized,
-                        ref uniformOrAverageContainerSize,
-                        ref hasAverageContainerSizeChanged,
-                        isHorizontal,
-                        false /* evaluateAreContainersUniformlySized */);
+                    if (isVSP45Compat)
+                    {
+                        SyncUniformSizeFlags(parentItem,
+                            parentItemStorageProvider,
+                            children,
+                            items,
+                            itemStorageProvider,
+                            itemCount,
+                            computedAreContainersUniformlySized,
+                            computedUniformOrAverageContainerSize,
+                            ref areContainersUniformlySized,
+                            ref uniformOrAverageContainerSize,
+                            ref hasAverageContainerSizeChanged,
+                            isHorizontal,
+                            false /* evaluateAreContainersUniformlySized */);
+                    }
+                    else
+                    {
+                        SyncUniformSizeFlags(parentItem,
+                            parentItemStorageProvider,
+                            children,
+                            items,
+                            itemStorageProvider,
+                            itemCount,
+                            computedAreContainersUniformlySized,
+                            computedUniformOrAverageContainerSize,
+                            computedUniformOrAverageContainerPixelSize,
+                            ref areContainersUniformlySized,
+                            ref uniformOrAverageContainerSize,
+                            ref uniformOrAverageContainerPixelSize,
+                            ref hasAverageContainerSizeChanged,
+                            isHorizontal,
+                            false /* evaluateAreContainersUniformlySized */);
+                    }
 
                     if (IsVirtualizing)
                     {
@@ -2445,11 +2803,13 @@ namespace System.Windows.Controls
                             itemStorageProvider,
                             areContainersUniformlySized,
                             uniformOrAverageContainerSize,
+                            uniformOrAverageContainerPixelSize,
                             ref stackPixelSize,
                             ref stackLogicalSize,
                             isHorizontal,
                             _firstItemInExtendedViewportIndex,
                             _firstItemInExtendedViewportChildIndex,
+                            firstItemInViewportIndex,
                             true /*before */);
 
                         ExtendPixelAndLogicalSizes(
@@ -2459,11 +2819,13 @@ namespace System.Windows.Controls
                             itemStorageProvider,
                             areContainersUniformlySized,
                             uniformOrAverageContainerSize,
+                            uniformOrAverageContainerPixelSize,
                             ref stackPixelSize,
                             ref stackLogicalSize,
                             isHorizontal,
                             _firstItemInExtendedViewportIndex + _actualItemsInExtendedViewportCount,
                             _firstItemInExtendedViewportChildIndex + _actualItemsInExtendedViewportCount,
+                            -1,                     // firstItemInViewportIndex - ignored in 'after' call
                             false /*before */);
                     }
 
@@ -2475,6 +2837,30 @@ namespace System.Windows.Controls
                     _previousStackPixelSizeInViewport = stackPixelSizeInViewport;
                     _previousStackLogicalSizeInViewport = stackLogicalSizeInViewport;
                     _previousStackPixelSizeInCacheBeforeViewport = stackPixelSizeInCacheBeforeViewport;
+
+                    // For item-scrolling, we need the pixel distance to the viewport, in
+                    // order to arrange children correctly.  This is the sum of three terms:
+                    //      distance to the first container (computed in ExtendPixelAndLogicalSizes)
+                    //   +  front inset from container to its items host
+                    //   +  items host's distance to the viewport
+                    // The latter two terms are only needed when the viewport starts
+                    // after the first container.
+                    if (!IsPixelBased &&
+                        DoubleUtil.GreaterThan((isHorizontal ? viewport.Left : viewport.Top), firstItemInViewportOffset))
+                    {
+                        IHierarchicalVirtualizationAndScrollInfo firstContainer = GetVirtualizingChild(firstContainerInViewport);
+                        if (firstContainer != null)
+                        {
+                            Thickness inset = GetItemsHostInsetForChild(firstContainer);
+                            _pixelDistanceToViewport += (isHorizontal ? inset.Left : inset.Top);
+
+                            VirtualizingStackPanel childPanel = firstContainer.ItemsHost as VirtualizingStackPanel;
+                            if (childPanel != null)
+                            {
+                                _pixelDistanceToViewport += childPanel._pixelDistanceToViewport;
+                            }
+                        }
+                    }
 
                     // Coerce infinite viewport dimensions to stackPixelSize
                     if (double.IsInfinity(viewport.Width))
@@ -2540,33 +2926,53 @@ namespace System.Windows.Controls
                     // ===================================================================================
                     // ===================================================================================
                     double effectiveOffset = 0.0;
-                    if (!isVSP45Compat && hasAverageContainerSizeChanged)
+                    if (!isVSP45Compat)
                     {
-                        // revise the offset used for the viewport origin, for use
-                        // in future calls to InitializeViewport (part of Measure)
-                        effectiveOffset = ComputeEffectiveOffset(
-                            ref viewport,
-                            firstContainerInViewport,
-                            firstItemInViewportIndex,
-                            firstItemInViewportOffset,
-                            items,
-                            itemStorageProvider,
-                            virtualizationInfoProvider,
-                            isHorizontal,
-                            areContainersUniformlySized,
-                            uniformOrAverageContainerSize);
-
-                        // also revise the offset of the first container, for use in Arrange
-                        if (firstContainerInViewport != null)
+                        if (hasAverageContainerSizeChanged)
                         {
-                            double newOffset;
-                            ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, 0, _firstItemInExtendedViewportIndex, out newOffset);
-                            if (ScrollTracer.IsEnabled && ScrollTracer.IsTracing(this))
+                            // revise the offset used for the viewport origin, for use
+                            // in future calls to InitializeViewport (part of Measure)
+                            effectiveOffset = ComputeEffectiveOffset(
+                                ref viewport,
+                                firstContainerInViewport,
+                                firstItemInViewportIndex,
+                                firstItemInViewportOffset,
+                                items,
+                                itemStorageProvider,
+                                virtualizationInfoProvider,
+                                isHorizontal,
+                                areContainersUniformlySized,
+                                uniformOrAverageContainerSize);
+
+                            // also revise the offset of the first container, for use in Arrange
+                            if (firstContainerInViewport != null)
                             {
-                                ScrollTracer.Trace(this, ScrollTraceOp.ReviseArrangeOffset,
-                                    _firstItemInExtendedViewportOffset, newOffset);
+                                double newOffset;
+                                ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, 0, _firstItemInExtendedViewportIndex, out newOffset);
+
+                                if (ScrollTracer.IsEnabled && ScrollTracer.IsTracing(this))
+                                {
+                                    ScrollTracer.Trace(this, ScrollTraceOp.ReviseArrangeOffset,
+                                        _firstItemInExtendedViewportOffset, newOffset);
+                                }
+                                _firstItemInExtendedViewportOffset = newOffset;
                             }
-                            _firstItemInExtendedViewportOffset = newOffset;
+                        }
+
+                        // (DevDiv2 1174102) if items are added/removed in a descendant panel,
+                        // we may need to recompute the effective offset of this panel
+                        // (see UpdateExtent).  The information necessary to do this won't
+                        // be directly available at that time, so we store it now
+                        // just in case.
+                        if (HasVirtualizingChildren)
+                        {
+                            FirstContainerInformation info =
+                                new FirstContainerInformation(
+                                        ref viewport,
+                                        firstContainerInViewport,
+                                        firstItemInViewportIndex,
+                                        firstItemInViewportOffset);
+                            FirstContainerInformationField.SetValue(this, info);
                         }
                     }
 
@@ -2772,7 +3178,11 @@ namespace System.Windows.Controls
                     //
                     IContainItemStorage uniformSizeItemStorageProvider = IsVSP45Compat ? itemStorageProvider : parentItemStorageProvider;
                     bool areContainersUniformlySized = GetAreContainersUniformlySized(uniformSizeItemStorageProvider, parentItem);
-                    double uniformOrAverageContainerSize = GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem);
+                    double uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize;
+                    GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem,
+                        IsPixelBased || IsVSP45Compat,
+                        out uniformOrAverageContainerSize,
+                        out uniformOrAverageContainerPixelSize);
 
                     ScrollViewer scrollOwner = ScrollOwner;
                     double arrangeLength = 0;
@@ -3170,6 +3580,7 @@ namespace System.Windows.Controls
         private void UpdateExtent(bool areItemChangesLocal)
         {
             bool isHorizontal = (Orientation == Orientation.Horizontal);
+            bool isVSP45Compat = IsVSP45Compat;
 
             ItemsControl itemsControl;
             GroupItem groupItem;
@@ -3184,9 +3595,12 @@ namespace System.Windows.Controls
                 out virtualizationInfoProvider, out parentItem,
                 out parentItemStorageProvider, out mustDisableVirtualization);
 
-            IContainItemStorage uniformSizeItemStorageProvider = IsVSP45Compat ? itemStorageProvider : parentItemStorageProvider;
-            double uniformOrAverageContainerSize = GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem);
+            IContainItemStorage uniformSizeItemStorageProvider = isVSP45Compat ? itemStorageProvider : parentItemStorageProvider;
             bool areContainersUniformlySized = GetAreContainersUniformlySized(uniformSizeItemStorageProvider, parentItem);
+            double uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize;
+            GetUniformOrAverageContainerSize(uniformSizeItemStorageProvider, parentItem,
+                isVSP45Compat || IsPixelBased,
+                out uniformOrAverageContainerSize, out uniformOrAverageContainerPixelSize);
 
             IList children = RealizedChildren;
             IItemContainerGenerator generator = Generator;
@@ -3201,23 +3615,68 @@ namespace System.Windows.Controls
                 // descendent panel that actually contained the collection changes.
                 //
                 double computedUniformOrAverageContainerSize = uniformOrAverageContainerSize;
+                double computedUniformOrAverageContainerPixelSize = uniformOrAverageContainerPixelSize;
                 bool computedAreContainersUniformlySized = areContainersUniformlySized;
-                bool hasAverageContainerSizeChanged = false;    // unused in this method
+                bool hasAverageContainerSizeChanged = false;
 
-                SyncUniformSizeFlags(
-                    parentItem,
-                    parentItemStorageProvider,
-                    children,
-                    items,
-                    itemStorageProvider,
-                    itemCount,
-                    computedAreContainersUniformlySized,
-                    computedUniformOrAverageContainerSize,
-                    ref areContainersUniformlySized,
-                    ref uniformOrAverageContainerSize,
-                    ref hasAverageContainerSizeChanged,
-                    isHorizontal,
-                    true /* evaluateAreContainersUniformlySized */);
+                if (isVSP45Compat)
+                {
+                    SyncUniformSizeFlags(
+                        parentItem,
+                        parentItemStorageProvider,
+                        children,
+                        items,
+                        itemStorageProvider,
+                        itemCount,
+                        computedAreContainersUniformlySized,
+                        computedUniformOrAverageContainerSize,
+                        ref areContainersUniformlySized,
+                        ref uniformOrAverageContainerSize,
+                        ref hasAverageContainerSizeChanged,
+                        isHorizontal,
+                        true /* evaluateAreContainersUniformlySized */);
+                }
+                else
+                {
+                    SyncUniformSizeFlags(
+                        parentItem,
+                        parentItemStorageProvider,
+                        children,
+                        items,
+                        itemStorageProvider,
+                        itemCount,
+                        computedAreContainersUniformlySized,
+                        computedUniformOrAverageContainerSize,
+                        computedUniformOrAverageContainerPixelSize,
+                        ref areContainersUniformlySized,
+                        ref uniformOrAverageContainerSize,
+                        ref uniformOrAverageContainerPixelSize,
+                        ref hasAverageContainerSizeChanged,
+                        isHorizontal,
+                        true /* evaluateAreContainersUniformlySized */);
+                }
+
+                if (hasAverageContainerSizeChanged && !IsVSP45Compat)
+                {
+                    // the extent change has altered the coordinate system, so
+                    // store an effective offset (DevDiv2 1174102)
+                    FirstContainerInformation info = FirstContainerInformationField.GetValue(this);
+                    Debug.Assert(info != null, "Expected state from previous measure not found");
+                    if (info != null)
+                    {
+                        ComputeEffectiveOffset(
+                                ref info.Viewport,
+                                info.FirstContainer,
+                                info.FirstItemIndex,
+                                info.FirstItemOffset,
+                                items,
+                                itemStorageProvider,
+                                virtualizationInfoProvider,
+                                isHorizontal,
+                                areContainersUniformlySized,
+                                uniformOrAverageContainerSize);
+                    }
+                }
             }
 
             double distance = 0;
@@ -4823,6 +5282,7 @@ namespace System.Windows.Controls
                         for (int i = 0; i < itemCount; i++)
                         {
                             object item = items[i];
+
                             GetContainerSizeForItem(itemStorageProvider, item, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, out containerSize);
                             containerSpan = isHorizontal ? containerSize.Width : containerSize.Height;
                             totalSpan += containerSpan;
@@ -4964,13 +5424,16 @@ namespace System.Windows.Controls
             IContainItemStorage itemStorageProvider,
             bool areContainersUniformlySized,
             double uniformOrAverageContainerSize,
+            double uniformOrAverageContainerPixelSize,
             ref Size stackPixelSize,
             ref Size stackLogicalSize,
             bool isHorizontal,
             int pivotIndex,
             int pivotChildIndex,
+            int firstContainerInViewportIndex,
             bool before)
         {
+            bool isVSP45Compat = IsVSP45Compat;
             Debug.Assert(IsVirtualizing, "We should only need to extend the viewport beyond the generated items when virtualizing");
 
             //
@@ -4981,14 +5444,47 @@ namespace System.Windows.Controls
             // In pixel-based mode we need to compute the same desired size as if we weren't virtualizing.
             //
 
-            double distance;
+            double distance, pixelDistance=0.0;
             if (before)
             {
-                ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, 0, pivotIndex, out distance);
+                if (isVSP45Compat)
+                {
+                    ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, 0, pivotIndex, out distance);
+                }
+                else
+                {
+                    ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized,
+                        uniformOrAverageContainerSize,
+                        uniformOrAverageContainerPixelSize,
+                        0, pivotIndex, out distance, out pixelDistance);
+
+                    // in item-scrolling mode, we need the pixel distance to the first container in the viewport
+                    if (!IsPixelBased)
+                    {
+                        double unused, pixelDistanceToFirstContainer;
+                        ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized,
+                            uniformOrAverageContainerSize,
+                            uniformOrAverageContainerPixelSize,
+                            pivotIndex, firstContainerInViewportIndex - pivotIndex,
+                            out unused, out pixelDistanceToFirstContainer);
+                        _pixelDistanceToViewport = pixelDistance + pixelDistanceToFirstContainer;
+                        _pixelDistanceToFirstContainerInExtendedViewport = pixelDistance;
+                    }
+                }
             }
             else
             {
-                ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, pivotIndex, itemCount - pivotIndex, out distance);
+                if (isVSP45Compat)
+                {
+                    ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized, uniformOrAverageContainerSize, pivotIndex, itemCount - pivotIndex, out distance);
+                }
+                else
+                {
+                    ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized,
+                        uniformOrAverageContainerSize,
+                        uniformOrAverageContainerPixelSize,
+                        pivotIndex, itemCount - pivotIndex, out distance, out pixelDistance);
+                }
             }
 
             if (IsPixelBased)
@@ -5020,33 +5516,53 @@ namespace System.Windows.Controls
                 // hierarchical cases to be able to arrange containers
                 // beyond the extended viewport accurately.
                 //
-
-                if (!IsScrolling)
+                if (isVSP45Compat)
                 {
-                    int startIndex, count;
-
-                    if (before)
+                    if (!IsScrolling)
                     {
-                        startIndex = 0;
-                        count = pivotChildIndex;
-                    }
-                    else
-                    {
-                        startIndex = pivotChildIndex;
-                        count = children.Count;
-                    }
+                        int startIndex, count;
 
-                    for (int i=startIndex; i<count; i++)
-                    {
-                        Size childDesiredSize = ((UIElement)children[i]).DesiredSize;
-
-                        if (isHorizontal)
+                        if (before)
                         {
-                            stackPixelSize.Width += childDesiredSize.Width;
+                            startIndex = 0;
+                            count = pivotChildIndex;
                         }
                         else
                         {
-                            stackPixelSize.Height += childDesiredSize.Height;
+                            startIndex = pivotChildIndex;
+                            count = children.Count;
+                        }
+
+                        for (int i=startIndex; i<count; i++)
+                        {
+                            Size childDesiredSize = ((UIElement)children[i]).DesiredSize;
+
+                            if (isHorizontal)
+                            {
+                                stackPixelSize.Width += childDesiredSize.Width;
+                            }
+                            else
+                            {
+                                stackPixelSize.Height += childDesiredSize.Height;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // 4.5 only accounted for realized items beyond the extended
+                    // viewport.  The actual stack pixel size should depend on
+                    // all items, otherwise containers can get arranged in the
+                    // wrong place.
+                    if (!IsScrolling)
+                    {
+                        if (isHorizontal)
+                        {
+                            stackPixelSize.Width += pixelDistance;
+                        }
+                        else
+                        {
+                            stackPixelSize.Height += pixelDistance;
                         }
                     }
                 }
@@ -5067,6 +5583,16 @@ namespace System.Windows.Controls
             int itemCount,
             out double distance)
         {
+            if (!(IsPixelBased || IsVSP45Compat))
+            {
+                double pixelDistance;
+                ComputeDistance(items, itemStorageProvider, isHorizontal, areContainersUniformlySized,
+                    uniformOrAverageContainerSize,
+                    1.0 /*uniformOrAverageContainerPixelSize*/, // dummy - pixelDistance not used
+                    startIndex, itemCount, out distance, out pixelDistance);
+                return;
+            }
+
             distance = 0.0;
 
             if (areContainersUniformlySized)
@@ -5109,6 +5635,64 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// This method is called upon to compute the pixel and logical
+        /// distances for the itemCount beginning at the the start index.
+        /// </summary>
+        private void ComputeDistance(
+            IList items,
+            IContainItemStorage itemStorageProvider,
+            bool isHorizontal,
+            bool areContainersUniformlySized,
+            double uniformOrAverageContainerSize,
+            double uniformOrAverageContainerPixelSize,
+            int startIndex,
+            int itemCount,
+            out double distance,
+            out double pixelDistance)
+        {
+            distance = 0.0;
+            pixelDistance = 0.0;
+
+            if (areContainersUniformlySized)
+            {
+                //
+                // Performance optimization for the most general case where
+                // all the children are of uniform size along the stacking direction.
+                // Note that the computation of the range size is performed in constant time.
+                //
+                distance += uniformOrAverageContainerSize * itemCount;
+                pixelDistance += uniformOrAverageContainerPixelSize * itemCount;
+            }
+            else
+            {
+                for (int i = startIndex; i < startIndex + itemCount; i++)
+                {
+                    object item = items[i];
+
+                    Size containerSize;
+                    Size containerPixelSize;
+                    GetContainerSizeForItem(itemStorageProvider, item, isHorizontal,
+                        areContainersUniformlySized,
+                        uniformOrAverageContainerSize,
+                        uniformOrAverageContainerPixelSize,
+                        out containerSize,
+                        out containerPixelSize);
+
+                    if (isHorizontal)
+                    {
+                        distance += containerSize.Width;
+                        pixelDistance += containerPixelSize.Width;
+                    }
+                    else
+                    {
+                        distance += containerSize.Height;
+                        pixelDistance += containerPixelSize.Height;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the size of the container for a given item.  The size can come from the container or a lookup in the ItemStorage
         /// </summary>
         private void GetContainerSizeForItem(
@@ -5119,6 +5703,18 @@ namespace System.Windows.Controls
             double uniformOrAverageContainerSize,
             out Size containerSize)
         {
+            if (!IsVSP45Compat)
+            {
+                Size containerPixelSize;
+                GetContainerSizeForItem(itemStorageProvider, item, isHorizontal,
+                    areContainersUniformlySized,
+                    uniformOrAverageContainerSize,
+                    1.0 /*uniformOrAverageContainerPixelSize*/, // dummy - pixelSize not used
+                    out containerSize,
+                    out containerPixelSize);
+                return;
+            }
+
             containerSize = Size.Empty;
 
             if (areContainersUniformlySized)
@@ -5176,8 +5772,93 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        /// Returns the size of the container for a given item.  The size can come from the container or a lookup in the ItemStorage
+        /// </summary>
+        private void GetContainerSizeForItem(
+            IContainItemStorage itemStorageProvider,
+            object item,
+            bool isHorizontal,
+            bool areContainersUniformlySized,
+            double uniformOrAverageContainerSize,
+            double uniformOrAverageContainerPixelSize,
+            out Size containerSize,
+            out Size containerPixelSize)
+        {
+            Debug.Assert(!IsVSP45Compat, "this method should not be called in VSP45Compat mode");
+            containerSize = new Size();
+            containerPixelSize = new Size();
+
+            bool useAverageSize = areContainersUniformlySized;
+
+            if (!areContainersUniformlySized)
+            {
+                //
+                // We fetch the size of a container from the ItemStorage.
+                // The size is cached if this item were previously realized.
+                //
+                if (IsPixelBased)
+                {
+                    object value = itemStorageProvider.ReadItemValue(item, ContainerSizeProperty);
+                    if (value != null)
+                    {
+                        containerSize = (Size)value;
+                        containerPixelSize = containerSize;
+                    }
+                    else
+                    {
+                        useAverageSize = true;
+                    }
+                }
+                else
+                {
+                    object value = itemStorageProvider.ReadItemValue(item, ContainerSizeDualProperty);
+                    if (value != null)
+                    {
+                        ContainerSizeDual cds = (ContainerSizeDual)value;
+                        containerSize = cds.ItemSize;
+                        containerPixelSize = cds.PixelSize;
+                    }
+                    else
+                    {
+                        useAverageSize = true;
+                    }
+                }
+            }
+
+            if (useAverageSize)
+            {
+                //
+                // This is a performance optimization for the case that the containers are unformly sized.
+                //
+                if (isHorizontal)
+                {
+                    double pixelHeight = DesiredSize.Height;
+
+                    containerSize.Width = uniformOrAverageContainerSize;
+                    containerSize.Height = IsPixelBased ? pixelHeight : 1;
+
+                    containerPixelSize.Width = uniformOrAverageContainerPixelSize;
+                    containerPixelSize.Height = pixelHeight;
+                }
+                else
+                {
+                    double pixelWidth = DesiredSize.Width;
+
+                    containerSize.Height = uniformOrAverageContainerSize;
+                    containerSize.Width = IsPixelBased ? pixelWidth : 1;
+
+                    containerPixelSize.Height = uniformOrAverageContainerPixelSize;
+                    containerPixelSize.Width = pixelWidth;
+                }
+            }
+
+            Debug.Assert(!containerSize.IsEmpty, "We can't estimate an empty size");
+        }
+
+        /// <summary>
         /// Sets the size of the container for a given item. If the items aren't uniformly sized store it in the ItemStorage.
         /// </summary>
+        // *** DEAD CODE This method is only called in VSP45-compat mode ***
         private void SetContainerSizeForItem(
             IContainItemStorage itemStorageProvider,
             IContainItemStorage parentItemStorageProvider,
@@ -5199,7 +5880,7 @@ namespace System.Windows.Controls
 
                 hasUniformOrAverageContainerSizeBeenSet = true;
                 uniformOrAverageContainerSize = isHorizontal ? containerSize.Width : containerSize.Height;
-                SetUniformOrAverageContainerSize(parentItemStorageProvider, parentItem, uniformOrAverageContainerSize);
+                SetUniformOrAverageContainerSize(parentItemStorageProvider, parentItem, uniformOrAverageContainerSize, 1.0);
             }
             else if (areContainersUniformlySized)
             {
@@ -5225,6 +5906,70 @@ namespace System.Windows.Controls
             if (!areContainersUniformlySized)
             {
                 itemStorageProvider.StoreItemValue(item, ContainerSizeProperty, containerSize);
+            }
+        }
+
+        /// <summary>
+        /// Sets the size of the container for a given item. If the items aren't uniformly sized store it in the ItemStorage.
+        /// </summary>
+        private void SetContainerSizeForItem(
+            IContainItemStorage itemStorageProvider,
+            IContainItemStorage parentItemStorageProvider,
+            object parentItem,
+            object item,
+            Size containerSize,
+            Size containerPixelSize,
+            bool isHorizontal,
+            ref bool hasUniformOrAverageContainerSizeBeenSet,
+            ref double uniformOrAverageContainerSize,
+            ref double uniformOrAverageContainerPixelSize,
+            ref bool areContainersUniformlySized)
+        {
+            if (!hasUniformOrAverageContainerSizeBeenSet)
+            {
+                hasUniformOrAverageContainerSizeBeenSet = true;
+                uniformOrAverageContainerSize = isHorizontal ? containerSize.Width : containerSize.Height;
+                uniformOrAverageContainerPixelSize = isHorizontal ? containerPixelSize.Width : containerPixelSize.Height;
+                SetUniformOrAverageContainerSize(parentItemStorageProvider, parentItem, uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize);
+            }
+            else if (areContainersUniformlySized)
+            {
+                //
+                // if we come across a child whose DesiredSize is different from _uniformOrAverageContainerSize,
+                // set AreContainersUniformlySized to false.
+                // Once AreContainersUniformlySized becomes false, don't ever set it back to true.
+                //
+                if (isHorizontal)
+                {
+                    areContainersUniformlySized = DoubleUtil.AreClose(containerSize.Width, uniformOrAverageContainerSize)
+                        && (IsPixelBased || DoubleUtil.AreClose(containerPixelSize.Width, uniformOrAverageContainerPixelSize));
+                }
+                else
+                {
+                    areContainersUniformlySized = DoubleUtil.AreClose(containerSize.Height, uniformOrAverageContainerSize)
+                        && (IsPixelBased || DoubleUtil.AreClose(containerPixelSize.Height, uniformOrAverageContainerPixelSize));
+                }
+            }
+
+            //
+            // Save off the child's desired size for later. The stored size is useful in hierarchical virtualization
+            // scenarios (Eg. TreeView, Grouping) to compute the index of the first visible item in the viewport
+            // and to Arrange children in their proper locations.
+            //
+            if (!areContainersUniformlySized)
+            {
+                if (IsPixelBased)
+                {
+                    // for pixel-scrolling the two values are the same - store only one
+                    itemStorageProvider.StoreItemValue(item, ContainerSizeProperty, containerSize);
+                }
+                else
+                {
+                    // for item-scrolling, store both values
+                    ContainerSizeDual value =
+                            new ContainerSizeDual(containerPixelSize, containerSize);
+                    itemStorageProvider.StoreItemValue(item, ContainerSizeDualProperty, value);
+                }
             }
         }
 
@@ -6284,6 +7029,7 @@ namespace System.Windows.Controls
             }
         }
 
+        // *** DEAD CODE This method is only called in VSP45-compat mode ***
         private void SyncUniformSizeFlags(
             object parentItem,
             IContainItemStorage parentItemStorageProvider,
@@ -6299,13 +7045,9 @@ namespace System.Windows.Controls
             bool isHorizontal,
             bool evaluateAreContainersUniformlySized)
         {
-            bool isVSP45Compat = IsVSP45Compat;
-
+            Debug.Assert(IsVSP45Compat, "this method should only be called in VSP45Compat mode");
             // 4.5 used the wrong ItemStorageProvider for the AreUniformlySized flag
-            if (isVSP45Compat)
-            {
-                parentItemStorageProvider = itemStorageProvider;
-            }
+            parentItemStorageProvider = itemStorageProvider;
 
             if (evaluateAreContainersUniformlySized || areContainersUniformlySized != computedAreContainersUniformlySized)
             {
@@ -6328,51 +7070,18 @@ namespace System.Windows.Controls
 
                         if (virtualizingChild != null)
                         {
-                            if (isVSP45Compat)
-                            {
-                                HierarchicalVirtualizationHeaderDesiredSizes headerDesiredSizes = virtualizingChild.HeaderDesiredSizes;
-                                HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
+                            HierarchicalVirtualizationHeaderDesiredSizes headerDesiredSizes = virtualizingChild.HeaderDesiredSizes;
+                            HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
 
-                                if (IsPixelBased)
-                                {
-                                    childSize = new Size(Math.Max(headerDesiredSizes.PixelSize.Width, itemDesiredSizes.PixelSize.Width),
-                                                                  headerDesiredSizes.PixelSize.Height + itemDesiredSizes.PixelSize.Height);
-                                }
-                                else
-                                {
-                                    childSize = new Size(Math.Max(headerDesiredSizes.LogicalSize.Width, itemDesiredSizes.LogicalSize.Width),
-                                                                  headerDesiredSizes.LogicalSize.Height + itemDesiredSizes.LogicalSize.Height);
-                                }
+                            if (IsPixelBased)
+                            {
+                                childSize = new Size(Math.Max(headerDesiredSizes.PixelSize.Width, itemDesiredSizes.PixelSize.Width),
+                                                              headerDesiredSizes.PixelSize.Height + itemDesiredSizes.PixelSize.Height);
                             }
                             else
                             {
-                                HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
-
-                                if (IsPixelBased)
-                                {
-                                    object v = child.ReadLocalValue(ItemsHostInsetProperty);
-                                    if (v != DependencyProperty.UnsetValue)
-                                    {
-                                        // inset has been set - add it to the ItemsHost size
-                                        Thickness inset = (Thickness)v;
-                                        childSize = new Size(inset.Left + itemDesiredSizes.PixelSize.Width + inset.Right,
-                                                             inset.Top + itemDesiredSizes.PixelSize.Height + inset.Bottom);
-                                    }
-                                    else
-                                    {
-                                        // inset has not been set (typically because
-                                        // child doesn't have an ItemsHost).  Use
-                                        // the child's desired size
-                                        childSize = child.DesiredSize;
-                                    }
-                                }
-                                else
-                                {
-                                    childSize = isHorizontal ? new Size(1 + itemDesiredSizes.LogicalSize.Width,
-                                                                        Math.Max(1, itemDesiredSizes.LogicalSize.Height))
-                                                             : new Size(Math.Max(1, itemDesiredSizes.LogicalSize.Width),
-                                                                        1 + itemDesiredSizes.LogicalSize.Height);
-                                }
+                                childSize = new Size(Math.Max(headerDesiredSizes.LogicalSize.Width, itemDesiredSizes.LogicalSize.Width),
+                                                              headerDesiredSizes.LogicalSize.Height + itemDesiredSizes.LogicalSize.Height);
                             }
                         }
                         else
@@ -6457,12 +7166,6 @@ namespace System.Windows.Controls
                     {
                         uniformOrAverageContainerSize = Math.Round(sumOfContainerSizes / numContainerSizes);
                     }
-
-                    if (SetUniformOrAverageContainerSize(parentItemStorageProvider, parentItem, uniformOrAverageContainerSize)
-                        && !IsVSP45Compat)
-                    {
-                        hasAverageContainerSizeChanged = true;
-                    }
                 }
             }
             else
@@ -6474,6 +7177,220 @@ namespace System.Windows.Controls
             {
                 ScrollTracer.Trace(this, ScrollTraceOp.SyncAveSize,
                     uniformOrAverageContainerSize, areContainersUniformlySized, hasAverageContainerSizeChanged);
+            }
+        }
+
+        private void SyncUniformSizeFlags(
+            object parentItem,
+            IContainItemStorage parentItemStorageProvider,
+            IList children,
+            IList items,
+            IContainItemStorage itemStorageProvider,
+            int itemCount,
+            bool computedAreContainersUniformlySized,
+            double computedUniformOrAverageContainerSize,
+            double computedUniformOrAverageContainerPixelSize,
+            ref bool areContainersUniformlySized,
+            ref double uniformOrAverageContainerSize,
+            ref double uniformOrAverageContainerPixelSize,
+            ref bool hasAverageContainerSizeChanged,
+            bool isHorizontal,
+            bool evaluateAreContainersUniformlySized)
+        {
+            Debug.Assert(!IsVSP45Compat, "this method should not be called in VSP45Compat mode");
+
+            if (evaluateAreContainersUniformlySized || areContainersUniformlySized != computedAreContainersUniformlySized)
+            {
+                Debug.Assert(evaluateAreContainersUniformlySized || !computedAreContainersUniformlySized, "AreContainersUniformlySized starts off true and can only be flipped to false.");
+
+                if (!evaluateAreContainersUniformlySized)
+                {
+                    areContainersUniformlySized = computedAreContainersUniformlySized;
+                    SetAreContainersUniformlySized(parentItemStorageProvider, parentItem, areContainersUniformlySized);
+                }
+
+                for (int i=0; i < children.Count; i++)
+                {
+                    UIElement child = children[i] as UIElement;
+                    if (child != null && VirtualizingPanel.GetShouldCacheContainerSize(child))
+                    {
+                        IHierarchicalVirtualizationAndScrollInfo virtualizingChild  = GetVirtualizingChild(child);
+
+                        Size childSize;
+                        Size childPixelSize;
+
+                        if (virtualizingChild != null)
+                        {
+                            HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
+
+                            object v = child.ReadLocalValue(ItemsHostInsetProperty);
+                            if (v != DependencyProperty.UnsetValue)
+                            {
+                                // inset has been set - add it to the ItemsHost size
+                                Thickness inset = (Thickness)v;
+                                childPixelSize = new Size(inset.Left + itemDesiredSizes.PixelSize.Width + inset.Right,
+                                                     inset.Top + itemDesiredSizes.PixelSize.Height + inset.Bottom);
+                            }
+                            else
+                            {
+                                // inset has not been set (typically because
+                                // child doesn't have an ItemsHost).  Use
+                                // the child's desired size
+                                childPixelSize = child.DesiredSize;
+                            }
+
+                            if (IsPixelBased)
+                            {
+                                childSize = childPixelSize;
+                            }
+                            else
+                            {
+                                childSize = isHorizontal ? new Size(1 + itemDesiredSizes.LogicalSize.Width,
+                                                                    Math.Max(1, itemDesiredSizes.LogicalSize.Height))
+                                                         : new Size(Math.Max(1, itemDesiredSizes.LogicalSize.Width),
+                                                                    1 + itemDesiredSizes.LogicalSize.Height);
+                            }
+                        }
+                        else
+                        {
+                            childPixelSize = child.DesiredSize;
+
+                            if (IsPixelBased)
+                            {
+                                childSize = childPixelSize;
+                            }
+                            else
+                            {
+                                childSize = new Size(DoubleUtil.GreaterThan(child.DesiredSize.Width, 0) ? 1 : 0,
+                                                     DoubleUtil.GreaterThan(child.DesiredSize.Height, 0) ? 1 : 0);
+                            }
+                        }
+
+                        if (evaluateAreContainersUniformlySized && computedAreContainersUniformlySized)
+                        {
+                            if (isHorizontal)
+                            {
+                                computedAreContainersUniformlySized = DoubleUtil.AreClose(childSize.Width, uniformOrAverageContainerSize)
+                                    && (IsPixelBased || DoubleUtil.AreClose(childPixelSize.Width, uniformOrAverageContainerPixelSize));
+                            }
+                            else
+                            {
+                                computedAreContainersUniformlySized = DoubleUtil.AreClose(childSize.Height, uniformOrAverageContainerSize)
+                                    && (IsPixelBased || DoubleUtil.AreClose(childPixelSize.Height, uniformOrAverageContainerPixelSize));
+                            }
+
+                            if (!computedAreContainersUniformlySized)
+                            {
+                                // We need to restart the loop and cache
+                                // the sizes of all children prior to this one
+
+                                i = -1;
+                            }
+                        }
+                        else
+                        {
+                            if (IsPixelBased)
+                            {
+                                // for pixel-scrolling the two values are the same - store only one
+                                itemStorageProvider.StoreItemValue(((ItemContainerGenerator)Generator).ItemFromContainer(child), ContainerSizeProperty, childSize);
+                            }
+                            else
+                            {
+                                // for item-scrolling, store both values
+                                ContainerSizeDual value =
+                                        new ContainerSizeDual(childPixelSize, childSize);
+                                itemStorageProvider.StoreItemValue(((ItemContainerGenerator)Generator).ItemFromContainer(child), ContainerSizeDualProperty, value);
+                            }
+                        }
+                    }
+                }
+
+                if (evaluateAreContainersUniformlySized)
+                {
+                    areContainersUniformlySized = computedAreContainersUniformlySized;
+                    SetAreContainersUniformlySized(parentItemStorageProvider, parentItem, areContainersUniformlySized);
+                }
+            }
+
+            if (!computedAreContainersUniformlySized)
+            {
+                Size containerSize = new Size();
+                Size containerPixelSize = new Size();
+                double sumOfContainerSizes = 0;
+                double sumOfContainerPixelSizes = 0;
+                int numContainerSizes = 0;
+
+                for (int i=0; i<itemCount; i++)
+                {
+                    object value = null;
+
+                    if (IsPixelBased)
+                    {
+                        value = itemStorageProvider.ReadItemValue(items[i], ContainerSizeProperty);
+                        if (value != null)
+                        {
+                            containerSize = (Size)value;
+                            containerPixelSize = containerSize;
+                        }
+                    }
+                    else
+                    {
+                        value = itemStorageProvider.ReadItemValue(items[i], ContainerSizeDualProperty);
+                        if (value != null)
+                        {
+                            ContainerSizeDual csd = (ContainerSizeDual)value;
+                            containerSize = csd.ItemSize;
+                            containerPixelSize = csd.PixelSize;
+                        }
+                    }
+
+                    if (value != null)
+                    {
+                        // we found an item that has been realized at some point.
+                        // add its size to the accumulated total
+                        if (isHorizontal)
+                        {
+                            sumOfContainerSizes += containerSize.Width;
+                            sumOfContainerPixelSizes += containerPixelSize.Width;
+                            numContainerSizes++;
+                        }
+                        else
+                        {
+                            sumOfContainerSizes += containerSize.Height;
+                            sumOfContainerPixelSizes += containerPixelSize.Height;
+                            numContainerSizes++;
+                        }
+                    }
+                }
+
+                if (numContainerSizes > 0)
+                {
+                    uniformOrAverageContainerPixelSize = sumOfContainerPixelSizes / numContainerSizes;
+                    if (IsPixelBased)
+                    {
+                        uniformOrAverageContainerSize = uniformOrAverageContainerPixelSize;
+                    }
+                    else
+                    {
+                        uniformOrAverageContainerSize = Math.Round(sumOfContainerSizes / numContainerSizes);
+                    }
+
+                    if (SetUniformOrAverageContainerSize(parentItemStorageProvider, parentItem, uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize))
+                    {
+                        hasAverageContainerSizeChanged = true;
+                    }
+                }
+            }
+            else
+            {
+                uniformOrAverageContainerSize = computedUniformOrAverageContainerSize;
+                uniformOrAverageContainerPixelSize = computedUniformOrAverageContainerPixelSize;
+            }
+
+            if (ScrollTracer.IsEnabled && ScrollTracer.IsTracing(this))
+            {
+                ScrollTracer.Trace(this, ScrollTraceOp.SyncAveSize,
+                    uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize, areContainersUniformlySized, hasAverageContainerSizeChanged);
             }
         }
 
@@ -6573,11 +7490,33 @@ namespace System.Windows.Controls
 
         private double GetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider, object item)
         {
-            bool hasUniformOrAverageContainerSizeBeenSet;
-            return GetUniformOrAverageContainerSize(itemStorageProvider, item, out hasUniformOrAverageContainerSizeBeenSet);
+            double uniformOrAverageContainerSize, uniformOrAverageContainerPixelSize;
+            GetUniformOrAverageContainerSize(itemStorageProvider, item,
+                IsPixelBased || IsVSP45Compat,
+                out uniformOrAverageContainerSize,
+                out uniformOrAverageContainerPixelSize);
+            return uniformOrAverageContainerSize;
         }
 
-        private double GetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider, object item, out bool hasUniformOrAverageContainerSizeBeenSet)
+        private void GetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider,
+            object item,
+            bool isSingleValue,
+            out double uniformOrAverageContainerSize,
+            out double uniformOrAverageContainerPixelSize)
+        {
+            bool hasUniformOrAverageContainerSizeBeenSet;
+            GetUniformOrAverageContainerSize(itemStorageProvider, item, isSingleValue,
+                out uniformOrAverageContainerSize,
+                out uniformOrAverageContainerPixelSize,
+                out hasUniformOrAverageContainerSizeBeenSet);
+        }
+
+        private void GetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider,
+            object item,
+            bool isSingleValue,
+            out double uniformOrAverageContainerSize,
+            out double uniformOrAverageContainerPixelSize,
+            out bool hasUniformOrAverageContainerSizeBeenSet)
         {
             Debug.Assert(itemStorageProvider != null || item == this, "An item storage provider must be available.");
             Debug.Assert(item != null, "An item must be available.");
@@ -6588,25 +7527,54 @@ namespace System.Windows.Controls
                 {
                     // Return the cached value if for VSP and if present.
                     hasUniformOrAverageContainerSizeBeenSet = true;
-                    return (double)UniformOrAverageContainerSize;
+                    uniformOrAverageContainerSize = (double)UniformOrAverageContainerSize;
+
+                    if (isSingleValue)
+                    {
+                        uniformOrAverageContainerPixelSize = uniformOrAverageContainerSize;
+                    }
+                    else
+                    {
+                        uniformOrAverageContainerPixelSize = (double)UniformOrAverageContainerPixelSize;
+                    }
+                    return;
                 }
             }
             else
             {
-                object value = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeProperty);
-                if (value != null)
+                if (isSingleValue)
                 {
-                    hasUniformOrAverageContainerSizeBeenSet = true;
-                    return (double)value;
+                    object value = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeProperty);
+                    if (value != null)
+                    {
+                        hasUniformOrAverageContainerSizeBeenSet = true;
+                        uniformOrAverageContainerSize = (double)value;
+                        uniformOrAverageContainerPixelSize = uniformOrAverageContainerSize;
+                        return;
+                    }
+                }
+                else
+                {
+                    object value = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeDualProperty);
+                    if (value != null)
+                    {
+                        UniformOrAverageContainerSizeDual d = (UniformOrAverageContainerSizeDual)value;
+                        hasUniformOrAverageContainerSizeBeenSet = true;
+                        uniformOrAverageContainerSize = d.ItemSize;
+                        uniformOrAverageContainerPixelSize = d.PixelSize;
+                        return;
+                    }
                 }
             }
 
             hasUniformOrAverageContainerSizeBeenSet = false;
-            return IsPixelBased ? ScrollViewer._scrollLineDelta : 1.0;
+            uniformOrAverageContainerPixelSize = ScrollViewer._scrollLineDelta;
+            uniformOrAverageContainerSize = IsPixelBased ? uniformOrAverageContainerPixelSize : 1.0;
+            return;
         }
 
         // returns true if the cached average size changed
-        private bool SetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider, object item, double value)
+        private bool SetUniformOrAverageContainerSize(IContainItemStorage itemStorageProvider, object item, double value, double pixelValue)
         {
             Debug.Assert(itemStorageProvider != null || item == this, "An item storage provider must be available.");
             Debug.Assert(item != null, "An item must be available.");
@@ -6627,14 +7595,25 @@ namespace System.Windows.Controls
                     if (UniformOrAverageContainerSize != value)
                     {
                         UniformOrAverageContainerSize = value;
+                        UniformOrAverageContainerPixelSize = pixelValue;
                         result = true;
                     }
                 }
                 else
                 {
-                    object oldValue = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeProperty);
-                    itemStorageProvider.StoreItemValue(item, UniformOrAverageContainerSizeProperty, value);
-                    result = !Object.Equals(oldValue, value);
+                    if (IsPixelBased || IsVSP45Compat)
+                    {
+                        object oldValue = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeProperty);
+                        itemStorageProvider.StoreItemValue(item, UniformOrAverageContainerSizeProperty, value);
+                        result = !Object.Equals(oldValue, value);
+                    }
+                    else
+                    {
+                        UniformOrAverageContainerSizeDual oldValue = itemStorageProvider.ReadItemValue(item, UniformOrAverageContainerSizeDualProperty) as UniformOrAverageContainerSizeDual;
+                        UniformOrAverageContainerSizeDual newValue = new UniformOrAverageContainerSizeDual(pixelValue, value);
+                        itemStorageProvider.StoreItemValue(item, UniformOrAverageContainerSizeDualProperty, newValue);
+                        result = (oldValue == null) || (oldValue.ItemSize != value);
+                    }
                 }
             }
 
@@ -6648,6 +7627,7 @@ namespace System.Windows.Controls
             ref object parentItem,
             ref bool hasUniformOrAverageContainerSizeBeenSet,
             ref double computedUniformOrAverageContainerSize,
+            ref double computedUniformOrAverageContainerPixelSize,
             ref bool computedAreContainersUniformlySized,
             ref IList items,
             ref IList children,
@@ -6686,6 +7666,7 @@ namespace System.Windows.Controls
                 ref parentItem,
                 ref hasUniformOrAverageContainerSizeBeenSet,
                 ref computedUniformOrAverageContainerSize,
+                ref computedUniformOrAverageContainerPixelSize,
                 ref computedAreContainersUniformlySized,
                 ref items,
                 ref item,
@@ -6724,6 +7705,7 @@ namespace System.Windows.Controls
             ref object parentItem,
             ref bool hasUniformOrAverageContainerSizeBeenSet,
             ref double computedUniformOrAverageContainerSize,
+            ref double computedUniformOrAverageContainerPixelSize,
             ref bool computedAreContainersUniformlySized,
             ref IList items,
             ref object item,
@@ -6920,16 +7902,34 @@ namespace System.Windows.Controls
 
             if (VirtualizingPanel.GetShouldCacheContainerSize(child))
             {
-                SetContainerSizeForItem(
-                    itemStorageProvider,
-                    parentItemStorageProvider,
-                    parentItem,
-                    item,
-                    IsPixelBased ? childPixelSize : childLogicalSize,
-                    isHorizontal,
-                    ref hasUniformOrAverageContainerSizeBeenSet,
-                    ref computedUniformOrAverageContainerSize,
-                    ref computedAreContainersUniformlySized);
+                if (IsVSP45Compat)
+                {
+                    SetContainerSizeForItem(
+                        itemStorageProvider,
+                        parentItemStorageProvider,
+                        parentItem,
+                        item,
+                        IsPixelBased ? childPixelSize : childLogicalSize,
+                        isHorizontal,
+                        ref hasUniformOrAverageContainerSizeBeenSet,
+                        ref computedUniformOrAverageContainerSize,
+                        ref computedAreContainersUniformlySized);
+                }
+                else
+                {
+                    SetContainerSizeForItem(
+                        itemStorageProvider,
+                        parentItemStorageProvider,
+                        parentItem,
+                        item,
+                        IsPixelBased ? childPixelSize : childLogicalSize,
+                        childPixelSize,
+                        isHorizontal,
+                        ref hasUniformOrAverageContainerSizeBeenSet,
+                        ref computedUniformOrAverageContainerSize,
+                        ref computedUniformOrAverageContainerPixelSize,
+                        ref computedAreContainersUniformlySized);
+                }
             }
 
             if (virtualizingChild != null)
@@ -6967,12 +7967,14 @@ namespace System.Windows.Controls
                 {
                     if (isHorizontal)
                     {
-                        rcChild.X = -1.0 * _previousStackPixelSizeInCacheBeforeViewport.Width;
+                        rcChild.X = -1.0 *
+                            ((IsVSP45Compat || !IsVirtualizing) ? _previousStackPixelSizeInCacheBeforeViewport.Width : _pixelDistanceToViewport);
                         rcChild.Y = -1.0 * _scrollData._computedOffset.Y;
                     }
                     else
                     {
-                        rcChild.Y = -1.0 * _previousStackPixelSizeInCacheBeforeViewport.Height;
+                        rcChild.Y = -1.0 *
+                            ((IsVSP45Compat || !IsVirtualizing) ? _previousStackPixelSizeInCacheBeforeViewport.Height : _pixelDistanceToViewport);
                         rcChild.X = -1.0 * _scrollData._computedOffset.X;
                     }
                 }
@@ -6983,15 +7985,29 @@ namespace System.Windows.Controls
                 }
             }
 
-            if (IsVirtualizing && IsPixelBased)
+            if (IsVirtualizing)
             {
-                if (isHorizontal)
+                if (IsPixelBased)
                 {
-                    rcChild.X += _firstItemInExtendedViewportOffset;
+                    if (isHorizontal)
+                    {
+                        rcChild.X += _firstItemInExtendedViewportOffset;
+                    }
+                    else
+                    {
+                        rcChild.Y += _firstItemInExtendedViewportOffset;
+                    }
                 }
-                else
+                else if (!IsVSP45Compat)
                 {
-                    rcChild.Y += _firstItemInExtendedViewportOffset;
+                    if (isHorizontal)
+                    {
+                        rcChild.X += _pixelDistanceToFirstContainerInExtendedViewport;
+                    }
+                    else
+                    {
+                        rcChild.Y += _pixelDistanceToFirstContainerInExtendedViewport;
+                    }
                 }
             }
 
@@ -7004,48 +8020,29 @@ namespace System.Windows.Controls
                 rcChild.Height = Math.Max(arrangeLength, childDesiredSize.Height);
                 previousChildSize = childDesiredSize;
 
-                if (!IsPixelBased && virtualizingChild != null)
+                if (!IsPixelBased && virtualizingChild != null && IsVSP45Compat)
                 {
                     //
                     // For a non leaf item we only want to account for the size in the extended viewport
                     //
                     HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
 
-                    if (IsVSP45Compat)
+                    previousChildSize.Width = itemDesiredSizes.PixelSizeInViewport.Width;
+
+                    if (isChildHorizontal == isHorizontal)
                     {
-                        previousChildSize.Width = itemDesiredSizes.PixelSizeInViewport.Width;
-
-                        if (isChildHorizontal == isHorizontal)
-                        {
-                            previousChildSize.Width += itemDesiredSizes.PixelSizeBeforeViewport.Width + itemDesiredSizes.PixelSizeAfterViewport.Width;
-                        }
-
-                        RelativeHeaderPosition headerPosition = RelativeHeaderPosition.Top; // virtualizingChild.RelativeHeaderPosition;
-                        Size pixelHeaderSize = virtualizingChild.HeaderDesiredSizes.PixelSize;
-                        if (headerPosition == RelativeHeaderPosition.Left || headerPosition == RelativeHeaderPosition.Right)
-                        {   // *** DEAD CODE  headerPosition is always Top ***
-                            previousChildSize.Width += pixelHeaderSize.Width;
-                        }   // *** END DEAD CODE ***
-                        else
-                        {
-                            previousChildSize.Width = Math.Max(previousChildSize.Width, pixelHeaderSize.Width);
-                        }
+                        previousChildSize.Width += itemDesiredSizes.PixelSizeBeforeViewport.Width + itemDesiredSizes.PixelSizeAfterViewport.Width;
                     }
+
+                    RelativeHeaderPosition headerPosition = RelativeHeaderPosition.Top; // virtualizingChild.RelativeHeaderPosition;
+                    Size pixelHeaderSize = virtualizingChild.HeaderDesiredSizes.PixelSize;
+                    if (headerPosition == RelativeHeaderPosition.Left || headerPosition == RelativeHeaderPosition.Right)
+                    {   // *** DEAD CODE  headerPosition is always Top ***
+                        previousChildSize.Width += pixelHeaderSize.Width;
+                    }   // *** END DEAD CODE ***
                     else
                     {
-                        // this only applies if the inner ItemsHost produced something
-                        if (itemDesiredSizes.PixelSize.Width > 0)
-                        {
-                            previousChildSize.Width = itemDesiredSizes.PixelSizeInViewport.Width;
-
-                            if (isChildHorizontal == isHorizontal)
-                            {
-                                previousChildSize.Width += itemDesiredSizes.PixelSizeBeforeViewport.Width + itemDesiredSizes.PixelSizeAfterViewport.Width;
-                            }
-
-                            Thickness inset = GetItemsHostInsetForChild(virtualizingChild);
-                            previousChildSize.Width += inset.Left + inset.Right;
-                        }
+                        previousChildSize.Width = Math.Max(previousChildSize.Width, pixelHeaderSize.Width);
                     }
                 }
             }
@@ -7055,49 +8052,30 @@ namespace System.Windows.Controls
                 rcChild.Width = Math.Max(arrangeLength, childDesiredSize.Width);
                 previousChildSize = childDesiredSize;
 
-                if (!IsPixelBased && virtualizingChild != null)
+                if (!IsPixelBased && virtualizingChild != null && IsVSP45Compat)
                 {
                     //
                     // For a non leaf item we only want to account for the size in the extended viewport
                     //
                     HierarchicalVirtualizationItemDesiredSizes itemDesiredSizes = virtualizingChild.ItemDesiredSizes;
 
-                    if (IsVSP45Compat)
+                    previousChildSize.Height = itemDesiredSizes.PixelSizeInViewport.Height;
+
+                    if (isChildHorizontal == isHorizontal)
                     {
-                        previousChildSize.Height = itemDesiredSizes.PixelSizeInViewport.Height;
+                        previousChildSize.Height += itemDesiredSizes.PixelSizeBeforeViewport.Height + itemDesiredSizes.PixelSizeAfterViewport.Height;
+                    }
 
-                        if (isChildHorizontal == isHorizontal)
-                        {
-                            previousChildSize.Height += itemDesiredSizes.PixelSizeBeforeViewport.Height + itemDesiredSizes.PixelSizeAfterViewport.Height;
-                        }
-
-                        RelativeHeaderPosition headerPosition = RelativeHeaderPosition.Top; // virtualizingChild.RelativeHeaderPosition;
-                        Size pixelHeaderSize = virtualizingChild.HeaderDesiredSizes.PixelSize;
-                        if (headerPosition == RelativeHeaderPosition.Top || headerPosition == RelativeHeaderPosition.Bottom)
-                        {
-                            previousChildSize.Height += pixelHeaderSize.Height;
-                        }
-                        else
-                        {   // *** DEAD CODE  headerPosition is always Top ***
-                            previousChildSize.Height = Math.Max(previousChildSize.Height, pixelHeaderSize.Height);
-                        }   // *** END DEAD CODE ***
+                    RelativeHeaderPosition headerPosition = RelativeHeaderPosition.Top; // virtualizingChild.RelativeHeaderPosition;
+                    Size pixelHeaderSize = virtualizingChild.HeaderDesiredSizes.PixelSize;
+                    if (headerPosition == RelativeHeaderPosition.Top || headerPosition == RelativeHeaderPosition.Bottom)
+                    {
+                        previousChildSize.Height += pixelHeaderSize.Height;
                     }
                     else
-                    {
-                        // this only applies if the inner ItemsHost produced something
-                        if (itemDesiredSizes.PixelSize.Height > 0)
-                        {
-                            previousChildSize.Height = itemDesiredSizes.PixelSizeInViewport.Height;
-
-                            if (isChildHorizontal == isHorizontal)
-                            {
-                                previousChildSize.Height += itemDesiredSizes.PixelSizeBeforeViewport.Height + itemDesiredSizes.PixelSizeAfterViewport.Height;
-                            }
-
-                            Thickness inset = GetItemsHostInsetForChild(virtualizingChild);
-                            previousChildSize.Height += inset.Top + inset.Bottom;
-                        }
-                    }
+                    {   // *** DEAD CODE  headerPosition is always Top ***
+                        previousChildSize.Height = Math.Max(previousChildSize.Height, pixelHeaderSize.Height);
+                    }   // *** END DEAD CODE ***
                 }
             }
 
@@ -8310,13 +9288,18 @@ namespace System.Windows.Controls
             if (ScrollTracer.IsEnabled && ScrollTracer.IsTracing(this))
             {
                 ScrollTracer.Trace(this, ScrollTraceOp.SVSDBegin,
-                    IsScrollActive, MeasureCaches,
-                    _scrollData._offset, computedViewportOffset, extentSize, viewportSize);
+                    "isa:", IsScrollActive,
+                    "mc:", MeasureCaches,
+                    "o:", _scrollData._offset,
+                    "co:", computedViewportOffset,
+                    "ex:", extentSize,
+                    "vs:", viewportSize,
+                    "pxInV:", stackPixelSizeInViewport);
 
                 if (hasAverageContainerSizeChanged)
                 {
                     ScrollTracer.Trace(this, ScrollTraceOp.SVSDBegin,
-                        "acs:", UniformOrAverageContainerSize);
+                        "acs:", UniformOrAverageContainerSize, UniformOrAverageContainerPixelSize);
                 }
             }
 
@@ -10008,6 +10991,16 @@ namespace System.Windows.Controls
         }
 
         /// <summary>
+        ///     Cache property for scrolling VSP to
+        ///     avoid ItemStorageProvider calls
+        /// </summary>
+        private double? UniformOrAverageContainerPixelSize
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Returns the list of childen that have been realized by the Generator.
         /// We must use this method whenever we interact with the Generator's index.
         /// In recycling mode the Children collection also contains recycled containers and thus does
@@ -10119,6 +11112,10 @@ namespace System.Windows.Controls
         private FrameworkElement _firstContainerInViewport;
         private double _firstContainerOffsetFromViewport;
         private double _expectedDistanceBetweenViewports;
+
+        // two quantities needed when item-scrolling, to arrange children correctly
+        private double _pixelDistanceToFirstContainerInExtendedViewport;
+        private double _pixelDistanceToViewport;
 
         // Used by the Recycling mode to maintain the list of actual realized children (a realized child is one that the ItemContainerGenerator has
         // generated).  We need a mapping between children in the UIElementCollection and realized containers in the generator.  In standard virtualization
@@ -10264,6 +11261,8 @@ namespace System.Windows.Controls
 
         #endregion ScrollData
 
+        #region Information caches
+
         // Information used to avoid loops when scrolling to the last page
         private class OffsetInformation
         {
@@ -10271,6 +11270,73 @@ namespace System.Windows.Controls
             public double? lastPageSafeOffset { get; set; }
             public double? lastPagePixelSize { get; set; }
         }
+
+        // Information used to handle extent changes due to added/removed items
+        // This is part of the state of Measure - exactly what's needed to compute
+        // the effective offset (see ComputeEffectiveOffset).   After an extent
+        // change we need to recompute the effective offset using the new average
+        // container size.  When this happens, there's no Measure going on;
+        // instead we use the state saved at the end of the most recent Measure.
+        private class FirstContainerInformation
+        {
+            public Rect             Viewport;           // in local coordinates
+            public DependencyObject FirstContainer;     // first container visible in viewport
+            public int              FirstItemIndex;     // index of corresponding item
+            public double           FirstItemOffset;    // offset from top of viewport
+
+            public FirstContainerInformation(ref Rect viewport, DependencyObject firstContainer, int firstItemIndex, double firstItemOffset)
+            {
+                Viewport = viewport;
+                FirstContainer = firstContainer;
+                FirstItemIndex = firstItemIndex;
+                FirstItemOffset = firstItemOffset;
+            }
+        }
+
+        private static UncommonField<FirstContainerInformation> FirstContainerInformationField =
+            new UncommonField<FirstContainerInformation>();
+
+        // For item-scrolling, record the size of each container in both
+        // pixels and items
+        private class ContainerSizeDual : Tuple<Size, Size>
+        {
+            public ContainerSizeDual(Size pixelSize, Size itemSize)
+                : base(pixelSize, itemSize)
+            {
+            }
+
+            public Size PixelSize
+            {
+                get { return Item1; }
+            }
+
+            public Size ItemSize
+            {
+                get { return Item2; }
+            }
+        }
+
+        // For item-scrolling, record the average container size in both
+        // pixels and items
+        private class UniformOrAverageContainerSizeDual : Tuple<Double, Double>
+        {
+            public UniformOrAverageContainerSizeDual(Double pixelSize, Double itemSize)
+                : base(pixelSize, itemSize)
+            {
+            }
+
+            public Double PixelSize
+            {
+                get { return Item1; }
+            }
+
+            public Double ItemSize
+            {
+                get { return Item2; }
+            }
+        }
+
+        #endregion Information caches
 
         #region ScrollTracer
 

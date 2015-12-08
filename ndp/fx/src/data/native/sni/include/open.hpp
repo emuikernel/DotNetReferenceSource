@@ -84,6 +84,8 @@ public:
 	bool m_fCanUseCache;
 	bool m_fStandardInstName;
 	bool m_fParallel;
+	TransparentNetworkResolutionMode m_TransparentNetworkResolution;
+	int  m_TotalTimeout;
 
 	ConnectParameter()
 	{
@@ -96,6 +98,8 @@ public:
 		m_fCanUseCache=true;
 		m_fStandardInstName=true;
 		m_fParallel=false;
+		m_TransparentNetworkResolution = TransparentNetworkResolutionMode::DisabledMode;
+		m_TotalTimeout = SNIOPEN_TIMEOUT_VALUE;
 	}
 
 	~ConnectParameter()
@@ -169,6 +173,14 @@ Exit:
 		BidTraceU1( SNI_BID_TRACE_ON, RETURN_TAG _T("%d{WINERR}\n"), dwRet);
 		return dwRet;
 		
+	}
+	
+		DWORD ParseConnectionString(const WCHAR * wszConnect, bool fParallel , TransparentNetworkResolutionMode transparentNetworkResolution, int totalTimeout)
+	{
+		m_TransparentNetworkResolution = transparentNetworkResolution;
+		m_TotalTimeout = totalTimeout;
+
+		return ParseConnectionString(wszConnect, fParallel);
 	}
 	
 	DWORD ParseConnectionString( const WCHAR * wszConnect, bool fParallel )
@@ -661,6 +673,8 @@ public:
 		{
 			WCHAR wszPort[MAX_PROTOCOLPARAMETER_LENGTH+1];
 			bool fParallel;
+			TransparentNetworkResolutionMode transparentNetworkIPResolution;
+			int  totalTimeout;
 		} Tcp;
 
 		struct
@@ -730,6 +744,8 @@ public:
 		{
 			case TCP_PROV:
 				Tcp.fParallel = false;
+				Tcp.transparentNetworkIPResolution = TransparentNetworkResolutionMode::DisabledMode;
+				Tcp.totalTimeout = SNIOPEN_TIMEOUT_VALUE;
 				break;
 			default:
 				// nothing to be done for other protocols

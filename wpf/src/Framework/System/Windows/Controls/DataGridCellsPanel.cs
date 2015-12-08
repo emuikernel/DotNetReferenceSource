@@ -1642,6 +1642,7 @@ namespace System.Windows.Controls
             get
             {
                 DataGridColumnCollection columns = (DataGridColumnCollection)ParentDataGrid.Columns;
+                EnsureRealizedChildren();   // necessary because this can be called before Measure (DevDiv2 1123429)
                 IList children = RealizedChildren;
 
                 // common case:  all columns are present

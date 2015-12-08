@@ -438,7 +438,7 @@ namespace Microsoft.Win32 {
         // simultaneously: overlapped IO, free the memory for the overlapped 
         // struct in a callback (or an EndRead method called by that callback), 
         // and pass in an address for the numBytesRead parameter.  
-        // <STRIP> See Windows Bug 105512 for details.  -- </STRIP>
+        // <
 
         [DllImport(KERNEL32, SetLastError = true)]
         [SecurityCritical]
@@ -456,7 +456,7 @@ namespace Microsoft.Win32 {
         // simultaneously: overlapped IO, free the memory for the overlapped 
         // struct in a callback (or an EndWrite method called by that callback),
         // and pass in an address for the numBytesRead parameter.  
-        // <STRIP> See Windows Bug 105512 for details.  -- </STRIP>
+        // <
 
         [DllImport(KERNEL32, SetLastError = true)]
         [SecurityCritical]

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation.  All rights reserved
+// Copyright (c) Microsoft Corporation.  All rights reserved
 // This program uses code hyperlinks available as part of the HyperAddin Visual Studio plug-in.
 // It is available from http://www.codeplex.com/hyperAddin 
 #define FEATURE_MANAGED_ETW
@@ -3298,23 +3299,27 @@ namespace System.Diagnostics.Tracing
                                 }
                                 else if (eventAttribute.Opcode == EventOpcode.Stop)
                                 {
-                                    // Find the start associated with this stop event.  We requre start to be immediately before the stop
+                                    // Find the start associated with this stop event.  We require start to be immediately before the stop
                                     int startEventId = eventAttribute.EventId - 1;
-                                    Contract.Assert(0 <= startEventId);                // Since we reserve id 0, we know that id-1 is <= 0
-                                    EventMetadata startEventMetadata = eventData[startEventId];
-
-                                    // If you remove the Stop and add a Start does that name match the Start Event's Name?
-                                    // Ideally we would throw an error 
-                                    string taskName = eventName.Substring(0, eventName.Length - s_ActivityStopSuffix.Length); // Remove the Stop suffix to get the task name
-                                    if (startEventMetadata.Descriptor.Opcode == (byte)EventOpcode.Start &&
-                                        string.Compare(startEventMetadata.Name, 0, taskName, 0, taskName.Length) == 0 &&
-                                        string.Compare(startEventMetadata.Name, taskName.Length, s_ActivityStartSuffix, 0, Math.Max(startEventMetadata.Name.Length - taskName.Length, s_ActivityStartSuffix.Length)) == 0)
+                                    if (eventData != null && startEventId < eventData.Length)    
                                     {
+                                        Contract.Assert(0 <= startEventId);                // Since we reserve id 0, we know that id-1 is <= 0
+                                        EventMetadata startEventMetadata = eventData[startEventId];
 
-                                        // Make the stop event match the start event
-                                        eventAttribute.Task = (EventTask)startEventMetadata.Descriptor.Task;
+                                        // If you remove the Stop and add a Start does that name match the Start Event's Name?
+                                        // Ideally we would throw an error 
+                                        string taskName = eventName.Substring(0, eventName.Length - s_ActivityStopSuffix.Length); // Remove the Stop suffix to get the task name
+                                        if (startEventMetadata.Descriptor.Opcode == (byte)EventOpcode.Start &&
+                                            string.Compare(startEventMetadata.Name, 0, taskName, 0, taskName.Length) == 0 &&
+                                            string.Compare(startEventMetadata.Name, taskName.Length, s_ActivityStartSuffix, 0, Math.Max(startEventMetadata.Name.Length - taskName.Length, s_ActivityStartSuffix.Length)) == 0)
+                                        {
+
+                                            // Make the stop event match the start event
+                                            eventAttribute.Task = (EventTask)startEventMetadata.Descriptor.Task;
+                                            noTask = false;
+                                        }
                                     }
-                                    else if ((flags & EventManifestOptions.Strict) != 0)        // Throw an error if we can compatibly.   
+                                    if (noTask && (flags & EventManifestOptions.Strict) != 0)        // Throw an error if we can compatibly.   
                                         throw new ArgumentException(Environment.GetResourceString("EventSource_StopsFollowStarts"));
                                 }
                             }
@@ -3551,8 +3556,14 @@ namespace System.Diagnostics.Tracing
                 manifest.ManifestError(Environment.GetResourceString("EventSource_EventIdReused", evtName, evtId, eventData[evtId].Name), true);
             }
 
+            // We give a task to things if they don't have one.  
+            Contract.Assert(eventAttribute.Task != EventTask.None || eventAttribute.Opcode != EventOpcode.Info);     
             for (int idx = 0; idx < eventData.Length; ++idx)
             {
+                // skip unused Event IDs. 
+                if (eventData[idx].Name == null)
+                    continue;
+                
                 if (eventData[idx].Descriptor.Task == (int)eventAttribute.Task && eventData[idx].Descriptor.Opcode == (int)eventAttribute.Opcode)
                 {
                     manifest.ManifestError(Environment.GetResourceString("EventSource_TaskOpcodePairReused",
@@ -4656,7 +4667,7 @@ namespace System.Diagnostics.Tracing
         {
             get
             {
-                if ((uint)EventId >= (uint)m_eventSource.m_eventData.Length)
+                if (EventId < 0)
                     return EventLevel.LogAlways;
                 return (EventLevel)m_eventSource.m_eventData[EventId].Descriptor.Level;
             }

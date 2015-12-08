@@ -385,6 +385,7 @@ namespace System.Data.SqlClient {
                               bool trustServerCert,
                               bool integratedSecurity,
                               bool withFailover,
+                              bool isFirstTransparentAttempt,
                               SqlAuthenticationMethod authType) {
             if (_state != TdsParserState.Closed) {
                 Debug.Assert(false, "TdsParser.Connect called on non-closed connection!");
@@ -433,8 +434,21 @@ namespace System.Data.SqlClient {
 
             bool fParallel = _connHandler.ConnectionOptions.MultiSubnetFailover;
 
-            _physicalStateObj.CreatePhysicalSNIHandle(serverInfo.ExtendedServerName, ignoreSniOpenTimeout, timerExpire, 
-                        out instanceName, _sniSpnBuffer, false, true, fParallel);
+            TransparentNetworkResolutionState transparentNetworkResolutionState;
+            if(_connHandler.ConnectionOptions.TransparentNetworkIPResolution)
+            {
+                if(isFirstTransparentAttempt)
+                    transparentNetworkResolutionState = TransparentNetworkResolutionState.SequentialMode;
+                else
+                    transparentNetworkResolutionState = TransparentNetworkResolutionState.ParallelMode;
+            }
+            else 
+                transparentNetworkResolutionState = TransparentNetworkResolutionState.DisabledMode;
+
+            int  totalTimeout = _connHandler.ConnectionOptions.ConnectTimeout;
+
+            _physicalStateObj.CreatePhysicalSNIHandle(serverInfo.ExtendedServerName, ignoreSniOpenTimeout, timerExpire,
+                        out instanceName, _sniSpnBuffer, false, true, fParallel, transparentNetworkResolutionState, totalTimeout);
 
             if (TdsEnums.SNI_SUCCESS != _physicalStateObj.Status) {
                 _physicalStateObj.AddError(ProcessSNIError(_physicalStateObj));
@@ -491,7 +505,7 @@ namespace System.Data.SqlClient {
 
                 // On Instance failure re-connect and flush SNI named instance cache.
                 _physicalStateObj.SniContext=SniContext.Snix_Connect;
-                _physicalStateObj.CreatePhysicalSNIHandle(serverInfo.ExtendedServerName, ignoreSniOpenTimeout, timerExpire, out instanceName, _sniSpnBuffer, true, true, fParallel);
+                _physicalStateObj.CreatePhysicalSNIHandle(serverInfo.ExtendedServerName, ignoreSniOpenTimeout, timerExpire, out instanceName, _sniSpnBuffer, true, true, fParallel, transparentNetworkResolutionState, totalTimeout);
 
                 if (TdsEnums.SNI_SUCCESS != _physicalStateObj.Status) {
                     _physicalStateObj.AddError(ProcessSNIError(_physicalStateObj));
@@ -1213,7 +1227,7 @@ namespace System.Data.SqlClient {
             // Don't break the connection if it is already closed
             breakConnection &= (TdsParserState.Closed != _state);
             if (breakConnection) {
-                if ((_state == TdsParserState.OpenNotLoggedIn) && (_connHandler.ConnectionOptions.MultiSubnetFailover || _loginWithFailover) && (temp.Count == 1) && ((temp[0].Number == TdsEnums.TIMEOUT_EXPIRED) || (temp[0].Number == TdsEnums.SNI_WAIT_TIMEOUT))) {
+                if ((_state == TdsParserState.OpenNotLoggedIn) && (_connHandler.ConnectionOptions.TransparentNetworkIPResolution || _connHandler.ConnectionOptions.MultiSubnetFailover || _loginWithFailover) && (temp.Count == 1) && ((temp[0].Number == TdsEnums.TIMEOUT_EXPIRED) || (temp[0].Number == TdsEnums.SNI_WAIT_TIMEOUT))) {
                     // DevDiv2 Bug 459546: With "MultiSubnetFailover=yes" in the Connection String, SQLClient incorrectly throws a Timeout using shorter time slice (3-4 seconds), not honoring the actual 'Connect Timeout'
                     // http://vstfdevdiv:8080/DevDiv2/DevDiv/_workitems/edit/459546
                     // For Multisubnet Failover we slice the timeout to make reconnecting faster (with the assumption that the server will not failover instantaneously)
@@ -7011,6 +7025,18 @@ namespace System.Data.SqlClient {
             return len; // size of data written
         }
 
+        internal int WriteGlobalTransactionsFeatureRequest(bool write /* if false just calculates the length */) {
+            int len = 5; // 1byte = featureID, 4bytes = featureData length
+
+            if (write) {
+                // Write Feature ID
+                _physicalStateObj.WriteByte(TdsEnums.FEATUREEXT_GLOBALTRANSACTIONS);
+                WriteInt(0, _physicalStateObj); // we don't send any data
+            }
+
+            return len;
+        }
+
         internal void TdsLogin(SqlLogin rec,
                                TdsEnums.FeatureExtension requestedFeatures,
                                SessionData recoverySessionData,
@@ -7139,6 +7165,9 @@ namespace System.Data.SqlClient {
                     }
                     if ((requestedFeatures & TdsEnums.FeatureExtension.Tce) != 0) {
                         length += WriteTceFeatureRequest (false);
+                    }
+                    if ((requestedFeatures & TdsEnums.FeatureExtension.GlobalTransactions) != 0) {
+                        length += WriteGlobalTransactionsFeatureRequest(false);
                     }
                     length++; // for terminator
                 }
@@ -7370,6 +7399,9 @@ namespace System.Data.SqlClient {
                     };
                     if ((requestedFeatures & TdsEnums.FeatureExtension.Tce) != 0) {
                         WriteTceFeatureRequest (true);
+                    };
+                    if ((requestedFeatures & TdsEnums.FeatureExtension.GlobalTransactions) != 0) {
+                        WriteGlobalTransactionsFeatureRequest(true);
                     };
                     _physicalStateObj.WriteByte(0xFF); // terminator
                 }
@@ -11325,7 +11357,8 @@ namespace System.Data.SqlClient {
                             null == _statistics,
                             _statisticsIsInTransaction,
                             _fPreserveTransaction,
-                            null == _connHandler ? "(null)" : _connHandler.ConnectionOptions.MultiSubnetFailover.ToString((IFormatProvider)null));
+                            null == _connHandler ? "(null)" : _connHandler.ConnectionOptions.MultiSubnetFailover.ToString((IFormatProvider)null),
+                            null == _connHandler ? "(null)" : _connHandler.ConnectionOptions.TransparentNetworkIPResolution.ToString((IFormatProvider)null));
         }
 
         private string TraceObjectClass(object instance) {

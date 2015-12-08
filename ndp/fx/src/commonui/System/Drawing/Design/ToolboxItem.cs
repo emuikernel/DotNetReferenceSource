@@ -121,7 +121,8 @@ namespace System.Drawing.Design {
         
         /// <include file='doc\ToolboxItem.uex' path='docs/doc[@for="ToolboxItem.Bitmap"]/*' />
         /// <devdoc>
-        ///     Gets or sets the bitmap that will be used on the toolbox for this item.
+        ///     Gets or sets the bitmap that will be used on the toolbox for this item. 
+        ///     Use this property on the design surface as this bitmap is scaled according to the current the DPI setting.
         /// </devdoc>
         public Bitmap Bitmap {
             get {
@@ -129,6 +130,20 @@ namespace System.Drawing.Design {
             }
             set {
                 Properties["Bitmap"] = value;
+            }
+        }
+
+        /// <include file='doc\ToolboxItem.uex' path='docs/doc[@for="ToolboxItem.OriginalBitmap"]/*' />
+        /// <devdoc>
+        ///     Gets or sets the original bitmap that will be used on the toolbox for this item.
+        ///     This bitmap should be 16x16 pixel and should be used in the Visual Studio toolbox, not on the design surface.
+        /// </devdoc>
+        public Bitmap OriginalBitmap {
+            get {
+                return (Bitmap)Properties["OriginalBitmap"];
+            }
+            set {
+                Properties["OriginalBitmap"] = value;
             }
         }
 
@@ -195,7 +210,7 @@ namespace System.Drawing.Design {
             set {
                 Properties["Filter"] = value;
             }
-        } 
+        }
                 
         /// <include file='doc\ToolboxItem.uex' path='docs/doc[@for="ToolboxItem.IsTransient"]/*' />
         /// <devdoc>
@@ -736,11 +751,14 @@ namespace System.Drawing.Design {
                     ToolboxBitmapAttribute attr = (ToolboxBitmapAttribute)TypeDescriptor.GetAttributes(type)[typeof(ToolboxBitmapAttribute)];
                     if (attr != null) {
                         Bitmap itemBitmap = attr.GetImage(type, false) as Bitmap;
-                        // make sure this thing is 16x16
-                        if (itemBitmap != null && (itemBitmap.Width != iconWidth || itemBitmap.Height != iconHeight)) {
-                            itemBitmap = new Bitmap(itemBitmap, new Size(iconWidth, iconHeight));
+                        if (itemBitmap != null) {
+                            // Original bitmap is used when adding the item to the Visual Studio toolbox 
+                            // if running on a machine with HDPI scaling enabled.
+                            OriginalBitmap = attr.GetOriginalBitmap();
+                            if ((itemBitmap.Width != iconWidth || itemBitmap.Height != iconHeight)) {
+                                itemBitmap = new Bitmap(itemBitmap, new Size(iconWidth, iconHeight));
+                            }
                         }
-
                         Bitmap = itemBitmap;
                     }
 
@@ -859,6 +877,10 @@ namespace System.Drawing.Design {
                     break;
 
                 case "Bitmap":
+                    ValidatePropertyType(propertyName, value, typeof(Bitmap), true);
+                    break;
+
+                case "OriginalBitmap":
                     ValidatePropertyType(propertyName, value, typeof(Bitmap), true);
                     break;
 

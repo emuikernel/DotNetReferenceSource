@@ -6,13 +6,13 @@
 // See code:EEStartup#TableOfContents for EE overview
 /*****************************************************************************
  **                                                                         **
- ** Corhlpr.h - <STRIP>this file contains a set of "as is" code that may be **
- **             used by developers writing compilers and tools against      **
- **             the Common Language Runtime. The code is not officially     **
- **             supported, but is code being used by the Runtime itself.    **
- ** </STRIP>                                                                **
- **                                                                         **
- *****************************************************************************/
+ ** Corhlpr.h - <
+
+
+
+
+
+*/
 
 
 #ifndef __CORHLPR_H__

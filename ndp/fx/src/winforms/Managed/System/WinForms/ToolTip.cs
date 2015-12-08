@@ -334,7 +334,8 @@ namespace System.Windows.Forms {
             Control windowControl = window as Control;
             // We want to enter in the IF block only if ShowParams does not return SW_SHOWNOACTIVATE.
             // for ToolStripDropDown ShowParams returns SW_SHOWNOACTIVATE, in which case we DONT want to check IsWindowActive and hence return true.
-            if ((windowControl.ShowParams & 0xF) != NativeMethods.SW_SHOWNOACTIVATE)
+            if (windowControl != null &&
+                (windowControl.ShowParams & 0xF) != NativeMethods.SW_SHOWNOACTIVATE)
             {
                 IntPtr hWnd = UnsafeNativeMethods.GetActiveWindow();
                 IntPtr rootHwnd =UnsafeNativeMethods.GetAncestor(new HandleRef(window, window.Handle), NativeMethods.GA_ROOT);

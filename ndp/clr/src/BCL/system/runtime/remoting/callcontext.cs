@@ -120,9 +120,9 @@ namespace System.Runtime.Remoting.Messaging{
             }
         }
         
-        // <STRIP>For callContexts we intend to expose only name, value dictionary
-        // type of behavior for now. We will re-consider if we need to expose
-        // the other functions above for Beta-2.</STRIP>
+        // <
+
+
         [System.Security.SecurityCritical]  // auto-generated
         public static Object GetData(String name)
         {

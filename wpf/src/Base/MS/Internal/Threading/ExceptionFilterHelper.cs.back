@@ -44,7 +44,7 @@ namespace MS.Internal.Threading
             {
                 result = _internalRealCall.Invoke(method, args, numArgs);
             }
-            catch (Exception e) if (_filterException.Invoke(source, e))
+            catch (Exception e) when (_filterException.Invoke(source, e))
             {
                 if (!_catchException.Invoke(source, e, catchHandler))
                 {

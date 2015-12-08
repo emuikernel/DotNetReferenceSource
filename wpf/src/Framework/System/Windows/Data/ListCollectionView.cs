@@ -1105,9 +1105,9 @@ namespace System.Windows.Data
 
                     // the pending changes may have moved (or even removed) the
                     // item.   Verify the index.
-                    if (index >= InternalList.Count || !Object.Equals(item, GetItemAt(index)))
+                    if (index >= InternalCount || !Object.Equals(item, GetItemAt(index)))
                     {
-                        index = InternalList.IndexOf(item);
+                        index = InternalIndexOf(item);
                         if (index < 0)
                             return;
                     }

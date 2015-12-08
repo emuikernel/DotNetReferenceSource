@@ -2167,17 +2167,15 @@ public class Page: TemplateControl, IHttpHandler {
         }
         // Load the scroll positions from the request if they exist
         if (_requestValueCollection != null) {
+            double doubleValue;
+            
             string xpos = _requestValueCollection[_scrollPositionXID];
             if (xpos != null) {
-                if (!Int32.TryParse(xpos, out _scrollPositionX)) {
-                    _scrollPositionX = 0;
-                }
+                _scrollPositionX = HttpUtility.TryParseCoordinates(xpos, out doubleValue) ? (int)doubleValue : 0 ;
             }
             string ypos = _requestValueCollection[_scrollPositionYID];
             if (ypos != null) {
-                if (!Int32.TryParse(ypos, out _scrollPositionY)) {
-                    _scrollPositionY = 0;
-                }
+                _scrollPositionY = HttpUtility.TryParseCoordinates(ypos, out doubleValue) ? (int)doubleValue : 0 ;
             }
         }
     }

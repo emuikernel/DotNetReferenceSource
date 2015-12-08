@@ -200,7 +200,7 @@ namespace System.Windows
                 return _previousAvailableSize;
             }
         }
-        
+
         // This is needed to prevent dirty elements from drawing and crashing while doing so.
         private bool IsRenderable()
         {
@@ -660,7 +660,7 @@ namespace System.Windows
                     {
                         layoutManager.EnterMeasure();
                         desiredSize = MeasureCore(availableSize);
-                        
+
                         gotException = false;
                     }
                     finally
@@ -781,7 +781,7 @@ namespace System.Windows
         {
             bool etwTracingEnabled = false;
             long perfElementID = 0;
-            
+
             ContextLayoutManager ContextLayoutManager = ContextLayoutManager.From(Dispatcher);
             if (ContextLayoutManager.AutomationEvents.Count != 0)
                 UIElementHelper.InvalidateAutomationAncestors(this);
@@ -1091,12 +1091,12 @@ namespace System.Windows
         /// <returns>Adjusted value that will produce layout rounding on screen at high dpi.</returns>
         /// <remarks>This is a layout helper method. It takes DPI into account and also does not return
         /// the rounded value if it is unacceptable for layout, e.g. Infinity or NaN. It's a helper associated with
-        /// UseLayoutRounding  property and should not be used as a general rounding utility.</remarks> 
+        /// UseLayoutRounding  property and should not be used as a general rounding utility.</remarks>
         internal static double RoundLayoutValue(double value, double dpiScale)
         {
             double newValue;
 
-            // If DPI == 1, don't use DPI-aware rounding. 
+            // If DPI == 1, don't use DPI-aware rounding.
             if (!DoubleUtil.AreClose(dpiScale, 1.0))
             {
                 newValue = Math.Round(value * dpiScale) / dpiScale;
@@ -1136,13 +1136,13 @@ namespace System.Windows
         }
 
         /// <summary>
-        /// Ensures that _dpiScaleX and _dpiScaleY are set. 
+        /// Ensures that _dpiScaleX and _dpiScaleY are set.
         /// </summary>
         /// <remarks>
         /// Should be called before reading _dpiScaleX and _dpiScaleY
         /// </remarks>
         /// <SecurityNote>
-        /// Critical - as this calls PresentationSource.CriticalFromVisual() 
+        /// Critical - as this calls PresentationSource.CriticalFromVisual()
         ///            under elevation.
         /// Safe - as this doesn't expose the information retrieved from that API,
         ///        it only uses it for calculation of screen coordinates.
@@ -1764,7 +1764,7 @@ namespace System.Windows
                     bool continuePastVisualTree = false;
                                         if (uiElement != null)
                     {
-                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers 
+                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers
                         uiElement.AddSynchronizedInputPreOpportunityHandler(route, args);
 
                         continuePastVisualTree = uiElement.BuildRouteCore(route, args);
@@ -1772,7 +1772,7 @@ namespace System.Windows
                         // Add this element to route
                         uiElement.AddToEventRoute(route, args);
 
-                        //Add a Synchronized input post-opportunity handler just after class and instance handlers 
+                        //Add a Synchronized input post-opportunity handler just after class and instance handlers
                         uiElement.AddSynchronizedInputPostOpportunityHandler(route, args);
 
                         // Get element's visual parent
@@ -1780,7 +1780,7 @@ namespace System.Windows
                     }
                     else if (contentElement != null)
                     {
-                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers 
+                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers
                         contentElement.AddSynchronizedInputPreOpportunityHandler(route, args);
 
                         continuePastVisualTree = contentElement.BuildRouteCore(route, args);
@@ -1788,7 +1788,7 @@ namespace System.Windows
                         // Add this element to route
                         contentElement.AddToEventRoute(route, args);
 
-                        //Add a Synchronized input post-opportunity handler just after the class and instance handlers 
+                        //Add a Synchronized input post-opportunity handler just after the class and instance handlers
                         contentElement.AddSynchronizedInputPostOpportunityHandler(route, args);
 
                         // Get element's visual parent
@@ -1796,7 +1796,7 @@ namespace System.Windows
                     }
                     else if (uiElement3D != null)
                     {
-                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers 
+                        //Add a Synchronized input pre-opportunity handler just before the class and instance handlers
                         uiElement3D.AddSynchronizedInputPreOpportunityHandler(route, args);
 
                         continuePastVisualTree = uiElement3D.BuildRouteCore(route, args);
@@ -1804,7 +1804,7 @@ namespace System.Windows
                         // Add this element to route
                         uiElement3D.AddToEventRoute(route, args);
 
-                        //Add a Synchronized input post-opportunity handler just after the class and instance handlers 
+                        //Add a Synchronized input post-opportunity handler just after the class and instance handlers
                         uiElement3D.AddSynchronizedInputPostOpportunityHandler(route, args);
 
                         // Get element's visual parent
@@ -1864,7 +1864,7 @@ namespace System.Windows
                 }
             }
         }
-             
+
         // This event handler to be called before all the class & instance handlers for this element.
         internal void SynchronizedInputPreOpportunityHandler(object sender, RoutedEventArgs args)
         {
@@ -1880,7 +1880,7 @@ namespace System.Windows
             }
         }
 
-        // Called by automation peer, when called this element will be the listening element for synchronized input.   
+        // Called by automation peer, when called this element will be the listening element for synchronized input.
         internal bool StartListeningSynchronizedInput(SynchronizedInputType inputType)
         {
             if(InputManager.IsSynchronizedInput)
@@ -1898,8 +1898,8 @@ namespace System.Windows
         internal void CancelSynchronizedInput()
         {
             InputManager.CancelSynchronizedInput();
-        }   
-                
+        }
+
         /// <summary>
         ///     Adds a handler for the given attached event
         /// </summary>
@@ -2041,7 +2041,7 @@ namespace System.Windows
             HitTestResult rawHitResult;
             InputHitTest(pt, out enabledHit, out rawHit, out rawHitResult);
         }
-        
+
         /// <summary>
         ///     Returns the input element within this element that is
         ///     at the specified coordinates relative to this element.
@@ -2076,7 +2076,7 @@ namespace System.Windows
 
             DependencyObject candidate = result.Result;
             rawHit = candidate as IInputElement;
-            rawHitResult = result.HitTestResult;            
+            rawHitResult = result.HitTestResult;
             enabledHit = null;
             while (candidate != null)
             {
@@ -2199,12 +2199,12 @@ namespace System.Windows
 
             public HitTestResult HitTestResult
             {
-                get 
+                get
                 {
                     return _result;
                 }
             }
-            
+
             private HitTestResult _result;
         }
 
@@ -2896,7 +2896,7 @@ namespace System.Windows
         {
             base.VisualTextHintingMode = TextOptionsInternal.GetTextHintingMode(this);
         }
-        
+
         /// <summary>
         ///     The CacheMode property.
         /// </summary>
@@ -2927,7 +2927,7 @@ namespace System.Windows
         {
             base.VisualCacheMode = CacheMode;
         }
-        
+
         /// <summary>
         /// pushVisualEffects - helper to propagate cacheMode, Opacity, OpacityMask, BitmapEffect, BitmapScalingMode and EdgeMode
         /// </summary>
@@ -3488,7 +3488,7 @@ namespace System.Windows
         /// <summary>
         ///     Indicates if the element has effectively focus.
         ///     Used by AccessKeyManager to determine starting
-        ///     element in case of duplicate access keys. This 
+        ///     element in case of duplicate access keys. This
         ///     helps when the focus is delegated to some
         ///     other element in the tree.
         /// </summary>
@@ -3703,7 +3703,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(IsEnabledChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -3806,7 +3806,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(IsHitTestVisibleChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -3943,7 +3943,7 @@ namespace System.Windows
             uie.RaiseDependencyPropertyChanged(IsVisibleChangedKey, e);
 
             // Invalidate the children so that they will inherit the new value.
-            InvalidateForceInheritPropertyOnChildren(uie, e.Property);
+            uie.InvalidateForceInheritPropertyOnChildren(e.Property);
 
             // The input manager needs to re-hittest because something changed
             // that is involved in the hit-testing we do, so a different result
@@ -4277,7 +4277,7 @@ namespace System.Windows
                     else
                     {
                         // We have to "walk through" non-UIElement visuals.
-                        InvalidateForceInheritPropertyOnChildren(vChild, property);
+                        vChild.InvalidateForceInheritPropertyOnChildren(property);
                     }
                 }
                 else
@@ -4306,7 +4306,7 @@ namespace System.Windows
                         else
                         {
                             // We have to "walk through" non-UIElement visuals.
-                            UIElement3D.InvalidateForceInheritPropertyOnChildren(v3DChild, property);
+                            v3DChild.InvalidateForceInheritPropertyOnChildren(property);
                         }
                     }
                 }
@@ -4693,7 +4693,7 @@ namespace System.Windows
         private  static readonly UncommonField<EventHandler> LayoutUpdatedHandlersField = new UncommonField<EventHandler>();
         private  static readonly UncommonField<StylusPlugInCollection> StylusPlugInsField = new UncommonField<StylusPlugInCollection>();
         private  static readonly UncommonField<AutomationPeer> AutomationPeerField = new UncommonField<AutomationPeer>();
-        
+
         internal SizeChangedInfo sizeChangedInfo;
 
         internal bool HasAutomationPeer

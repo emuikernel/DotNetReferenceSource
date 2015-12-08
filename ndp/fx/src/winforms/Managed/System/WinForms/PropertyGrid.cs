@@ -91,7 +91,7 @@ namespace System.Windows.Forms {
         private int                                 paintFrozen;
         private Color                               lineColor = SystemColors.InactiveBorder;
         internal Brush                              lineBrush = null;
-        private Color                               categoryForeColor = SystemColors.InactiveCaptionText;
+        private Color                               categoryForeColor = SystemColors.ControlText;
         private Color                               categorySplitterColor = SystemColors.Control;
         private Color                               viewBorderColor = SystemColors.ControlDark;
         private Color                               selectedItemWithFocusForeColor = SystemColors.HighlightText;

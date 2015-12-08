@@ -5761,7 +5761,7 @@ namespace System.Runtime.Remoting.MetadataServices
                         if (_baseTypeName == null || _baseType is SystemType)
                         {
                             _baseTypeName = "RemotingClientProxy";
-                            //<STRIP>_baseTypeXmlNS = "http://schemas.microsoft.com/urt/NSAssem/System.Runtime.Remoting/System.Runtime.Remoting";</STRIP>
+                            //<
                             _baseTypeXmlNS = SoapServices.CodeXmlNamespaceForClrTypeNamespace("System.Runtime.Remoting","System.Runtime.Remoting");
                             baseTypeNS = "System.Runtime.Remoting.Services";
                             baseTypeAssemName = "System.Runtime.Remoting";
@@ -5771,7 +5771,7 @@ namespace System.Runtime.Remoting.MetadataServices
                     else if (_baseTypeName == null)
                     {                       
                         _baseTypeName = "MarshalByRefObject";
-                        //<STRIP>_baseTypeXmlNS = "http://schemas.microsoft.com/urt/NS/System";</STRIP>
+                        //<
                         _baseTypeXmlNS = SoapServices.CodeXmlNamespaceForClrTypeNamespace("System", null);
                         baseTypeNS = "System";
                         baseTypeAssemName = null;

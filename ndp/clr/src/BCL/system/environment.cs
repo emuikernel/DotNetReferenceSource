@@ -1367,7 +1367,7 @@ namespace System {
                         && isWow64;
                 #else
                     // 64-bit programs run only on 64-bit
-                    //<STRIP>This will have to change for Mac if we add this API to Silverlight</STRIP>
+                    //<
                     return true;
                 #endif
             }
@@ -1521,7 +1521,7 @@ namespace System {
                     break;
                 case __HResults.COR_E_PLATFORMNOTSUPPORTED:
                     // This one error is the one we do want to throw.
-                    // <STRIP>
+                    // <
 
                     throw new PlatformNotSupportedException();
                 }

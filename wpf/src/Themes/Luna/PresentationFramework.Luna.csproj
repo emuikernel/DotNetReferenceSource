@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{9f4e2087-af84-4240-ab74-46ddd3546ed4}</ProjectGuid>
+    <ProjectGuid>{8d88ae62-5091-4c29-8411-9e9dc7ccd76b}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>PresentationFramework.Luna</AssemblyName>
@@ -20,23 +20,23 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ndp\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\PresentationCore.csproj">
-      <Project>{e556ed9d-6b47-4362-a6e3-eda0139224e0}</Project>
+      <Project>{395e27ce-8277-441f-8dba-265dc9159132}</Project>
       <Name>PresentationCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\PresentationFramework.csproj">
-      <Project>{426d73ca-280b-4a37-956d-0883b44f5aa9}</Project>
+      <Project>{ff4ccb1e-5744-474d-a1d5-241edfe082d3}</Project>
       <Name>PresentationFramework</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ndp\fx\src\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WindowsBase.csproj">
-      <Project>{baac4c8e-f013-46b8-886c-06283b8f8005}</Project>
+      <Project>{2fbfec40-d5b1-4297-92c7-f05be01f1962}</Project>
       <Name>WindowsBase</Name>
     </ProjectReference>
   </ItemGroup>
@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\..\Test\Common\FxCop\Suppression\Luna\Security.cs" />
+    <Compile Include="..\..\Shared\RefAssemblyAttrs.cs" />
+    <Compile Include="..\Shared\AssemblyAttributes.cs" />
     <Compile Include="..\Shared\Microsoft\Windows\Themes\BulletChrome.cs" />
     <Compile Include="..\Shared\Microsoft\Windows\Themes\DataGridHeaderBorder.cs" />
     <Compile Include="..\Shared\Microsoft\Windows\Themes\KnownTypeHelper.cs" />

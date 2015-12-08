@@ -960,14 +960,14 @@ DWORD SsrpGetInfo( __in LPWSTR wszServer, __in LPWSTR wszInstance, __inout ProtL
 	if (FAILED(StringCchPrintfW(pwBuf,
 							ARRAYSIZE(pwBuf),
 							L"%hs",
-							pBuf)))
+							&pBuf[14])))
 	{
 		goto ErrorExit;
 	}
 	pwBuf[1023] = L'\0';
 
 	if( IsLocalHost(wszServer) && 
-		!IsLocalHost(&pwBuf[14] ))
+		!IsLocalHost(pwBuf))
 	{
 		goto ErrorExit;
 	}
@@ -1646,12 +1646,18 @@ HANDLE SNIServerEnumOpenEx( LPWSTR pwszServer,
 					pwszServer, fExtendedInfo, waittime_least, waittimeout);
 
 	ServerEnum * pServerEnum = NULL;
-	
-	if(pwszServer == NULL)
+
+	WCHAR wszServer[MAX_NAME_SIZE+1] = L"";
+	if (pwszServer && wcslen(pwszServer) == 0)
 	{
 		BidTraceU1( SNI_BID_TRACE_ON, RETURN_TAG _T("%p\n"), NULL);
-        return NULL;
-    }
+
+		return NULL;
+	}
+	else if(!pwszServer)
+	{
+		pwszServer = wszServer;
+	}
 	
 	if( !_wcsicmp(pwszServer, L"(local)") || !_wcsicmp(pwszServer, L"."))
 	{

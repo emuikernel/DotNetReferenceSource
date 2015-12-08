@@ -427,6 +427,17 @@ typedef struct Sni_Consumer_Info
 } SNI_CONSUMER_INFO, *PSNI_CONSUMER_INFO; 
 
 //----------------------------------------------------------------------------
+// TransparentNetworkResolution Action type
+//
+//----------------------------------------------------------------------------
+enum TransparentNetworkResolutionMode : BYTE
+{
+    DisabledMode = 0,
+    SequentialMode,
+    ParallelMode
+};
+
+//----------------------------------------------------------------------------
 // Name: 	SNI_CLIENT_CONSUMER_INFO
 //
 // Purpose:	Struct for client consumer information
@@ -447,6 +458,8 @@ struct SNI_CLIENT_CONSUMER_INFO
 	BOOL				fSynchronousConnection; // input
 	int					timeout; // input
 	BOOL				fParallel; // input
+	TransparentNetworkResolutionMode transparentNetworkResolution; // input
+	int					totalTimeout; // input
 
 	SNI_CLIENT_CONSUMER_INFO()
 	{
@@ -460,6 +473,8 @@ struct SNI_CLIENT_CONSUMER_INFO
 		fSynchronousConnection = FALSE;
 		timeout = SNIOPEN_TIMEOUT_VALUE;
 		fParallel = FALSE;
+		transparentNetworkResolution = TransparentNetworkResolutionMode::DisabledMode;
+		totalTimeout = SNIOPEN_TIMEOUT_VALUE;
 	};
 };
 

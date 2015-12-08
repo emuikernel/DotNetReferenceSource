@@ -775,7 +775,8 @@ namespace System.Data.SqlClient {
                     SqlBulkCopyOptions.KeepNulls
                     | SqlBulkCopyOptions.TableLock
                     | SqlBulkCopyOptions.CheckConstraints
-                    | SqlBulkCopyOptions.FireTriggers)) != SqlBulkCopyOptions.Default) {
+                    | SqlBulkCopyOptions.FireTriggers
+                    | SqlBulkCopyOptions.AllowEncryptedValueModifications)) != SqlBulkCopyOptions.Default) {
                 bool addSeparator = false;  // insert a comma character if multiple options in list ...
                 updateBulkCommandText.Append(" with (");
                 if(IsCopyOption(SqlBulkCopyOptions.KeepNulls)) {
@@ -792,6 +793,10 @@ namespace System.Data.SqlClient {
                 }
                 if(IsCopyOption(SqlBulkCopyOptions.FireTriggers)) {
                     updateBulkCommandText.Append((addSeparator ? ", " : "") + "FIRE_TRIGGERS");
+                    addSeparator = true;
+                }
+                if(IsCopyOption(SqlBulkCopyOptions.AllowEncryptedValueModifications)) {
+                    updateBulkCommandText.Append((addSeparator ? ", " : "") + "ALLOW_ENCRYPTED_VALUE_MODIFICATIONS");
                     addSeparator = true;
                 }
                 updateBulkCommandText.Append(")");

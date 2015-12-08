@@ -2489,17 +2489,17 @@ namespace System.Reflection
                 if (length > Int64.MaxValue)
                     throw new NotImplementedException(Environment.GetResourceString("NotImplemented_ResourcesLongerThan2^63"));
 
-                // <STRIP>For cases where we're loading an embedded resource from an assembly,
-                // in V1 we do not have any serious lifetime issues with the 
-                // UnmanagedMemoryStream.  If the Stream is only used
-                // in the AppDomain that contains the assembly, then if that AppDomain
-                // is unloaded, we will collect all of the objects in the AppDomain first
-                // before unloading assemblies.  If the Stream is shared across AppDomains,
-                // then the original AppDomain was unloaded, accesses to this Stream will
-                // throw an exception saying the appdomain was unloaded.  This is 
-                // guaranteed be EE AppDomain goo.  And for shared assemblies like 
-                // mscorlib, their lifetime is the lifetime of the process, so the 
-                // assembly will NOT be unloaded, so the resource will always be in memory.</STRIP>
+                // <
+
+
+
+
+
+
+
+
+
+
                 return new UnmanagedMemoryStream(pbInMemoryResource, (long)length, (long)length, FileAccess.Read, true);
             }
 

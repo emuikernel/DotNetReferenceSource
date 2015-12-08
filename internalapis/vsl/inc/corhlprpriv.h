@@ -6,12 +6,12 @@
 // See code:EEStartup#TableOfContents for EE overview
 /*****************************************************************************
  **                                                                         **
- ** Corhlprpriv.h - <STRIP>this file contains a set of code that was once
- **             part of corhlpr.h, but due to a desire to remove unnecessary** 
- **             code from the sdk, is no longer part of that file.          **
- ** </STRIP>                                                                **
- **                                                                         **
- *****************************************************************************/
+ ** Corhlprpriv.h - <
+
+
+
+
+*/
 
 #ifndef __CORHLPRPRIV_H__
 #define __CORHLPRPRIV_H__

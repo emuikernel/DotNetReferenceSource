@@ -125,7 +125,7 @@ namespace System.Windows.Media
             | VisualProxyFlags.IsCacheModeDirty
             | VisualProxyFlags.IsTextRenderingModeDirty
             | VisualProxyFlags.IsTextHintingModeDirty;
-             
+
 
         /// <summary>
         /// This is the dirty mask for a visual, set every time we marshall
@@ -278,7 +278,7 @@ namespace System.Windows.Media
 
 
         /// <summary>
-        /// Sends a command to compositor to remove the child 
+        /// Sends a command to compositor to remove the child
         /// from its parent on the channel.
         /// </summary>
         void DUCE.IResource.RemoveChildFromParent(
@@ -300,7 +300,7 @@ namespace System.Windows.Media
         {
             return _proxy.GetChannel(index);
         }
-      
+
         #endregion IResource implementation
 
 
@@ -468,15 +468,15 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Same as the parameterless CalculateSubgraphBoundsInnerSpace except it takes a 
+        /// Same as the parameterless CalculateSubgraphBoundsInnerSpace except it takes a
         /// boolean indicating whether or not to calculate the rendering bounds.
         /// If the renderBounds parameter is set to true then the render bounds are returned.
         /// The render bounds differ in that they treat zero area bounds as emtpy rectangles.
         ///
-        /// NTRAID#Longhorn-111639-2007/07/05-kurtb: 
+        /// NTRAID#Longhorn-111639-2007/07/05-kurtb:
         /// This is needed since MIL and the managed size differ about how big content bounds are
         /// WPF considers geometric bounds (i.e. it will union in points) while MIL considers anything
-        /// with zero area to be empty.  This poses problems when looking for the exact size of a 
+        /// with zero area to be empty.  This poses problems when looking for the exact size of a
         /// CyclicBrush.
         /// </summary>
         internal virtual Rect CalculateSubgraphBoundsInnerSpace(bool renderBounds)
@@ -504,7 +504,7 @@ namespace System.Windows.Media
             // bounds (i.e. what MIL will consider the size of the object), we set 0 area rects
             // to be empty so that they don't union to create larger sized rects.
             Rect contentBounds = GetContentBounds();
-            if (renderBounds && IsEmptyRenderBounds(ref contentBounds /* ref for perf - not modified */)) 
+            if (renderBounds && IsEmptyRenderBounds(ref contentBounds /* ref for perf - not modified */))
             {
                 contentBounds = Rect.Empty;
             }
@@ -539,15 +539,15 @@ namespace System.Windows.Media
         }
 
         /// <summary>
-        /// Same as the parameterless CalculateSubgraphBoundsOuterSpace except it takes a 
+        /// Same as the parameterless CalculateSubgraphBoundsOuterSpace except it takes a
         /// boolean indicating whether or not to calculate the rendering bounds.
         /// If the renderBounds parameter is set to true then the render bounds are returned.
         /// The render bounds differ in that they treat zero area bounds as emtpy rectangles.
         ///
-        /// NTRAID#Longhorn-111639-2007/07/05-kurtb: 
+        /// NTRAID#Longhorn-111639-2007/07/05-kurtb:
         /// This is needed since MIL and the managed size differ about how big content bounds are
         /// WPF considers geometric bounds (i.e. it will union in points) while MIL considers anything
-        /// with zero area to be empty.  This poses problems when looking for the exact size of a 
+        /// with zero area to be empty.  This poses problems when looking for the exact size of a
         /// CyclicBrush.
         /// </summary>
         private Rect CalculateSubgraphBoundsOuterSpace(bool renderBounds)
@@ -564,7 +564,7 @@ namespace System.Windows.Media
             if (CheckFlagsAnd(VisualFlags.NodeHasEffect))
             {
                 Rect effectBounds;
-                
+
                 Effect effect = EffectField.GetValue(this);
                 if (effect != null)
                 {
@@ -575,14 +575,14 @@ namespace System.Windows.Media
                     Rect unitBounds = new Rect(0,0,1,1);
                     Rect unitTransformedBounds = effect.EffectMapping.TransformBounds(unitBounds);
                     effectBounds = Effect.UnitToWorld(unitTransformedBounds, bboxSubgraph);
-                    
+
                     bboxSubgraph.Union(effectBounds);
                 }
                 else
                 {
                     Debug.Assert(BitmapEffectStateField.GetValue(this) != null);
                     // BitmapEffects are deprecated so they no longer affect bounds.
-                }                
+                }
             }
 
             // Apply Clip.
@@ -623,7 +623,7 @@ namespace System.Windows.Media
                 bboxSubgraph.Y = Double.NegativeInfinity;
                 bboxSubgraph.Width = Double.PositiveInfinity;
                 bboxSubgraph.Height = Double.PositiveInfinity;
-            }            
+            }
 
             return bboxSubgraph;
         }
@@ -633,7 +633,7 @@ namespace System.Windows.Media
         /// empty in terms of rendering.  This is the case when the bounds describe
         /// a zero-area space.  bounds are passed by ref for speed but are not modified
         ///
-        /// NTRAID#Longhorn-111639-2007/07/05-kurtb: 
+        /// NTRAID#Longhorn-111639-2007/07/05-kurtb:
         /// See above CalculateSubgraphBounds* methods for more detail.  This helper method
         /// goes with them.
         /// </summary>
@@ -668,11 +668,11 @@ namespace System.Windows.Media
         private bool IsCyclicBrushRootOnChannel(DUCE.Channel channel)
         {
             bool isCyclicBrushRootOnChannel = false;
-            
+
             Dictionary<DUCE.Channel, int> channelsToCyclicBrushMap =
               ChannelsToCyclicBrushMapField.GetValue(this);
 
-            if (channelsToCyclicBrushMap != null) 
+            if (channelsToCyclicBrushMap != null)
             {
                 int references;
 
@@ -694,7 +694,7 @@ namespace System.Windows.Media
         void DUCE.IResource.ReleaseOnChannel(DUCE.Channel channel)
         {
             if (!IsOnChannel(channel)
-                || CheckFlagsAnd(channel, VisualProxyFlags.IsDeleteResourceInProgress))                
+                || CheckFlagsAnd(channel, VisualProxyFlags.IsDeleteResourceInProgress))
             {
                 return;
             }
@@ -708,18 +708,18 @@ namespace System.Windows.Media
                 SetFlags(channel, false, VisualProxyFlags.IsConnectedToParent);
 
                 //
-                // Before unmarshaling this visual and its subtree, check if there are any visual 
-                // brushes holding references to it. In such case, we want to keep this visual 
-                // in the marshaled state and wait for all the visual brushes to release their 
-                // references through ReleaseOnChannelForCyclicBrush. 
+                // Before unmarshaling this visual and its subtree, check if there are any visual
+                // brushes holding references to it. In such case, we want to keep this visual
+                // in the marshaled state and wait for all the visual brushes to release their
+                // references through ReleaseOnChannelForCyclicBrush.
                 //
 
                 //
-                // NTRAID#Longhorn-1964653-2007/04/19-[....]: 
+                // NTRAID#Longhorn-1964653-2007/04/19-[....]:
                 // RenderTargetBitmap and BitmapEffects use synchronous channels. If a
                 // node on the synchronous channel is the root of a VisualBrush from another
-                // channel, then the node will never be deleted. Instead we really need to 
-                // check if the node is the root of a VisualBrush _on the same channel_. 
+                // channel, then the node will never be deleted. Instead we really need to
+                // check if the node is the root of a VisualBrush _on the same channel_.
                 // This check is more expensive so we'll leave the faster check first to avoid
                 // the more expensive check which isn't necessary most of the time.
                 //
@@ -728,39 +728,39 @@ namespace System.Windows.Media
                 // cycle will leak. On [....] channels, this is particularly bad because
                 // the user doesn't know about the [....] channel and has no control over it.
                 // We have a queue of [....] channels that are reused and leaking can lead
-                // to conflicts on channel reuse resulting in a crash. 
+                // to conflicts on channel reuse resulting in a crash.
                 //
-                // *** DANGER *** Fortunately, as of today, tree structure on a [....] channel is 
-                // never manipulated. The tree gets built, the tree gets drawn, and the tree gets 
-                // released. Because of this, we can just always delete. In the future if that 
+                // *** DANGER *** Fortunately, as of today, tree structure on a [....] channel is
+                // never manipulated. The tree gets built, the tree gets drawn, and the tree gets
+                // released. Because of this, we can just always delete. In the future if that
                 // changes, the isSynchronous check here will cause a problem. *** DANGER ***
                 //
                 // The bug representing the outstanding cyle leak issue is 1981551
                 //
-                
-                if (   !CheckFlagsOr(VisualFlags.NodeIsCyclicBrushRoot) 
+
+                if (   !CheckFlagsOr(VisualFlags.NodeIsCyclicBrushRoot)
                             // If we aren't a root of a CyclicBrush, then we aren't referenced
                             // at all and we can go away
                     || !channel.IsConnected
                             // If the channel isn't connected, there's no reason to keep things alive
                     || channel.IsSynchronous
                             // If the channel is synchronous, the node isn't going to stick around
-                            // so just delete it. *** THIS IS DANGEROUS ***. See above for 
+                            // so just delete it. *** THIS IS DANGEROUS ***. See above for
                             // more comments.
                     || !IsCyclicBrushRootOnChannel(channel)
-                            // If we got to here, we are the root of a VisualBrush. We can go away 
-                            // only if the VB is on a different channel. This check is more expensive 
+                            // If we got to here, we are the root of a VisualBrush. We can go away
+                            // only if the VB is on a different channel. This check is more expensive
                             // and not very common so we put it last.
                        )
                 {
                     FreeContent(channel);
-    
+
                     // Free dependent DUCE resources.
                     //
                     // We don't need to free the dependent resources if they're
                     // marked as dirty because when the flag is set, we also
                     // disconnect the resource from the visual resource.
-    
+
                     Transform transform = TransformField.GetValue(this);
                     if ((transform != null)
                         && (!CheckFlagsAnd(channel, VisualProxyFlags.IsTransformDirty)))
@@ -769,7 +769,7 @@ namespace System.Windows.Media
                         // Note that in this particular case, the transform is not
                         // really dirty. Namely because the visual is not marshalled.
                         //
-    
+
                         ((DUCE.IResource)transform).ReleaseOnChannel(channel);
                     }
 
@@ -779,7 +779,7 @@ namespace System.Windows.Media
                     {
                         ((DUCE.IResource)effect).ReleaseOnChannel(channel);
                     }
-    
+
                     Geometry clip = ClipField.GetValue(this);
                     if ((clip != null)
                         && (!CheckFlagsAnd(channel, VisualProxyFlags.IsClipDirty)))
@@ -800,18 +800,18 @@ namespace System.Windows.Media
                     {
                         ((DUCE.IResource)cacheMode).ReleaseOnChannel(channel);
                     }
-    
+
                     //
                     // Release the visual.
                     //
-    
+
                     this.ReleaseOnChannelCore(channel);
 
                     //
                     // Finally, the children.
                     //
                     int count = VisualChildrenCount;
-    
+
                     for (int i = 0; i < count; i++)
                     {
                         Visual visual = GetVisualChild(i);
@@ -839,7 +839,7 @@ namespace System.Windows.Media
             ICyclicBrush cyclicBrush,
             DUCE.Channel channel)
         {
-            
+
             //
             // Since the ICyclicBrush to visual relationship is being created on this channel,
             // we need to update the number of cyclic brushes using this visual on this channel.
@@ -854,7 +854,7 @@ namespace System.Windows.Media
 
             if (!channelsToCyclicBrushMap.ContainsKey(channel))
             {
-                // If on this channel we were not previously using this Visual as the root 
+                // If on this channel we were not previously using this Visual as the root
                 // node of a VisualBrush, set the flag indicating that it is the root now.
                 // Also set the number of uses on this channel to 1.
                 SetFlags(true, VisualFlags.NodeIsCyclicBrushRoot);
@@ -947,7 +947,7 @@ namespace System.Windows.Media
             //
             // If on this channel, there are no more ICyclicBrushes using this visual as
             // a root then we need to remove the flag saying that the visual is a visual
-            // brush root and make sure that the dependant resources are released in 
+            // brush root and make sure that the dependant resources are released in
             // case we are no longer connected to the visual tree.
             //
 
@@ -963,7 +963,7 @@ namespace System.Windows.Media
                     VisualProxyFlags.IsSubtreeDirtyForRender);
 
                 //
-                // If we do not have a parent or we have already disconnected from                
+                // If we do not have a parent or we have already disconnected from
                 // the parent and we are also not the root then we need to clear out
                 // the tree.
                 //
@@ -1113,7 +1113,7 @@ namespace System.Windows.Media
                                 _bboxSubgraph.Union(bboxSubgraphChild);
                             }
                         }
-                        
+
                         SetFlags(false, VisualFlags.IsSubtreeDirtyForPrecompute);
                     }
 
@@ -1347,7 +1347,7 @@ namespace System.Windows.Media
                         opacity,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsOpacityDirty);                              
+                SetFlags(channel, false, VisualProxyFlags.IsOpacityDirty);
             }
         }
 
@@ -1390,7 +1390,7 @@ namespace System.Windows.Media
                         DUCE.ResourceHandle.Null,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsOpacityMaskDirty);               
+                SetFlags(channel, false, VisualProxyFlags.IsOpacityMaskDirty);
             }
 
         }
@@ -1434,7 +1434,7 @@ namespace System.Windows.Media
                         DUCE.ResourceHandle.Null,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsTransformDirty);               
+                SetFlags(channel, false, VisualProxyFlags.IsTransformDirty);
             }
         }
 
@@ -1476,7 +1476,7 @@ namespace System.Windows.Media
                         DUCE.ResourceHandle.Null,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsEffectDirty);               
+                SetFlags(channel, false, VisualProxyFlags.IsEffectDirty);
             }
         }
 
@@ -1515,10 +1515,10 @@ namespace System.Windows.Media
                         DUCE.ResourceHandle.Null,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsCacheModeDirty);               
+                SetFlags(channel, false, VisualProxyFlags.IsCacheModeDirty);
             }
         }
-    
+
         /// <summary>
         /// Update clip
         /// </summary>
@@ -1569,23 +1569,23 @@ namespace System.Windows.Media
         /// <param name="channel"></param>
         /// <param name="handle"></param>
         /// <param name="flags"></param>
-        /// <param name="isOnChannel">The Visual exists on channel.</param>    
+        /// <param name="isOnChannel">The Visual exists on channel.</param>
         private void UpdateScrollableAreaClip(DUCE.Channel channel,
                                               DUCE.ResourceHandle handle,
                                               VisualProxyFlags flags,
                                               bool isOnChannel)
         {
             if ((flags & VisualProxyFlags.IsScrollableAreaClipDirty) != 0)
-            {                    
+            {
                 Rect? scrollableArea = ScrollableAreaClipField.GetValue(this);
-                
+
                 if (isOnChannel || (scrollableArea != null))
                 {
                     DUCE.CompositionNode.SetScrollableAreaClip(
                         handle,
                         scrollableArea,
-                        channel);                    
-                    
+                        channel);
+
                 }
                 SetFlags(channel, false, VisualProxyFlags.IsScrollableAreaClipDirty);
             }
@@ -1620,7 +1620,7 @@ namespace System.Windows.Media
                         _offset.Y,
                         channel);
                 }
-                SetFlags(channel, false, VisualProxyFlags.IsOffsetDirty);               
+                SetFlags(channel, false, VisualProxyFlags.IsOffsetDirty);
             }
         }
 
@@ -1672,11 +1672,11 @@ namespace System.Windows.Media
                                     VisualProxyFlags flags,
                                     bool isOnChannel)
         {
-            if (((flags & VisualProxyFlags.IsEdgeModeDirty) != 0)          || 
+            if (((flags & VisualProxyFlags.IsEdgeModeDirty) != 0)          ||
                 ((flags & VisualProxyFlags.IsBitmapScalingModeDirty) != 0) ||
                 ((flags & VisualProxyFlags.IsClearTypeHintDirty) != 0)     ||
                 ((flags & VisualProxyFlags.IsTextRenderingModeDirty) != 0) ||
-                ((flags & VisualProxyFlags.IsTextHintingModeDirty) != 0))          
+                ((flags & VisualProxyFlags.IsTextHintingModeDirty) != 0))
             {
                 MilRenderOptions renderOptions = new MilRenderOptions();
 
@@ -1731,10 +1731,10 @@ namespace System.Windows.Media
                         channel);
                 }
                 SetFlags(
-                    channel, 
-                    false, 
-                    VisualProxyFlags.IsEdgeModeDirty | 
-                    VisualProxyFlags.IsBitmapScalingModeDirty | 
+                    channel,
+                    false,
+                    VisualProxyFlags.IsEdgeModeDirty |
+                    VisualProxyFlags.IsBitmapScalingModeDirty |
                     VisualProxyFlags.IsClearTypeHintDirty |
                     VisualProxyFlags.IsTextRenderingModeDirty |
                     VisualProxyFlags.IsTextHintingModeDirty
@@ -1747,7 +1747,7 @@ namespace System.Windows.Media
         /// </summary>
         /// <param name="ctx"></param>
         /// <param name="flags"></param>
-        /// <param name="isOnChannel">The Visual exists on channel.</param>        
+        /// <param name="isOnChannel">The Visual exists on channel.</param>
         private void UpdateContent(RenderContext ctx,
                                    VisualProxyFlags flags,
                                    bool isOnChannel)
@@ -1915,7 +1915,7 @@ namespace System.Windows.Media
 
         /// <summary>
         /// Return top most visual of a hit test.  If include2DOn3D is true we will
-        /// hit test in to 2D on 3D children, otherwise we will ignore that part of 
+        /// hit test in to 2D on 3D children, otherwise we will ignore that part of
         /// the tree.
         /// </summary>
         internal HitTestResult HitTest(Point point, bool include2DOn3D)
@@ -2030,14 +2030,14 @@ namespace System.Windows.Media
             PointHitTestParameters pointParams)
         {
             // we do not need parameter checks because they are done in HitTest()
-            
+
             Geometry clip = VisualClip;
 
             // Before we continue hit-testing we check against the hit-test bounds for the sub-graph.
             // If the point is not with-in the hit-test bounds, the sub-graph can be skipped.
             if (_bboxSubgraph.Contains(pointParams.HitPoint) &&
                 ((null == clip) || clip.FillContains(pointParams.HitPoint))) // Check that the hit-point is with-in the clip.
-            {   
+            {
                 //
                 // Determine if there is a special filter behavior defined for this
                 // Visual.
@@ -2063,7 +2063,7 @@ namespace System.Windows.Media
                 // Backup the hit point so that we can restore it later on.
                 Point originalHitPoint = pointParams.HitPoint;
                 Point hitPoint = originalHitPoint;
-                
+
                 if (CheckFlagsAnd(VisualFlags.NodeHasEffect))
                 {
                     Effect imageEffect = EffectField.GetValue(this);
@@ -2120,7 +2120,7 @@ namespace System.Windows.Media
                     {
                         Visual child = GetVisualChild(i);
                         if (child != null)
-                        {   
+                        {
                             // Hit the scollClip bounds first, which are in the child's outer-space.
                             Rect? scrollClip = ScrollableAreaClipField.GetValue(child);
                             if (scrollClip.HasValue && !scrollClip.Value.Contains(hitPoint))
@@ -2128,7 +2128,7 @@ namespace System.Windows.Media
                                 // Skip child if the point is not within the ScrollableClip.
                                 continue;
                             }
-                            
+
                             //
                             // Transform the hit-test point below offset and transform.
                             //
@@ -2199,15 +2199,15 @@ namespace System.Windows.Media
 
             return HitTestResultBehavior.Continue;
         }
-        
+
         // provides a transform that goes between the Visual's coordinate space
-        // and that after applying the transforms that bring it to outer space.        
+        // and that after applying the transforms that bring it to outer space.
         internal GeneralTransform TransformToOuterSpace()
         {
             Matrix m = Matrix.Identity;
             GeneralTransformGroup group = null;
             GeneralTransform result = null;
-            
+
             if (CheckFlagsAnd(VisualFlags.NodeHasEffect))
             {
                 Effect effect = EffectField.GetValue(this);
@@ -2272,7 +2272,7 @@ namespace System.Windows.Media
                 // HitTest with a Geometry and a clip should hit test with
                 // the intersection of the geometry and the clip, not the entire geometry
                 IntersectionDetail intersectionDetail = clip.FillContainsWithDetail(geometryParams.InternalHitGeometry);
-                
+
                 Debug.Assert(intersectionDetail != IntersectionDetail.NotCalculated);
                 if (intersectionDetail == IntersectionDetail.Empty)
                 {
@@ -2280,7 +2280,7 @@ namespace System.Windows.Media
                     return HitTestResultBehavior.Continue;
                 }
             }
-            
+
             //
             // Check if the geometry intersects with our hittest bounds.
             // If not, the Visual is not hit-testable at all.
@@ -2330,7 +2330,7 @@ namespace System.Windows.Media
                                 // the intersection of the geometry and the clip, not the entire geometry
                                 RectangleGeometry rectClip = new RectangleGeometry(scrollClip.Value);
                                 IntersectionDetail intersectionDetail = rectClip.FillContainsWithDetail(geometryParams.InternalHitGeometry);
-   
+
                                 Debug.Assert(intersectionDetail != IntersectionDetail.NotCalculated);
                                 if (intersectionDetail == IntersectionDetail.Empty)
                                 {
@@ -2338,7 +2338,7 @@ namespace System.Windows.Media
                                     continue;
                                 }
                             }
-                            
+
                             // Transform the geometry below offset and transform.
                             Matrix inv = Matrix.Identity;
                             inv.Translate(-child._offset.X, -child._offset.Y);
@@ -2732,7 +2732,7 @@ namespace System.Windows.Media
                         VisualProxyFlags.IsSubtreeDirtyForRender);
 
             this.SetFlagsOnAllChannels(true, VisualProxyFlags.IsChildrenZOrderDirty);
-            
+
             //  
 
             System.Windows.Input.InputManager.SafeCurrentNotifyHitTestInvalidated();
@@ -2893,13 +2893,13 @@ namespace System.Windows.Media
 
                 // Legacy BitmapEffects and new Effects cannot be mixed because the new image effect
                 // pipeline may be used to emulate a legacy BitmapEffect.
-                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);                
+                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);
                 if (bed != null)
                 {
-                    if (value != null) // UIElement has a tendency to set a lot of properties to null even if it 
+                    if (value != null) // UIElement has a tendency to set a lot of properties to null even if it
                                        // never set a property to a different value in the first place.
                     {
-                        // If a BitmapEffect is set, the user cannot set an Effect, since 
+                        // If a BitmapEffect is set, the user cannot set an Effect, since
                         // mixing of legacy BitmapEffects is not allowed with Effects.
                         throw new Exception(SR.Get(SRID.Effect_CombinedLegacyAndNew));
                     }
@@ -2910,10 +2910,10 @@ namespace System.Windows.Media
                 }
 
                 VisualEffectInternal = value;
-                
+
             }
         }
-        
+
         /// <summary>
         /// Internal accessor to image effect property that gets or sets the Effect of this Visual.
         /// The internal accessor is used by the VisualBitmapEffect emulation layer to avoid some of the
@@ -2924,10 +2924,10 @@ namespace System.Windows.Media
             get
             {
                 // Legacy BitmapEffects and new Effects cannot be mixed because the new image effect
-                // pipeline may be used to emulate a legacy BitmapEffect. Therefore, if a BitmapEffect is 
+                // pipeline may be used to emulate a legacy BitmapEffect. Therefore, if a BitmapEffect is
                 // assigned to this node, the Effect is conceptually not set and null must be returned
                 // from this getter. If no BitmapEffect is set on this node, the Effect has been provided
-                // by the user and therefore the Effect is returned. 
+                // by the user and therefore the Effect is returned.
 
                 if (NodeHasLegacyBitmapEffect)
                 {
@@ -2939,7 +2939,7 @@ namespace System.Windows.Media
                 }
             }
 
-            set 
+            set
             {
                 Effect imageEffect = EffectField.GetValue(this);
                 if (imageEffect == value)
@@ -3020,19 +3020,19 @@ namespace System.Windows.Media
 
                 //
                 // Figure out if a image effect has been provided by the user. If so, calling this API is illegal
-                // since new Effects and legacy BitmapEffects cannot be mixed. 
-                
+                // since new Effects and legacy BitmapEffects cannot be mixed.
+
                 Effect imageEffect = EffectField.GetValue(this);
-                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);                
-                if (   (bed == null) 
+                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);
+                if (   (bed == null)
                     && (imageEffect != null))
-                  
+
                 {
                     if (value != null) // Allowing incoming value of null because UIElements tend
                                        // to aggressively set this property to null even if it has never been set.
                     {
                         // If no BitmapEffect is set and an Effect is set, the Effect has been
-                        // provided by the user and not by emulation. Since mixing of legacy 
+                        // provided by the user and not by emulation. Since mixing of legacy
                         // BitmapEffects is not allowed with Effects, setting a BitmapEffect is illegal.
                         throw new Exception(SR.Get(SRID.Effect_CombinedLegacyAndNew));
                     }
@@ -3041,14 +3041,14 @@ namespace System.Windows.Media
                         return;
                     }
                 }
-                    
+
 
                 //
-                // To enable emulation of the legacy effects on top of the new effects pipeline, store the 
-                // bitmap effect information in our staging uncommon field: UserProvidedBitmapEffectData. 
-           
+                // To enable emulation of the legacy effects on top of the new effects pipeline, store the
+                // bitmap effect information in our staging uncommon field: UserProvidedBitmapEffectData.
+
                 BitmapEffect oldBitmapEffect = (bed == null) ? null : bed.BitmapEffect;
-                if (oldBitmapEffect == value) // If new and old value are the same, this set call can be treated as a no-op. 
+                if (oldBitmapEffect == value) // If new and old value are the same, this set call can be treated as a no-op.
                 {
                     return;
                 }
@@ -3058,9 +3058,9 @@ namespace System.Windows.Media
                 if (newBitmapEffect == null)
                 {
                     Debug.Assert(bed != null, "Must be non-null because otherwise the code would have earlied out where new value is compared against old value.");
-                    // The following line of code will effectively set the BitmapEffectInput property to null. This is strange behavior for WPF properties, but follows the 
-                    // original BitmapEffects implementation. 
-                    UserProvidedBitmapEffectData.SetValue(this, null); 
+                    // The following line of code will effectively set the BitmapEffectInput property to null. This is strange behavior for WPF properties, but follows the
+                    // original BitmapEffects implementation.
+                    UserProvidedBitmapEffectData.SetValue(this, null);
                 }
                 else
                 {
@@ -3082,7 +3082,7 @@ namespace System.Windows.Media
                     oldBitmapEffect.Changed -= new EventHandler(BitmapEffectEmulationChanged);
                 }
 
-                // Notify about the bitmap effect changes to configure the new emulation. 
+                // Notify about the bitmap effect changes to configure the new emulation.
                 BitmapEffectEmulationChanged(/* sender */ null, /* args */ null);
             }
         }
@@ -3119,11 +3119,11 @@ namespace System.Windows.Media
 
                 //
                 // Figure out if a image effect has been provided by the user. If so, calling this API is illegal
-                // sinc new Effects and legacy BitmapEffects cannot be mixed. 
-                
+                // sinc new Effects and legacy BitmapEffects cannot be mixed.
+
                 Effect imageEffect = EffectField.GetValue(this);
-                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);                
-                if ((bed == null) && (imageEffect != null))  
+                BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);
+                if ((bed == null) && (imageEffect != null))
                 {
                     if (value != null) // Allowing null because parser and UIElement tend to set this property to null
                                        // even if it has never been set to non-null.
@@ -3138,16 +3138,16 @@ namespace System.Windows.Media
                         return;
                     }
                 }
-                    
+
 
                 //
-                // To enable emulation of the legacy effects on top of the new effects pipeline, store the 
-                // bitmap effect input information in our staging uncommon field: UserProvidedBitmapEffectData. 
-           
+                // To enable emulation of the legacy effects on top of the new effects pipeline, store the
+                // bitmap effect input information in our staging uncommon field: UserProvidedBitmapEffectData.
+
                 BitmapEffectInput oldBitmapEffectInput = (bed == null) ? null : bed.BitmapEffectInput;
                 BitmapEffectInput newBitmapEffectInput = value;
 
-                if (oldBitmapEffectInput == newBitmapEffectInput) // If new and old value are the same, this set call can be treated as a no-op. 
+                if (oldBitmapEffectInput == newBitmapEffectInput) // If new and old value are the same, this set call can be treated as a no-op.
                 {
                     return;
                 }
@@ -3171,37 +3171,37 @@ namespace System.Windows.Media
                     oldBitmapEffectInput.Changed -= new EventHandler(BitmapEffectEmulationChanged);
                 }
 
-                // Notify about the bitmap effect changes to configure the new emulation. 
+                // Notify about the bitmap effect changes to configure the new emulation.
                 BitmapEffectEmulationChanged(/* sender */ null, /* args */ null);
             }
         }
 
 
         // <summary>
-        // This handler reconfigures the bitmap effects pipeline whenever anything changes. It is 
-        // responsible for figuring out if a legacy effect can be emulated on the new pipeline or 
-        // not. 
+        // This handler reconfigures the bitmap effects pipeline whenever anything changes. It is
+        // responsible for figuring out if a legacy effect can be emulated on the new pipeline or
+        // not.
         // </summary>
         internal void BitmapEffectEmulationChanged(object sender, EventArgs e)
-        {           
-            BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);            
+        {
+            BitmapEffectState bed = UserProvidedBitmapEffectData.GetValue(this);
             BitmapEffect currentBitmapEffect = (bed == null) ? null : bed.BitmapEffect;
             BitmapEffectInput currentBitmapEffectInput = (bed == null) ? null : bed.BitmapEffectInput;
 
             // Note that when this method is called, a legacy BitmapEffect has been set or reset on
             // the Visual by the user. The next step is to try to emulate the effect in case the current
-            // effect is non null or reset the emulation layer if the user has set the effect to null. 
+            // effect is non null or reset the emulation layer if the user has set the effect to null.
 
             if (currentBitmapEffect == null)
             {
-                // This means the effect has been disconnected from this Visual. Setting the internal 
-                // bitmap effect property and the image effect property to null to disconnect all the 
-                // effects. The Effect property needs to be set to null because the effect might 
-                // be emulated. 
+                // This means the effect has been disconnected from this Visual. Setting the internal
+                // bitmap effect property and the image effect property to null to disconnect all the
+                // effects. The Effect property needs to be set to null because the effect might
+                // be emulated.
                 VisualBitmapEffectInternal = null;
                 VisualBitmapEffectInputInternal = null;
                 VisualEffectInternal = null;
-            }                
+            }
             else if (currentBitmapEffectInput != null)
             {
                 // If a BitmapEffectInput is specified, make sure the legacy effect is not being
@@ -3212,10 +3212,10 @@ namespace System.Windows.Media
                 VisualBitmapEffectInputInternal = currentBitmapEffectInput;
             }
             else if (RenderCapability.IsShaderEffectSoftwareRenderingSupported &&
-                    currentBitmapEffect.CanBeEmulatedUsingEffectPipeline() && 
+                    currentBitmapEffect.CanBeEmulatedUsingEffectPipeline() &&
                     (!CheckFlagsAnd(VisualFlags.BitmapEffectEmulationDisabled)))
             {
-                // If we can emulate the effect switch to emulating it. 
+                // If we can emulate the effect switch to emulating it.
                 VisualBitmapEffectInternal = null;
                 VisualBitmapEffectInputInternal = null;
                 Effect emulatingEffect = currentBitmapEffect.GetEmulatingEffect();
@@ -3230,15 +3230,15 @@ namespace System.Windows.Media
                 VisualBitmapEffectInputInternal = null;
                 VisualBitmapEffectInternal = currentBitmapEffect;
             }
-                
+
         }
 
         /// <summary>
         /// Used by the test team to disable bitmap effect emulation for testing purposes.
         /// </summary>
-        internal bool BitmapEffectEmulationDisabled 
+        internal bool BitmapEffectEmulationDisabled
         {
-            get 
+            get
             {
                 return CheckFlagsAnd(VisualFlags.BitmapEffectEmulationDisabled);
             }
@@ -3248,7 +3248,7 @@ namespace System.Windows.Media
                 {
                     SetFlags(value, VisualFlags.BitmapEffectEmulationDisabled);
 
-                    // Notify about the bitmap effect changes to configure the new emulation. 
+                    // Notify about the bitmap effect changes to configure the new emulation.
                     BitmapEffectEmulationChanged(/* sender */ null, /* args */ null);
                 }
             }
@@ -3276,7 +3276,7 @@ namespace System.Windows.Media
             }
 
             set
-            {                
+            {
                 BitmapEffectState bitmapEffectState = BitmapEffectStateField.GetValue(this);
 
                 BitmapEffect bitmapEffect = (bitmapEffectState == null) ? null : bitmapEffectState.BitmapEffect;
@@ -3302,7 +3302,7 @@ namespace System.Windows.Media
                     }
 
                     bitmapEffectState.BitmapEffect = newBitmapEffect;
-                    
+
                     Debug.Assert(EffectField.GetValue(this) == null, "Not expecting both BitmapEffect and Effect to be set on the same node");
                 }
             }
@@ -3391,7 +3391,7 @@ namespace System.Windows.Media
 
                     //
                     // Disconnect the cache mode from this visual.
-                    // 
+                    //
                     DisconnectAttachedResource(
                         VisualProxyFlags.IsCacheModeDirty,
                         ((DUCE.IResource)cacheMode));
@@ -3430,10 +3430,10 @@ namespace System.Windows.Media
                 {
                     ScrollableAreaClipField.SetValue(this, value);
 
-                    SetFlagsOnAllChannels(true, VisualProxyFlags.IsScrollableAreaClipDirty);                    
+                    SetFlagsOnAllChannels(true, VisualProxyFlags.IsScrollableAreaClipDirty);
 
                     ScrollableAreaClipChanged(/* sender */ null, /* args */ null);
-                }                
+                }
             }
         }
 
@@ -3725,8 +3725,8 @@ namespace System.Windows.Media
                     VisualFlags.None,
                     VisualProxyFlags.IsSubtreeDirtyForRender);
             }
-        }        
-        
+        }
+
         /// <summary>
         /// OpacityMask Property -
         /// Gets or sets the optional OpacityMask.  If set, the Brush's opacity will
@@ -3771,7 +3771,7 @@ namespace System.Windows.Media
 
                     //
                     // Disconnect the opacity mask from this visual.
-                    // 
+                    //
                     DisconnectAttachedResource(
                         VisualProxyFlags.IsOpacityMaskDirty,
                         ((DUCE.IResource)opacityMask));
@@ -4101,7 +4101,7 @@ namespace System.Windows.Media
             else
             {
                 Visual eAsVisual = e as Visual;
-                
+
                 // If the flag is not set, then we are Done.
                 if(!eAsVisual.CheckFlagsAnd(VisualFlags.SubTreeHoldsAncestorChanged))
                 {
@@ -4187,7 +4187,7 @@ namespace System.Windows.Media
                     {
                         current = null;
                     }
-                }                
+                }
             }
 
             return current == ancestor;
@@ -4207,7 +4207,7 @@ namespace System.Windows.Media
             {
                 current.SetFlags(value, flag);
 
-                
+
                 Visual currentParent = current._parent as Visual;
 
                 // if the cast to currentParent failed and yet current._parent is not null then
@@ -4243,7 +4243,7 @@ namespace System.Windows.Media
 
                 DependencyObject parent = current._parent;
 
-                // first attempt to see if parent is a Visual, in which case we continue the loop.  
+                // first attempt to see if parent is a Visual, in which case we continue the loop.
                 // Otherwise see if it's a Visual3D, and call the similar method on it.
                 current = parent as Visual;
                 if (current == null)
@@ -4295,6 +4295,14 @@ namespace System.Windows.Media
 
         #endregion Visual Ancestry Relations
 
+        #region ForceInherit property support
+
+        internal virtual void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
+        {
+            UIElement.InvalidateForceInheritPropertyOnChildren(this, property);
+        }
+
+        #endregion ForceInherit property support
 
         // --------------------------------------------------------------------
         //
@@ -4524,14 +4532,14 @@ namespace System.Windows.Media
                         // here, and there's no need to improve on our
                         // BitmapEffect implementation if it didn't work
                         // before.
-                        
+
                         Effect imageEffect = EffectField.GetValue(gAsVisual);
                         if (imageEffect != null)
                         {
                             GeneralTransform gt = imageEffect.CoerceToUnitSpaceGeneralTransform(
                                 imageEffect.EffectMapping,
                                 gAsVisual.VisualDescendantBounds);
-                        
+
                             Transform affineTransform = gt.AffineTransform;
                             if (affineTransform != null)
                             {
@@ -4565,14 +4573,14 @@ namespace System.Windows.Media
                 else
                 {
                     // we just hit a Visual3D - use a GeneralTransform to go from 2D -> 3D -> 2D
-                    // and then return to the tree using the 2D parent - the general transform will deal with the 
+                    // and then return to the tree using the 2D parent - the general transform will deal with the
                     // actual transformation.  This Visual3D also must be a Viewport2DVisual3D since this is the only
                     // Visual3D that can have a 2D child.
                     Viewport2DVisual3D gAsVisual3D = g as Viewport2DVisual3D;
-                    
+
                     if (group == null)
                     {
-                        group = new GeneralTransformGroup();                        
+                        group = new GeneralTransformGroup();
                     }
 
                     group.Children.Add(new MatrixTransform(m));
@@ -4588,7 +4596,7 @@ namespace System.Windows.Media
                         visualForGenTransform = this;
                         embedded2Don3D = true;
                     }
-                    
+
                     group.Children.Add(new GeneralTransform2DTo3DTo2D(gAsVisual3D, visualForGenTransform));
 
                     g = VisualTreeHelper.GetContainingVisual2D(gAsVisual3D);
@@ -4695,13 +4703,13 @@ namespace System.Windows.Media
             {
                 throw new System.InvalidOperationException(SR.Get(SRID.Visual_NotAnAncestor));
             }
-            
+
             GeneralTransform transform2D = this.TransformToAncestor(containingVisual3D.Visual);
             GeneralTransform3D transform3D = containingVisual3D.TransformToAncestor(ancestor);
             transformTo3D = new GeneralTransform2DTo3D(transform2D, containingVisual3D, transform3D);
 
             return true;
-        }  
+        }
 
         /// <summary>
         /// This method converts a point in the current Visual's coordinate
@@ -4812,7 +4820,7 @@ namespace System.Windows.Media
             PropagateChangedFlags();
         }
 
-        
+
         internal EventHandler EffectChangedHandler
         {
             get
@@ -5031,7 +5039,7 @@ namespace System.Windows.Media
             {
                 eAsVisual = e as Visual;
                 if (eAsVisual != null)
-                {                
+                {
                     // if the bit is already set, then we're done.
                     if(eAsVisual.CheckFlagsAnd(treeFlag))
                         return;
@@ -5046,7 +5054,7 @@ namespace System.Windows.Media
                     if(eAsVisual3D.CheckFlagsAnd(treeFlag))
                         return;
 
-                    eAsVisual3D.SetFlags(true, treeFlag);                    
+                    eAsVisual3D.SetFlags(true, treeFlag);
                 }
 
                 e = VisualTreeHelper.GetParent(e);
@@ -5068,7 +5076,7 @@ namespace System.Windows.Media
         {
             Visual eAsVisual;
             Visual3D eAsVisual3D;
-            
+
             // This bit might not be set, but checking costs as much as setting
             // So it is faster to just clear it everytime.
             if (e != null)
@@ -5088,7 +5096,7 @@ namespace System.Windows.Media
             {
                 eAsVisual = e as Visual;
                 if (eAsVisual != null)
-                {      
+                {
                     if(eAsVisual.CheckFlagsAnd(nodeFlag))
                     {
                         return;  // Done;   if a parent also has the Node bit set.
@@ -5104,7 +5112,7 @@ namespace System.Windows.Media
                 else
                 {
                     eAsVisual3D = e as Visual3D;
-                    
+
                     if(eAsVisual3D.CheckFlagsAnd(nodeFlag))
                     {
                         return;  // Done;   if a parent also has the Node bit set.
@@ -5205,11 +5213,11 @@ namespace System.Windows.Media
                 {
                     // if the parent is not null (saw this with earlier null check) and is not a Visual
                     // it must be a Visual3D - continue the propagation
-                    Visual3D.PropagateFlags((Visual3D)e._parent, flags, proxyFlags);     
+                    Visual3D.PropagateFlags((Visual3D)e._parent, flags, proxyFlags);
                     return;
                 }
 
-                e = parentAsVisual;                
+                e = parentAsVisual;
             }
         }
 
@@ -5239,7 +5247,7 @@ namespace System.Windows.Media
                     BitmapEffectStateField.GetValue(this) != null;
             }
         }
-        
+
 
         #endregion Visual flags manipulation
 
@@ -5317,11 +5325,11 @@ namespace System.Windows.Media
         private static readonly UncommonField<Rect?> ScrollableAreaClipField = new UncommonField<Rect?>(null);
 
         private static readonly UncommonField<TextRenderingMode> TextRenderingModeField = new UncommonField<TextRenderingMode>();
-        private static readonly UncommonField<TextHintingMode> TextHintingModeField = new UncommonField<TextHintingMode>();       
+        private static readonly UncommonField<TextHintingMode> TextHintingModeField = new UncommonField<TextHintingMode>();
 
         private Vector _offset;
         private VisualFlags _flags;
-        
+
         private const uint TreeLevelLimit = 0x7FF;
 
         #endregion Private Fields

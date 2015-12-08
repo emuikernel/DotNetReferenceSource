@@ -654,6 +654,7 @@ namespace System.Windows.Markup
                 owSettings.SkipDuplicatePropertyCheck = parentSettings.SkipDuplicatePropertyCheck;
                 owSettings.AccessLevel = parentSettings.AccessLevel;
                 owSettings.SkipProvideValueOnRoot = parentSettings.SkipProvideValueOnRoot;
+                owSettings.SourceBamlUri = parentSettings.SourceBamlUri;
             }
             return owSettings;
         }

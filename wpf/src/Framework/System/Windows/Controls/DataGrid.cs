@@ -4633,6 +4633,13 @@ namespace System.Windows.Controls
             int columnCount = _columns.Count;
             if (columnCount > 0)
             {
+                if (!isSelected && _pendingInfos != null)
+                {
+                    // deselecting an item - remove it from the pending list
+                    // regardless of whether its index is known
+                    _pendingInfos.Remove(rowInfo);
+                }
+
                 int rowIndex = rowInfo.Index;
                 if (rowIndex >= 0)
                 {
@@ -4648,14 +4655,10 @@ namespace System.Windows.Controls
                 else
                 {
                     // the index isn't known yet.  Mark the ItemInfo as pending
-                    EnsurePendingInfos();
                     if (isSelected)
                     {
+                        EnsurePendingInfos();
                         _pendingInfos.Add(rowInfo);
-                    }
-                    else
-                    {
-                        _pendingInfos.Remove(rowInfo);
                     }
                 }
             }

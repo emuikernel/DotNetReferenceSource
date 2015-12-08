@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</ProjectGuid>
+    <ProjectGuid>{de666f01-fb7c-4239-a4b1-91741ed0c421}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Xml</AssemblyName>
@@ -20,15 +20,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core\System.Core.csproj">
-      <Project>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</Project>
+      <Project>{027422eb-9e92-49f3-b8bb-ee9b97985138}</Project>
       <Name>System.Core</Name>
     </ProjectReference>
   </ItemGroup>
@@ -38,6 +38,7 @@
     <Compile Include="..\..\..\..\InternalApis\Clr\inc\AppContextDefaultValues.cs" />
     <Compile Include="..\..\..\..\InternalApis\Clr\inc\LocalAppContext.cs" />
     <Compile Include="..\..\..\..\InternalApis\NDP_Common\inc\Win8Helpers.cs" />
+    <Compile Include="..\misc\HResults.cs" />
     <Compile Include="..\misc\InvariantComparer.cs" />
     <Compile Include="..\misc\PrivilegedConfigurationManager.cs" />
     <Compile Include="System\Xml\Assembly\System.Xml.Assembly.cs" />

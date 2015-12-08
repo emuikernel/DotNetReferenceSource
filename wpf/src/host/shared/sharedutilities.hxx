@@ -23,6 +23,7 @@
 HRESULT GetDefaultBrowser(__inout_ecount(nBufferSize)LPCWSTR pszCommandlineToExec, size_t nBufferSize);
 HRESULT GetURLFromCommandLine(__in LPWSTR pszCommandStart, __deref_out_ecount(1) LPWSTR* ppszURL);
 HRESULT InvokeBrowser(__in LPCWSTR pszURL); 
+HRESULT GetInternetExplorerPath(_Out_writes_(MAX_PATH) LPWSTR pszPath);
 
 HRESULT GetRegistryDWORD(__in HKEY hKey, __in LPWSTR pswzSubKey, __in LPWSTR pswzName, __out_ecount(1) DWORD& dwValue, __in DWORD dwDefaultValue);
 HRESULT GetRegistryString(__in HKEY hKey, __in LPWSTR pswzSubKey, __in LPWSTR pswzName, CString& strValue);

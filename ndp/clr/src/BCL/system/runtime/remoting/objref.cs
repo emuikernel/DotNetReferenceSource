@@ -632,9 +632,9 @@ namespace System.Runtime.Remoting {
             if (oldChannelData == null)
                 return oldChannelInfo;
 
-            // <STRIP>This will work for the IIS scenario since the machine name + application name
-            //   will differentiate the url. If we generalize this mechanism in the future,
-            //   we should only [....] the url if the ObjRef is from the current appdomain.</STRIP>
+            // <
+
+
             String[] bashInfo = (String[])CallContext.GetData("__bashChannelUrl");
             if (bashInfo == null)
                 return oldChannelInfo;

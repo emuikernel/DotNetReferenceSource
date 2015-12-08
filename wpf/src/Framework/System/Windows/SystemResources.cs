@@ -806,24 +806,24 @@ namespace System.Windows
                     settings.LocalAssembly = assembly;
 
                     // For system themes, we don't seem to be passing the BAML Uri to the Baml2006Reader
-                    if (XamlSourceInfoHelper.IsXamlSourceInfoEnabled)
-                    {
-                        AssemblyName asemblyName = new AssemblyName(assembly.FullName);
-                        Uri streamUri = null;
-                        string packUri = string.Format("pack://application:,,,/{0};v{1};{2}", asemblyName.Name, asemblyName.Version.ToString(), resourceName);
-                        if (Uri.TryCreate(packUri, UriKind.Absolute, out streamUri))
-                        {
-                            settings.BaseUri = streamUri;
-                        }
-                    }
-
                     Baml2006Reader bamlReader = new Baml2006Reader(stream, new Baml2006SchemaContext(settings.LocalAssembly), settings);
 
                     System.Xaml.XamlObjectWriterSettings owSettings = XamlReader.CreateObjectWriterSettingsForBaml();
                     if (assembly != null)
                     {
                         owSettings.AccessLevel = XamlAccessLevel.AssemblyAccessTo(assembly);
+                        if (XamlSourceInfoHelper.IsXamlSourceInfoEnabled)
+                        {
+                            AssemblyName asemblyName = new AssemblyName(assembly.FullName);
+                            Uri streamUri = null;
+                            string packUri = string.Format("pack://application:,,,/{0};v{1};component/{2}", asemblyName.Name, asemblyName.Version.ToString(), resourceName);
+                            if (Uri.TryCreate(packUri, UriKind.Absolute, out streamUri))
+                            {
+                                owSettings.SourceBamlUri = streamUri;
+                            }
+                        }
                     }
+
                     System.Xaml.XamlObjectWriter writer = new System.Xaml.XamlObjectWriter(bamlReader.SchemaContext, owSettings);
 
                     if (owSettings.AccessLevel != null)

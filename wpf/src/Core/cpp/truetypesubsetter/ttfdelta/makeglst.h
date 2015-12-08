@@ -19,6 +19,7 @@ CONST uint16 usCharListCount,
 uint8 *puchKeepGlyphList, /* pointer to an array of characters representing glyphs 0-usGlyphListCount. */
 CONST uint16 usGlyphListCount,
 uint16 *pusMaxGlyphIndexUsed,
-uint16 *pusGlyphKeepCount
+uint16 *pusGlyphKeepCount,
+BOOL bAddRelatedGlyphs 
 );
 #endif /* MAKEGLIST_DOT_H_DEFINED */

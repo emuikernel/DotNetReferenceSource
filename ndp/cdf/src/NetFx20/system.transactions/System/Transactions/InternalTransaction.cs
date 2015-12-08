@@ -41,6 +41,21 @@ namespace System.Transactions
         // a different state so that it is promoted correctly.
         internal TransactionState promoteState;
 
+        // The PromoterType for the transaction.
+        // This is set when a PSPE enlistment is created via Transaction.EnlistPromotableSinglePhase.
+        // It is also set when a transaction promotes without a PSPE enlistment.
+        internal Guid promoterType = Guid.Empty;
+
+        // The promoted token for the transaction.
+        // This is set when the transaction is promoted. For an MSDTC transaction, it is the 
+        // same as the DTC propagation token.
+        internal byte[] promotedToken;
+
+        // This is only used if the promoter type is different than TransactionInterop.PromoterTypeDtc.
+        // The promoter is supposed to tell us what the distributed transaction id after promoting it.
+        // We store the value here.
+        internal Guid distributedTransactionIdentifierNonMSDTC = Guid.Empty;
+
 #if DEBUG
         // Keep a history of th transaction states
         internal const int MaxStateHist = 20;
@@ -260,6 +275,29 @@ namespace System.Transactions
         // checked for true in TransactionStatePSPEOperation.PSPEPromoteAndConvertToEnlistDurable to make sure the transaction
         // is in the process of promoting via a PSPE enlistment.
         internal bool attemptingPSPEPromote = false;
+
+        // This is called from TransactionStatePromoted.EnterState. We assume we are promoting to MSDTC.
+        internal void SetPromoterTypeToMSDTC()
+        {
+            // The promoter type should either not yet be set or should already be TransactionInterop.PromoterTypeDtc in this case.
+            if ((this.promoterType != Guid.Empty) && (this.promoterType != TransactionInterop.PromoterTypeDtc))
+            {
+                throw new InvalidOperationException(SR.GetString(SR.PromoterTypeInvalid));
+            }
+            this.promoterType = TransactionInterop.PromoterTypeDtc;
+        }
+
+        // Throws a TransactionPromotionException if the promoterType is NOT
+        // Guid.Empty AND NOT TransactionInterop.PromoterTypeDtc.
+        internal void ThrowIfPromoterTypeIsNotMSDTC()
+        {
+            if ((this.promoterType != Guid.Empty) && (this.promoterType != TransactionInterop.PromoterTypeDtc))
+            {
+                throw new TransactionPromotionException(string.Format(CultureInfo.CurrentCulture,
+                    SR.GetString(SR.PromoterTypeUnrecognized), this.promoterType.ToString()),
+                    this.innerException);
+            }
+        }
 
         // Construct an internal transaction
         internal InternalTransaction( TimeSpan timeout, CommittableTransaction committableTransaction )

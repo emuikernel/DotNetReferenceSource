@@ -266,8 +266,9 @@ namespace System.Windows.Input
 
         /////////////////////////////////////////////////////////////////////
         /// <SecurityNote>
-        /// Critical - Calls security critical routine (InvokeStylusPluginCollection)
-        ///           - Access SecurityCritical data (_queueStylusEvents, RawStylusInputReport.PenContexts).
+        /// Critical  - Calls security critical routine (InvokeStylusPluginCollection)
+        ///           - Calls security critical routine (QueueStylusEvent)
+        ///           - Access SecurityCritical data (RawStylusInputReport.PenContexts).
         ///           - PenThreadWorker.ThreadProc() is TAS boundry
         /// </SecurityNote>
         [SecurityCritical]
@@ -283,13 +284,119 @@ namespace System.Windows.Input
                 InvokeStylusPluginCollection(inputReport);
             }
 
+            // DevDiv:652804
+            // Previously the pen thread would blindly shove any move from Wisp onto the stylus
+            // queue.  This is a problem if the main thread stalls but the pen thread does not.
+            // Wisp will coalesce data, but only if the pen thread fails to pick up the event.
+            // Otherwise, we need to re-implement coalescing of move events here so that we
+            // make move data available via GetIntermediateTouchPoints but do not flood the
+            // stylus queue with old moves, creating lag in user interaction.  To do that we 
+            // detect stalls in the main thread by checking if the last move has processed.
+            // If not, we coalesce moves together until we can queue up the coalesced events.
+
+            RawStylusInputReport lastMoveReport = null;
+            _lastMovesQueued.TryGetValue(inputReport.StylusDevice, out lastMoveReport);
+
+            RawStylusInputReport coalescedMove = null;
+            _coalescedMoves.TryGetValue(inputReport.StylusDevice, out coalescedMove);
+
+            // All moves now go through a coalesce to simplify logic
+            if (inputReport.Actions == RawStylusActions.Move)
+            {
+                // Start a new coalescing report if none exists
+                if (coalescedMove == null)
+                {
+                    _coalescedMoves[inputReport.StylusDevice] = inputReport;
+                    coalescedMove = inputReport;
+                }
+                // Add new move to coalesced
+                else
+                {
+                    // GetRawPacketData creates copies, so only call them once
+                    int[] oldData = coalescedMove.GetRawPacketData();
+                    int[] newData = inputReport.GetRawPacketData();
+                    int[] mergedData = new int[oldData.Length + newData.Length];
+
+                    oldData.CopyTo(mergedData, 0);
+                    newData.CopyTo(mergedData, oldData.Length);
+
+                    coalescedMove = new RawStylusInputReport(
+                            coalescedMove.Mode,
+                            coalescedMove.Timestamp,
+                            coalescedMove.InputSource,
+                            coalescedMove.PenContext,
+                            coalescedMove.Actions,
+                            coalescedMove.TabletDeviceId,
+                            coalescedMove.StylusDeviceId,
+                            mergedData
+                            );
+
+                    coalescedMove.StylusDevice = inputReport.StylusDevice;
+
+                    _coalescedMoves[inputReport.StylusDevice] = coalescedMove;
+                }
+
+                // We can't queue any move if one is still waiting for processing
+                if (lastMoveReport != null
+                    && lastMoveReport.IsQueued)
+                {
+                    return;
+                }
+            }
+
+            // If we get this far, we are queuing a coalesced move if it exists
+            if (coalescedMove != null)
+            {
+                QueueStylusEvent(coalescedMove);
+
+                // Set last move and cleanup coalescing tracking
+                _lastMovesQueued[inputReport.StylusDevice] = coalescedMove;
+                _coalescedMoves.Remove(inputReport.StylusDevice);
+            }
+
+            // Move always queues via coalescing, so only queue here if not a move
+            // This has to be done post-coalesced move to maintain order of touch
+            // operations
+            if (inputReport.Actions != RawStylusActions.Move)
+            {
+                QueueStylusEvent(inputReport);
+
+                // Once we see a non-move, we should get no more input for this particular chain
+                // so we can remove the stored prior moves (if they exist).
+                _lastMovesQueued.Remove(inputReport.StylusDevice);
+            }
+        }
+
+        /// <summary>
+        /// Queues a RawStylusInputReport for later processing on the dispatcher thread
+        /// </summary>
+        /// <SecurityNote>
+        ///     Critical:  Accesses critical field _queueStylusEvents
+        /// </SecurityNote>
+        /// <param name="report"></param>
+        [SecurityCritical]
+        private void QueueStylusEvent(RawStylusInputReport report)
+        {
             // ETW event indicating that a stylus input report was queued.
-            EventTrace.EasyTraceEvent(EventTrace.Keyword.KeywordInput | EventTrace.Keyword.KeywordPerf, EventTrace.Level.Info, EventTrace.Event.StylusEventQueued, inputReport.StylusDeviceId);
+            EventTrace.EasyTraceEvent(EventTrace.Keyword.KeywordInput | EventTrace.Keyword.KeywordPerf, 
+                EventTrace.Level.Info, EventTrace.Event.StylusEventQueued, report.StylusDeviceId);
+
+            report.IsQueued = true;
 
             // Queue up new event.
-            lock(_stylusEventQueueLock)
+            lock (_stylusEventQueueLock)
             {
-                _queueStylusEvents.Enqueue(inputReport);
+                if (report.StylusDevice != null)
+                 {
+                     TabletDevice tablet = report.StylusDevice.TabletDevice;
+
+                     if (tablet != null)
+                     {
+                         tablet.QueuedEventCount++;
+                     }
+                 }
+
+                _queueStylusEvents.Enqueue(report);
             }
 
             // post the args into dispatcher queue
@@ -315,18 +422,32 @@ namespace System.Windows.Input
                 if (_queueStylusEvents.Count > 0)
                 {
                     rawStylusInputReport = _queueStylusEvents.Dequeue();
+
+                    if (rawStylusInputReport.StylusDevice != null)
+                    {
+                        TabletDevice tablet = rawStylusInputReport.StylusDevice.TabletDevice;
+
+                        if (tablet != null)
+                        {
+                            tablet.QueuedEventCount--;
+                        }
+                    }
                 }
             }
 
-            if (rawStylusInputReport != null)
+            // Bug 839668, StylusDevice could have been disposed internally here.
+            // We should check StylusDevice.IsValid property.  This check has
+            // been moved to support DevDiv:1078091.
+            if (rawStylusInputReport != null
+                && rawStylusInputReport.StylusDevice != null
+                && rawStylusInputReport.StylusDevice.IsValid)
             {
-                PenContext penContext = rawStylusInputReport.PenContext;
+                rawStylusInputReport.IsQueued = false;
 
-             // Bug 839668,StylusDevice could have been disposed internally here.
-             // We should check StylusDevice.IsValid property.
-             if (penContext.UpdateScreenMeasurementsPending &&
-                 rawStylusInputReport.StylusDevice != null &&
-                 rawStylusInputReport.StylusDevice.IsValid)
+
+               PenContext penContext = rawStylusInputReport.PenContext;
+              
+                if (penContext.UpdateScreenMeasurementsPending)
                 {
                     TabletDevice tabletDevice = rawStylusInputReport.StylusDevice.TabletDevice;
                     bool areSizeDeltasValid = tabletDevice.AreSizeDeltasValid();
@@ -335,19 +456,22 @@ namespace System.Windows.Input
                     penContext.UpdateScreenMeasurementsPending = false;
                     tabletDevice.UpdateScreenMeasurements();
 
-                    if (areSizeDeltasValid)
+
+                   if (areSizeDeltasValid)
                     {
                         // Update TabletDevice.DoubleTapDelta and TabletDevice.CancelDelta if needed.
                         tabletDevice.UpdateSizeDeltas(penContext.StylusPointDescription, this);
                     }
                 }
-
+ 
                 // build InputReportEventArgs
                 InputReportEventArgs input = new InputReportEventArgs(null, rawStylusInputReport);
                 input.RoutedEvent=InputManager.PreviewInputReportEvent;
+
                 // Set flag to prevent reentrancy due to wisptis mouse event getting triggered
                 // while processing this stylus event.
                 _processingQueuedEvent = true;
+
                 try
                 {
                     InputManagerProcessInputEventArgs(input);
@@ -1128,8 +1252,27 @@ namespace System.Windows.Input
                         stylusDevice.LastTapBarrelDown = bBarrelPressed;
                     }
 
+                    // DevDiv:1135009
+                    // When the touch stack is enabled, it eats all promoted Win32/Wisp mouse input 
+                    // in favor of its own input (and generated mouse events).  This does not stop
+                    // Windows messages from arriving into the mouse stack.  In the case where Windows
+                    // promotes a touch down into a mouse move/click, the mouse stack will record a
+                    // last location for the mouse.  The touch down will also record the same location
+                    // and use that to replay a mouse move into the mouse input stack.  If the mouse
+                    // was previously outside of the WPF window and the window was not activated, the
+                    // mouse will have a null mouseover object.  When WPF replays this move, there will
+                    // be no hit test as the mouse stack will compare the previous hardware point with
+                    // the point sent in by the simulated move and see no change has occured.  Therefore,
+                    // the generated click message from the touch stack will not forward to any object 
+                    // and no capture will be enabled for the mouse.  This means that if the mouse/stylus
+                    // has been used to touch outside of a WPF window (and deactivate the window), there
+                    // will be no click raised if the next touch down occurs on a button in the deactivated
+                    // WPF window.  To fix this issue, we force a synchronization (and therefore a global 
+                    // hit test) on the preview touch down in order to make sure the mouseover has been 
+                    // properly updated by the time a move/click message has been generated by the touch stack.
+                    
                     // Make sure to update the mouse location on stylus down.
-                    ProcessMouseMove(stylusDevice, stylusDownEventArgs.Timestamp, false);
+                    ProcessMouseMove(stylusDevice, stylusDownEventArgs.Timestamp, true);
                 }
             }
         }
@@ -1140,6 +1283,7 @@ namespace System.Windows.Input
         ///     Critical - calls a critical method (PromoteRawToPreview, MouseDevice.CriticalActiveSource,
         ///                 InputReport.InputSource, PromotePreviewToMain, UpdateButtonStates,
         ///                 PromoteMainToMouse and GenerateGesture)
+        ///              - calls critical method RefreshTablets()
         ///              - accesses e.StagingItem.Input, _inputManager.Value and TabletDevices.
         ///              It can also be used for Input spoofing.
         ///</SecurityNote>
@@ -1309,6 +1453,34 @@ namespace System.Windows.Input
                 if (stylusSystemGesture.SystemGesture == SystemGesture.Flick)
                 {
                     HandleFlick(stylusSystemGesture.ButtonState, stylusSystemGesture.StylusDevice.DirectlyOver);
+                }
+            }
+
+            // DevDiv:1078901
+            // As per discussions with the Wisp dev team on 1/14/15 (aliases mikkid, xiaotu, kmenon) we confirmed 
+            // that an out of range should be the last event for any given set of stylus device input and therefore
+            // the last event for any given tablet device (if this is the last stylus point for the device).  When 
+            // we see the last out of range for the stylus device (and there is no more pending input), we can be
+            // sure the input stack no longer needs a tablet and can dispose it immediately if previously deferred.
+            //
+            // Due to stylus events being fed from a different pen thread, it is possible that another stylus event
+            // will enter the queue between the disposal check and the actual dispose.  This is not an issue as the
+            // input loop is guarded against disposed tablets and the guard and this dispose are synchronous.  The
+            // act of missing a set of messages is also acceptable as we will discard whole in-range to out of range
+            // sets and it will be as if that entire input set had not occured.  This is fine in our disconnect 
+            // scenario as the user experience will be consistent.
+            if (e.StagingItem.Input.RoutedEvent == Stylus.StylusOutOfRangeEvent)
+            {
+                var stylusArgs = e.StagingItem.Input as StylusEventArgs;
+
+                if (stylusArgs != null
+                    && stylusArgs.StylusDevice != null
+                    && stylusArgs.StylusDevice.TabletDevice != null
+                    && stylusArgs.StylusDevice.TabletDevice.IsDisposalPending
+                    && stylusArgs.StylusDevice.TabletDevice.CanDispose)
+                {
+                    // Update all tablets to sweep for tablets that can now be disposed
+                    RefreshTablets();
                 }
             }
         }
@@ -3623,18 +3795,9 @@ namespace System.Windows.Input
                     }
                     else
                     {
-                        // rebuild all contexts and tablet collection if duplicate found.
-                        foreach ( PenContexts contexts in __penContextsMap.Values )
-                        {
-                            contexts.Disable(shutdownWorkerThread:false);
-                        }
-
-                        tabletDeviceCollection.UpdateTablets();
-
-                        foreach ( PenContexts contexts in __penContextsMap.Values )
-                        {
-                            contexts.Enable();
-                        }
+                        // DevDiv:1078091
+                        // Changed to use refactored code
+                        RefreshTablets();
                     }
                 }
             }
@@ -3698,18 +3861,9 @@ namespace System.Windows.Input
                             (_lastKnownDeviceCount < 0 ||
                              currentDeviceCount != _lastKnownDeviceCount - 1))
                         {
-                            // rebuild all contexts and tablet collection
-                            foreach ( PenContexts contexts in __penContextsMap.Values )
-                            {
-                                contexts.Disable(shutdownWorkerThread:false);
-                            }
-
-                            TabletDevices.UpdateTablets();
-
-                            foreach ( PenContexts contexts in __penContextsMap.Values )
-                            {
-                                contexts.Enable();
-                            }
+                            // DevDiv:1078091
+                            // Changed to use refactored code
+                            RefreshTablets();
 
                             if (!_inputEnabled)
                             {
@@ -3725,10 +3879,16 @@ namespace System.Windows.Input
                         }
                         else
                         {
+                            int numDeferredTablets = _tabletDeviceCollection.DeferredTablets.Count;
+
                             // remove the affected device
                             uint tabletIndex = _tabletDeviceCollection.HandleTabletRemoved(wisptisIndex);
-
-                            if (tabletIndex != UInt32.MaxValue)
+                            
+                            // DevDiv:1078091
+                            // Only shut the context down if this tablet has not been placed on 
+                            // the deferred list.  Otherwise, we still need to receive new messages.
+                            if (tabletIndex != UInt32.MaxValue
+                                && _tabletDeviceCollection.DeferredTablets.Count == numDeferredTablets)
                             {
                                 foreach (PenContexts contexts in __penContextsMap.Values)
                                 {
@@ -3743,6 +3903,35 @@ namespace System.Windows.Input
             }
         }
 
+        /// <summary>
+        /// Refreshes all tablets and syncs them to what is being track in Wisp.
+        /// This shuts down all contexts and will bring them back up for any
+        /// tablet that is not immediately disposed of.
+        ///
+        /// DevDiv:1078091
+        /// Refactoring this out of the previous function (OnTabletRemovedImpl)
+        /// so this can be called independently of a wisp index.
+        /// </summary>
+        /// <SecurityNote>
+        ///     Critical: Calls PenContexts.Disable/Enable
+        ///               Calls TabletCollection.UpdateTablets
+        /// </SecurityNote>
+        [SecurityCritical]
+        private void RefreshTablets()
+        {
+            // rebuild all contexts and tablet collection
+            foreach (PenContexts contexts in __penContextsMap.Values)
+            {
+                contexts.Disable(shutdownWorkerThread: false);
+            }
+
+            TabletDevices.UpdateTablets();
+
+            foreach (PenContexts contexts in __penContextsMap.Values)
+            {
+                contexts.Enable();
+            }
+        }
 
         /// <SecurityNote>
         ///     Critical: This code calls SecurityCritical code (PenThread.WorkerGetTabletsInfo)
@@ -4073,6 +4262,15 @@ namespace System.Windows.Input
         // have tablet devices in play, so as to avoid starting a pen thread unecessarily.
         // Doing so causes problems, as reported in Dev11 946388, 984115, 993269.
         private int _lastKnownDeviceCount = -1;
+
+        // DevDiv: 652804
+        // Stores the last move report that was added to the stylus event queue per device
+        Dictionary<StylusDevice, RawStylusInputReport> _lastMovesQueued = new Dictionary<StylusDevice, RawStylusInputReport>();
+
+        // DevDiv: 652804
+        // Stores the move report that is currently being used to coalesce subsequent moves
+        Dictionary<StylusDevice, RawStylusInputReport> _coalescedMoves = new Dictionary<StylusDevice, RawStylusInputReport>();
+
 
 #if !MULTICAPTURE
         IInputElement _stylusCapture;

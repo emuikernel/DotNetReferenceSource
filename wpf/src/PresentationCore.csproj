@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{e556ed9d-6b47-4362-a6e3-eda0139224e0}</ProjectGuid>
+    <ProjectGuid>{395e27ce-8277-441f-8dba-265dc9159132}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>PresentationCore</AssemblyName>
@@ -20,27 +20,27 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ndp\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\Configuration\System.Configuration.csproj">
-      <Project>{c8acffc3-9a67-4b99-b153-3456d8d6a9e2}</Project>
+      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
       <Name>System.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\Xml\System.Xml.csproj">
-      <Project>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</Project>
+      <Project>{de666f01-fb7c-4239-a4b1-91741ed0c421}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="UIAutomation\UIAutomationClient\UIAutomationClient.csproj">
-      <Project>{0ec13705-827c-45c4-9226-0d02404f1e01}</Project>
+      <Project>{a624a509-e440-4593-9d55-f3b56c136756}</Project>
       <Name>UIAutomationClient</Name>
     </ProjectReference>
     <ProjectReference Include="WindowsBase.csproj">
-      <Project>{baac4c8e-f013-46b8-886c-06283b8f8005}</Project>
+      <Project>{2fbfec40-d5b1-4297-92c7-f05be01f1962}</Project>
       <Name>WindowsBase</Name>
     </ProjectReference>
   </ItemGroup>
@@ -542,10 +542,10 @@
     <Compile Include="Core\CSharp\System\Windows\Interop\HwndTarget.cs" />
     <Compile Include="Core\CSharp\System\Windows\Interop\Imaging.cs" />
     <Compile Include="Core\CSharp\System\Windows\Interop\IWin32Window.cs" />
-    <Compile Include="Core\CSharp\System\Windows\Interop\OperatingSystemVersion.cs" />
     <Compile Include="Core\CSharp\System\Windows\Interop\OperatingSystemVersionCheck.cs" />
     <Compile Include="Core\CSharp\System\Windows\LayoutManager.cs" />
     <Compile Include="Core\CSharp\System\Windows\LocalizabilityAttribute.cs" />
+    <Compile Include="Core\CSharp\System\Windows\LocalizationCategory.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\IAddChild.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\IProvidePropertyFallback.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\XamlSerializerUtil.cs" />
@@ -1239,6 +1239,7 @@
     <Compile Include="Core\CSharp\System\Windows\Media3D\Viewport3DVisual.cs" />
     <Compile Include="Core\CSharp\System\Windows\Media3D\Visual3D.cs" />
     <Compile Include="Core\CSharp\System\Windows\Media3D\Visual3DCollection.cs" />
+    <Compile Include="Core\CSharp\System\Windows\Modifiability.cs" />
     <Compile Include="Core\CSharp\System\Windows\MouseCaptureWithinProperty.cs" />
     <Compile Include="Core\CSharp\System\Windows\MouseOverProperty.cs" />
     <Compile Include="Core\CSharp\System\Windows\Navigation\BaseUriHelper.cs" />
@@ -1246,6 +1247,7 @@
     <Compile Include="Core\CSharp\System\Windows\PresentationSource.cs" />
     <Compile Include="Core\CSharp\System\Windows\QueryContinueDragEventArgs.cs" />
     <Compile Include="Core\CSharp\System\Windows\QueryContinueDragEventHandler.cs" />
+    <Compile Include="Core\CSharp\System\Windows\Readability.cs" />
     <Compile Include="Core\CSharp\System\Windows\ReadOnlyPropertyMetadata.cs" />
     <Compile Include="Core\CSharp\System\Windows\Resources\AssemblyAssociatedContentFileAttribute.cs" />
     <Compile Include="Core\CSharp\System\Windows\ReverseInheritProperty.cs" />
@@ -1332,7 +1334,10 @@
     <Compile Include="Shared\MS\Win32\SafeSystemMetrics.cs" />
     <Compile Include="Shared\MS\Win32\UnsafeNativeMethodsCompiler.cs" />
     <Compile Include="Shared\MS\Win32\WinInet.cs" />
+    <Compile Include="Shared\RefAssemblyAttrs.cs" />
     <Compile Include="Shared\System\Windows\Ink\KnownIds.cs" />
+    <Compile Include="Shared\System\Windows\Interop\OperatingSystemVersion.cs" />
+    <Compile Include="Shared\System\Windows\Interop\OSVersionHelper.cs" />
     <Compile Include="Shared\System\Windows\Media\TypeConverterHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4192,7 +4192,7 @@ namespace System {
                         if (iriParsing && hasUnicode
                             && StaticNotAny(flags, Flags.HostUnicodeNormalized)){
                             // Normalize any other host
-                            String user = new string(pString, startOtherHost, startOtherHost - end);
+                            String user = new string(pString, startOtherHost, end - startOtherHost);
                             try
                             {
                                 newHost += user.Normalize(NormalizationForm.FormC);

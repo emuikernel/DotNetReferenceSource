@@ -920,6 +920,10 @@ namespace System.Windows.Documents
                     blinkAnimation.KeyFrames.Add(new DiscreteDoubleKeyFrame(0, KeyTime.FromPercent(0.5)));
                     blinkAnimation.Duration = blinkDuration;
 
+                    // Reduce desired framerate from 60 to 10, to reduce number of no-op renders.
+                    // This significantly improves typing responsiveness on low end GPUs for RichTextBox.
+                    Timeline.SetDesiredFrameRate(blinkAnimation, 10);
+
                     _blinkAnimationClock = blinkAnimation.CreateClock();
                     _blinkAnimationClock.Controller.Begin();
 

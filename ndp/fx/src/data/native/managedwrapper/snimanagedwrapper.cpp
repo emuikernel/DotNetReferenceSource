@@ -569,7 +569,6 @@ ref class  SNINativeMethodWrapper
              MultiSubnetFailoverWithInstanceSpecified = (SNIE_48 - SNI_STRING_ERROR_BASE),
              MultiSubnetFailoverWithNonTcpProtocol = (SNIE_49 - SNI_STRING_ERROR_BASE),
 
-
              // max error code value
              MaxErrorValue = SNIE_MAX
          };
@@ -666,7 +665,9 @@ internal:
         System::Boolean fOverrideCache,
         System::Boolean fSync,
         System::Int32 timeout,
-        System::Boolean fParallel)
+        System::Boolean fParallel,
+        System::Int32 transparentNetworkResolutionStateNo,
+        System::Int32 totalTimeout)
     {
         ::SNI_CLIENT_CONSUMER_INFO clientConsumerInfo;  // native SNI_CLIENT_CONSUMER_INFO
 
@@ -695,6 +696,19 @@ internal:
         clientConsumerInfo.fSynchronousConnection = fSync;
         clientConsumerInfo.timeout = timeout;
         clientConsumerInfo.fParallel = fParallel;
+        switch (transparentNetworkResolutionStateNo)
+        {
+        case (0):
+            clientConsumerInfo.transparentNetworkResolution = DisabledMode;
+            break;
+        case (1):
+            clientConsumerInfo.transparentNetworkResolution = SequentialMode;
+            break;
+        case (2):
+            clientConsumerInfo.transparentNetworkResolution = ParallelMode;
+            break;
+        };
+        clientConsumerInfo.totalTimeout = totalTimeout;
 
         System::UInt32 ret  =  ::SNIOpenSyncExWrapper (&clientConsumerInfo, &local_pConn);
         pConn =  static_cast<System::IntPtr>(local_pConn);
@@ -1423,6 +1437,8 @@ private:
                COMPILE_TIME_ASSERT (sizeof(BOOL) == sizeof(SniClientConsumerInfo.fSynchronousConnection));
                COMPILE_TIME_ASSERT (sizeof(int) == sizeof(SniClientConsumerInfo.timeout));
                COMPILE_TIME_ASSERT (sizeof(BOOL) == sizeof(SniClientConsumerInfo.fParallel));
+               COMPILE_TIME_ASSERT(sizeof(BYTE) == sizeof(SniClientConsumerInfo.transparentNetworkResolution));
+               COMPILE_TIME_ASSERT (sizeof(int) == sizeof(SniClientConsumerInfo.totalTimeout));
            }
 
            // This check makes sure that nothing was added

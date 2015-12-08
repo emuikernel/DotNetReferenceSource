@@ -749,7 +749,7 @@ namespace System {
 
         //
         // StringToShort, StringToInt, and StringToLong are wrappers around COMUtilNative integer parsing routines;
-        //<STRIP>
+        //<
 
         [System.Security.SecuritySafeCritical]
         private static unsafe bool StringToShort(String str, int requiredLength, int flags, out short result, ref GuidResult parseResult) {

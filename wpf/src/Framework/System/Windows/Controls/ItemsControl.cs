@@ -2953,6 +2953,21 @@ namespace System.Windows.Controls
             return GetElementViewportPosition(viewPort, element, axis, fullyVisible, out elementRect);
         }
 
+        internal static ElementViewportPosition GetElementViewportPosition(FrameworkElement viewPort,
+            UIElement element,
+            FocusNavigationDirection axis,
+            bool fullyVisible,
+            out Rect elementRect)
+        {
+            return GetElementViewportPosition(
+                viewPort,
+                element,
+                axis,
+                fullyVisible,
+                false,
+                out elementRect);
+        }
+
         /// <summary>
         /// Determines if the given element is
         ///     1) Completely in the current visible page along the given axis.
@@ -2960,13 +2975,16 @@ namespace System.Windows.Controls
         ///     3) Before the current page along the given axis.
         ///     4) After the current page along the given axis.
         /// fullyVisible parameter specifies if the element needs to be completely
-        /// in the current visible page along the perpendicular axis (if it is
-        /// completely in the page along the major axis)
+        ///     in the current visible page along the perpendicular axis (if it is
+        ///     completely in the page along the major axis).
+        /// ignorePerpendicularAxis parameter specifies whether the position of
+        ///     given element along the secondary axis doesn't matter
         /// </summary>
         internal static ElementViewportPosition GetElementViewportPosition(FrameworkElement viewPort,
             UIElement element,
             FocusNavigationDirection axis,
             bool fullyVisible,
+            bool ignorePerpendicularAxis,
             out Rect elementRect)
         {
             elementRect = Rect.Empty;
@@ -2989,6 +3007,21 @@ namespace System.Windows.Controls
             bool eastWest = (axis == FocusNavigationDirection.Left || axis == FocusNavigationDirection.Right);
 
             elementRect = elementBounds;
+
+            if (ignorePerpendicularAxis)
+            {
+                // expand the viewport bounds to infinity along the secondary axis
+                if (northSouth)
+                {
+                    viewPortBounds = new Rect(Double.NegativeInfinity, viewPortBounds.Top,
+                                                Double.PositiveInfinity, viewPortBounds.Height);
+                }
+                else if (eastWest)
+                {
+                    viewPortBounds = new Rect(viewPortBounds.Left, Double.NegativeInfinity,
+                                                viewPortBounds.Width, Double.PositiveInfinity);
+                }
+            }
 
             // Return true if the element is completely contained within the page along the given axis.
 

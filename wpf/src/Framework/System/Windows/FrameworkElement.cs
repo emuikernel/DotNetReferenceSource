@@ -3069,6 +3069,41 @@ namespace System.Windows
             return InvalidateAutomationAncestorsCoreHelper(branchNodeStack, out continuePastCoreTree, shouldInvalidateIntermediateElements);
         }
 
+        #region ForceInherit property support
+
+        // FrameworkElement can have both logical and visual children, and force-inheritance
+        // for some properties must propagate through both.  The propagation to logical
+        // children happens here using the same logic as in FrameworkContentElement,
+        // while the base class (UIElement) handles visual children.
+        //   Perf note: Propagation for normal inherited properties goes to some trouble to
+        // avoid walking through an element's childrent more than once, as that leads
+        // to exponential explosion.  That's not necessary here because (a) we only walk
+        // an element's children if the element's own property value changes, and (b)
+        // an element's property value can only change once during any given propagation.
+        internal override void InvalidateForceInheritPropertyOnChildren(DependencyProperty property)
+        {
+            if (property == IsEnabledProperty)
+            {
+                IEnumerator enumerator = LogicalChildren;
+
+                if (enumerator != null)
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        DependencyObject child = enumerator.Current as DependencyObject;
+                        if (child != null)
+                        {
+                            child.CoerceValue(property);
+                        }
+                    }
+                }
+            }
+
+            base.InvalidateForceInheritPropertyOnChildren(property);
+        }
+
+        #endregion ForceInherit property support
+
         internal bool InvalidateAutomationAncestorsCoreHelper(Stack<DependencyObject> branchNodeStack, out bool continuePastCoreTree, bool shouldInvalidateIntermediateElements)
         {
             bool continueInvalidation = true;

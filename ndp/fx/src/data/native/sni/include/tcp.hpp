@@ -9,7 +9,7 @@
 // <owner current="true" primary="false">nantu</owner>
 //
 // Purpose: SNI Tcp Provider
-//
+// 
 // Notes:
 //          
 // @EndHeader@
@@ -191,6 +191,8 @@ private:
 
 	DWORD Tcp::FInit(); 
 
+	DWORD ParallelOpen(__in ADDRINFOW *AddrInfoW, int timeout, DWORD dwStartTickCount);
+	
 	__inline  DWORD CheckAndAdjustSendBufferSizeBasedOnISB();
 	
 // helper for Tcp::Open
@@ -203,6 +205,7 @@ private:
 	BOOL FCloseRefHandle(); 
 
 	static DWORD ShouldEnableSkipIOCompletion(__out BOOL* pfShouldEnable);
+	static UINT GetAddrCount(const ADDRINFOW *AIW);
 };
 
 #endif

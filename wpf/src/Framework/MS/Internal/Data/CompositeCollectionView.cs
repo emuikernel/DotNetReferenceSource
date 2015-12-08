@@ -760,7 +760,7 @@ namespace MS.Internal.Data
                     }
 
                     UpdateCurrencyAfterAdd(flatNewIndex, x, false);
-                    args = new NotifyCollectionChangedEventArgs(args.Action, args.NewItems[0]);
+                    args = new NotifyCollectionChangedEventArgs(args.Action, args.NewItems[0], flatNewIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -772,7 +772,7 @@ namespace MS.Internal.Data
                     }
 
                     UpdateCurrencyAfterRemove(flatOldIndex, x, false);
-                    args = new NotifyCollectionChangedEventArgs(args.Action, args.OldItems[0]);
+                    args = new NotifyCollectionChangedEventArgs(args.Action, args.OldItems[0], flatOldIndex);
                     break;
 
                 case NotifyCollectionChangedAction.Replace:

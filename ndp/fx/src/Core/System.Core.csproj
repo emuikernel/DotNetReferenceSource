@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</ProjectGuid>
+    <ProjectGuid>{027422eb-9e92-49f3-b8bb-ee9b97985138}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Core</AssemblyName>
@@ -20,19 +20,19 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\Numerics\System.Numerics.csproj">
-      <Project>{133748dd-0b3c-4405-be9d-72d73a500d8d}</Project>
+      <Project>{8f8b0a52-c276-486a-b47e-bcdd67bfdcc4}</Project>
       <Name>System.Numerics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\clr\src\managedlibraries\security\System.Security.csproj">
-      <Project>{fbc0d97a-d604-4806-aa26-4fb7c017f571}</Project>
+      <Project>{7537e9c3-586c-4cf6-87d5-791a0e795cbb}</Project>
       <Name>System.Security</Name>
     </ProjectReference>
   </ItemGroup>
@@ -419,6 +419,7 @@
     <Compile Include="System\Security\Cryptography\SignatureVerificationResult.cs" />
     <Compile Include="System\Security\Cryptography\StrongNameSignatureInformation.cs" />
     <Compile Include="System\Security\Cryptography\X509Certificates\AuthenticodeSignatureInformation.cs" />
+    <Compile Include="System\Security\Cryptography\X509Certificates\ECDsaCertificateExtensions.cs" />
     <Compile Include="System\Security\Cryptography\X509Certificates\RSACertificateExtensions.cs" />
     <Compile Include="System\Security\Cryptography\X509Certificates\TimestampInformation.cs" />
     <Compile Include="System\Security\Cryptography\X509Certificates\TrustStatus.cs" />

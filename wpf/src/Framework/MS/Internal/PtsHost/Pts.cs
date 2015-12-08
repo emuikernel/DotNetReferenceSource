@@ -1,3 +1,28 @@
+/* 
+
+
+* 11/17/07 - bartde
+*
+* NOTICE: Code excluded from Developer Reference Sources.
+*         Don't remove the SSS_DROP_BEGIN directive on top of the file.
+*
+* Reason for exclusion: obscure PTLS interface
+*
+**************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -2933,6 +2958,7 @@ namespace MS.Internal.PtsHost.UnsafeNativeMethods
             IntPtr pmcsclientIn,
             int dvrDisplaced,
             out int pdvrUsed);
+    
 
 
 
@@ -3094,6 +3120,7 @@ namespace MS.Internal.PtsHost.UnsafeNativeMethods
         LONG iFtnFirst,
         PFSFTNINFO pfsftninf,
         LONG* piFtnLim);
+    
         [SecurityCritical] internal delegate int GetCellMinColumnBalancingStep(
             IntPtr pfscell,                         // IN:
             uint fswdir,                            // IN:

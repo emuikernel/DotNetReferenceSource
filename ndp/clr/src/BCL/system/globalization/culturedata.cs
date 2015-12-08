@@ -1186,24 +1186,10 @@ namespace System.Globalization
                 if (this.sLocalizedDisplayName == null)
                 {
 #if !FEATURE_CORECLR
-                    if (this.IsSupplementalCustomCulture)
+                    String resourceKey = "Globalization.ci_" + this.sName;
+                    if (IsResourcePresent(resourceKey))
                     {
-                        if (this.IsNeutralCulture)
-                        {
-                            this.sLocalizedDisplayName = this.SNATIVELANGUAGE;
-                        }
-                        else
-                        {
-                            this.sLocalizedDisplayName = this.SNATIVEDISPLAYNAME;
-                        }
-                    }
-                    else
-                    {
-                        String resourceKey = "Globalization.ci_" + this.sName;
-                        if (IsResourcePresent(resourceKey))
-                        {
-                            this.sLocalizedDisplayName = Environment.GetResourceString(resourceKey);
-                        }
+                        this.sLocalizedDisplayName = Environment.GetResourceString(resourceKey);
                     }
 #endif
                     // If it hasn't been found (Windows 8 and up), fallback to the system
@@ -1525,17 +1511,10 @@ namespace System.Globalization
                 if (this.sLocalizedCountry == null)
                 {
 #if !FEATURE_CORECLR
-                    if (this.IsSupplementalCustomCulture)
+                    String resourceKey = "Globalization.ri_" + this.SREGIONNAME;
+                    if (IsResourcePresent(resourceKey))
                     {
-                        this.sLocalizedCountry = SNATIVECOUNTRY;
-                    }
-                    else
-                    {
-                        String resourceKey = "Globalization.ri_" + this.SREGIONNAME;
-                        if (IsResourcePresent(resourceKey))
-                        {
-                            this.sLocalizedCountry = Environment.GetResourceString(resourceKey);
-                        }
+                        this.sLocalizedCountry = Environment.GetResourceString(resourceKey);
                     }
 #endif
                     // If it hasn't been found (Windows 8 and up), fallback to the system

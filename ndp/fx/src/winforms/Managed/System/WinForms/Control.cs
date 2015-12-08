@@ -1897,7 +1897,7 @@ example usage
             bool valid = true;
             validatedControlAllowsFocusChange = false;
             IContainerControl c = GetContainerControlInternal();
-            if (c != null) {
+            if (c != null && this.CausesValidation) {
                 ContainerControl container = c as ContainerControl;
                 if (container != null) {
                     while (container.ActiveControl == null) {

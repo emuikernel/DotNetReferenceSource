@@ -2858,15 +2858,24 @@ namespace System.Windows.Documents
             // Record all the IME related char state before the extract.
             int imeCharCount = elementNode.IMECharCount;
             int imeLeftEdgeCharCount = elementNode.IMELeftEdgeCharCount;
-            TextTreeTextElementNode nextNode = (empty && element.IsFirstIMEVisibleSibling) ? (TextTreeTextElementNode)elementNode.GetNextNode() : null;
-
+            
             int nextNodeCharDelta = 0;
-            if (nextNode != null)
+            
+            // DevDiv.1092668 We care about the next node only if it will become the First IME Visible Sibling 
+            // after the extraction. If this is a deep extract we shouldn't care if the element is empty, 
+            // since all of its contents are getting extracted as well
+            TextTreeTextElementNode nextNode = null;
+            if ((deep || empty) && element.IsFirstIMEVisibleSibling)
             {
-                // The following node is the new first ime visible sibling.
-                // It just moved, and loses an edge character.
-                nextNodeCharDelta = -nextNode.IMELeftEdgeCharCount;
-                nextNode.IMECharCount += nextNodeCharDelta;
+                nextNode = (TextTreeTextElementNode)elementNode.GetNextNode();
+                
+                if (nextNode != null)
+                {
+                    // The following node is the new first ime visible sibling.
+                    // It just moved, and loses an edge character.
+                    nextNodeCharDelta = -nextNode.IMELeftEdgeCharCount;
+                    nextNode.IMECharCount += nextNodeCharDelta;
+                }
             }
 
             // Rip the element out of its sibling tree.

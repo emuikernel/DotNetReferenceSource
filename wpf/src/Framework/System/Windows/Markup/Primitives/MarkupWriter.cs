@@ -655,6 +655,24 @@ namespace System.Windows.Markup.Primitives
             {
                 _writer.WriteAttributeString("xml", "space", NamespaceCache.XmlNamespace, "preserve");
                 scope.XmlnsSpacePreserve = true;
+
+                // Per the documentation for XmlWriterSettings.Indent, elements are indented as
+                // long as the element does not contain mixed content. Once WriteString or 
+                // WriteWhiteSpace method is called to write out a mixed element content, 
+                // the XmlWriter stops indenting. The indenting resumes once the mixed content
+                // element is closed. 
+                // 
+                // It is desirable to ensure that indentation is suspended within 
+                // an element with xml:space="preserve". Here, we make a dummy call to WriteString
+                // to indicate to the XmlWriter that we are about to write a "mixed" element 
+                // content. When we call WriteEndElement later in this method, indentation 
+                // behavior will be rolled back to that of the parent element (typically, 
+                // indentaiton will simply be resumed).
+                // 
+                // If the underlying XmlWriterSettings did not specify indentation, this would 
+                // have no net effect.  
+                _writer.WriteString(string.Empty);
+
                 if( scope.IsTopOfSpacePreservationScope && _xmlTextWriter != null )
                 {
                     // If we are entering a xml:space="preserve" scope and using

@@ -744,7 +744,8 @@ namespace System.Data.SqlClient {
             return myInfo;
         }
 
-        internal void CreatePhysicalSNIHandle(string serverName, bool ignoreSniOpenTimeout, long timerExpire, out byte[] instanceName, byte[] spnBuffer, bool flushCache, bool async, bool fParallel) {
+        internal void CreatePhysicalSNIHandle(string serverName, bool ignoreSniOpenTimeout, long timerExpire, out byte[] instanceName, byte[] spnBuffer, bool flushCache, bool async, bool fParallel, TransparentNetworkResolutionState transparentNetworkResolutionState, int totalTimeout)
+        {
             SNINativeMethodWrapper.ConsumerInfo myInfo = CreateConsumerInfo(async);
 
             // Translate to SNI timeout values (Int32 milliseconds)
@@ -761,8 +762,7 @@ namespace System.Data.SqlClient {
                     timeout = 0;
                 }
             }
-
-            _sessionHandle = new SNIHandle(myInfo, serverName, spnBuffer, ignoreSniOpenTimeout, checked((int)timeout), out instanceName, flushCache, !async, fParallel);
+            _sessionHandle = new SNIHandle(myInfo, serverName, spnBuffer, ignoreSniOpenTimeout, checked((int)timeout), out instanceName, flushCache, !async, fParallel, transparentNetworkResolutionState, totalTimeout);
         }
 
         internal bool Deactivate() {
@@ -2375,7 +2375,7 @@ namespace System.Data.SqlClient {
                                 // For DB Mirroring Failover during login, never break the connection, just close the TdsParser (Devdiv 846298)
                                 _parser.Disconnect();
                             }
-                            else if ((_parser.State == TdsParserState.OpenNotLoggedIn) && (_parser.Connection.ConnectionOptions.MultiSubnetFailover))
+                            else if ((_parser.State == TdsParserState.OpenNotLoggedIn) && (_parser.Connection.ConnectionOptions.MultiSubnetFailover || _parser.Connection.ConnectionOptions.TransparentNetworkIPResolution))
                             {
                                 // For MultiSubnet Failover during login, never break the connection, just close the TdsParser
                                 _parser.Disconnect();

@@ -462,14 +462,25 @@ namespace System.Windows.Controls
                     // It's important to use IDispatchEx::InvokeEx here rather than the non-Ex versions for security reasons.
                     // This version allows us to pass the IServiceProvider for security context.
                     // See Dev10 bugs 710329 and 710325 for context.
+                    //
+                    // DevDiv Bug 1166586: Calling window.open from within WPF WebBrowser control results in Access Denied script error
+                    // Providing a service provider to InvokeEx only makes sense when nesting occurs (for e.g., when WPF calls
+                    // a script which calls back into WPF which in turn calls the script again) and there is a need to maintain 
+                    // the service provider chain. When the execution is from a root occurance, then there is no valid service 
+                    // provider that will have all of the information from the stack. 
+                    // 
+                    // Until recently, IE was ignoring bad service providers -so our passing (IServiceProvider)htmlDocument to InvokeEx
+                    // worked. IE has recently taken a security fix to ensure that it doesn't fall back to the last IOleCommandTarget
+                    // in the chain it found - so now we simply pass null to indicate that this is the root call site. 
+
                     hr = scriptObjectEx.InvokeEx(
                         dispids[0],
                         Thread.CurrentThread.CurrentCulture.LCID,
                         NativeMethods.DISPATCH_METHOD,
                         dp,
                         out retVal, 
-                        new NativeMethods.EXCEPINFO(), 
-                        (UnsafeNativeMethods.IServiceProvider)htmlDocument);
+                        new NativeMethods.EXCEPINFO(),
+                        null);
                     hr.ThrowIfFailed();
                 }
                 finally

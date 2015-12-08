@@ -198,8 +198,8 @@ namespace System.Runtime.Remoting {
         // Note: for each of these calls that take a RuntimeXXX reflection
         // structure, there is a wrapper that takes XXX and throws if it is
         // not a RuntimeXXX. This is to avoid clutter in code where these 
-        // methods are called. <BUGNUM>(48721)</BUGNUM> <STRIP> Ideally this should have been done
-        // as a breaking change to the public APIs that use them!</STRIP>
+        // methods are called. <BUGNUM>(48721)</BUGNUM> <
+
 
         [System.Security.SecurityCritical]  // auto-generated
         internal static Object CreateTransparentProxy(
@@ -2496,9 +2496,9 @@ namespace System.Runtime.Remoting {
         //   A qualified type name describes the name that we use in the ObjRef and
         //   message TypeName. It consists either of the actual type name or 
         //   "<typeId>:typename" where for now "soap:<soap type name>" is the only
-        //   supported alternative.  <STRIP>In the future, we may make this type resolution
-        //   extensible and publicly exposed.</STRIP>
-        //
+        //   supported alternative.  <
+
+
 
         // This is used by the cached type data to figure out which type name
         //   to use (this should never be publicly exposed; GetDefaultQualifiedTypeName should,

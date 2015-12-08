@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{9b5e900a-4b44-4962-93a8-827a95fd1b55}</ProjectGuid>
+    <ProjectGuid>{78ef2fd0-cc3d-48ad-8ab6-fe3147a7fd06}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.ComponentModel.DataAnnotations</AssemblyName>
@@ -20,29 +20,37 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{224f6f5b-c254-4b89-95cd-b690effa845e}</Project>
+      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\System.csproj">
-      <Project>{41970311-a2a7-4957-b118-3e82738754bb}</Project>
+      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
       <Name>System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Configuration\System.Configuration.csproj">
+      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
+      <Name>System.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\System.Core.csproj">
-      <Project>{8237366e-c580-4edf-9fbc-6bc04dd169c7}</Project>
+      <Project>{027422eb-9e92-49f3-b8bb-ee9b97985138}</Project>
       <Name>System.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\data\System.Data.csproj">
-      <Project>{43a395d8-b07e-4166-a2ec-54449a6112aa}</Project>
+      <Project>{bd91c18e-116c-453e-b644-3855114e0c82}</Project>
       <Name>System.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Xml\System.Xml.csproj">
-      <Project>{e8f114a4-6ee9-49ae-9129-c5d7579eb5e9}</Project>
+      <Project>{de666f01-fb7c-4239-a4b1-91741ed0c421}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\..\..\..\InternalApis\Clr\inc\AppContextDefaultValues.cs" />
+    <Compile Include="..\..\..\..\..\..\InternalApis\Clr\inc\LocalAppContext.cs" />
+    <Compile Include="DataAnnotations\AppContextDefaultValues.Default.cs" />
+    <Compile Include="DataAnnotations\AppSettings.cs" />
     <Compile Include="DataAnnotations\AssociatedMetadataTypeTypeDescriptionProvider.cs" />
     <Compile Include="DataAnnotations\AssociatedMetadataTypeTypeDescriptor.cs" />
     <Compile Include="DataAnnotations\AssociationAttribute.cs" />
@@ -63,6 +71,7 @@
     <Compile Include="DataAnnotations\FilterUIHintAttribute.cs" />
     <Compile Include="DataAnnotations\IValidatableObject.cs" />
     <Compile Include="DataAnnotations\KeyAttribute.cs" />
+    <Compile Include="DataAnnotations\LocalAppContextSwitches.cs" />
     <Compile Include="DataAnnotations\LocalizableString.cs" />
     <Compile Include="DataAnnotations\MaxLengthAttribute.cs" />
     <Compile Include="DataAnnotations\MetadataPropertyDescriptorWrapper.cs" />

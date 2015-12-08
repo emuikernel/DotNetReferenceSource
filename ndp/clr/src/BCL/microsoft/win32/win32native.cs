@@ -112,19 +112,19 @@ namespace Microsoft.Win32 {
      */
     // Remove the default demands for all P/Invoke methods with this
     // global declaration on the class.
-    // <STRIP>Developers - please do not mark this type with the FriendAccessAllowedAttribute.
-    // Do it on a per-method basis if necessary.  There's just too much surface area here
-    // to accidentally take dependencies on, and it may have a few subtle bugs or some 
-    // liberties taken with the definition for our specific purposes.  We can
-    // tackle a global FX P/Invoke definitions feature at some point for size reasons, but  
-    // let's review that set in detail for correctness.  This code is generally solid
-    // but may have a few lingering issues:
-    //   * Using signed ints for the unsigned SIZE_T and DWORD types (use UIntPtr & UInt32)
-    //   * Consider using real pointer types where appropriate (byte*, void*, etc)
-    //   * Consider using SafeHandles in more places
-    //   * the mustBeZero parameters are simplifications for mscorlib's usages and may not
-    //     be appropriate for other FX teams.
-    //   -- Brian, 8/25/2010</STRIP>
+    // <
+
+
+
+
+
+
+
+
+
+
+
+
     [System.Security.SecurityCritical]
     [SuppressUnmanagedCodeSecurityAttribute()]
     internal static class Win32Native {
@@ -1059,7 +1059,7 @@ namespace Microsoft.Win32 {
         // simultaneously: overlapped IO, free the memory for the overlapped 
         // struct in a callback (or an EndRead method called by that callback), 
         // and pass in an address for the numBytesRead parameter.  
-        // <STRIP> See Windows Bug 105512 for details.  -- </STRIP>
+        // <
 
         [DllImport(KERNEL32, SetLastError=true)]
         [ResourceExposure(ResourceScope.None)]
@@ -1075,7 +1075,7 @@ namespace Microsoft.Win32 {
         // simultaneously: overlapped IO, free the memory for the overlapped 
         // struct in a callback (or an EndWrite method called by that callback),
         // and pass in an address for the numBytesRead parameter.  
-        // <STRIP> See Windows Bug 105512 for details.  -- </STRIP>
+        // <
 
         [DllImport(KERNEL32, SetLastError=true)]
         [ResourceExposure(ResourceScope.None)]
@@ -1859,32 +1859,32 @@ namespace Microsoft.Win32 {
 //////!!!!!! 3) rotor\pal\inc\rotor_pal.h                         !!!!!!////////
 //////!!!!!! 4) rotor\pal\corunix\shfolder\shfolder.cpp           !!!!!!////////
 //////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!////////
-/*<STRIP>
-        // .NET Framework 4.0 and newer - Vista+                 ||| \public\sdk\inc\knownfolders.h
-        internal const Guid FOLDERID_Contacts               = new Guid("{56784854-C6CB-462b-8169-88E350ACB882}");
-        internal const Guid FOLDERID_Downloads              = new Guid("{374DE290-123F-4565-9164-39C4925E467B}");
-        internal const Guid FOLDERID_GameTasks              = new Guid("{054FAE61-4DD8-4787-80B6-090220C4B700}");
-        internal const Guid FOLDERID_Links                  = new Guid("{bfb9d5e0-c6a9-404c-b2b2-ae6db6af4968}");
-        internal const Guid FOLDERID_LocalAppDataLow        = new Guid("{A520A1A4-1780-4FF6-BD18-167343C5AF16}");
-        internal const Guid FOLDERID_OriginalImages         = new Guid("{2C36C0AA-5812-4b87-BFD0-4CD0DFB19B39}");
-        internal const Guid FOLDERID_PhotoAlbums            = new Guid("{69D2CF90-FC33-4FB7-9A0C-EBB0F0FCB43C}");
-        internal const Guid FOLDERID_Playlists              = new Guid("{DE92C1C7-837F-4F69-A3BB-86E631204A23}");
-        internal const Guid FOLDERID_QuickLaunch            = new Guid("{52a4f021-7b75-48a9-9f6b-4b87a210bc8f}");
-        internal const Guid FOLDERID_SavedGames             = new Guid("{4C5C32FF-BB9D-43b0-B5B4-2D72E54EAAA4}");
-        internal const Guid FOLDERID_SavedSearches          = new Guid("{7d1d3a04-debb-4115-95cf-2f29da2920da}");
-        internal const Guid FOLDERID_SidebarParts           = new Guid("{A75D362E-50FC-4fb7-AC2C-A8BEAA314493}");
-        internal const Guid FOLDERID_PublicDownloads        = new Guid("{3D644C9B-1FB8-4f30-9B45-F670235F79C0}");
-        internal const Guid FOLDERID_PublicGameTasks        = new Guid("{DEBF2536-E1A8-4c59-B6A2-414586476AEA}");
-        internal const Guid FOLDERID_SampleMusic            = new Guid("{B250C668-F57D-4EE1-A63C-290EE7D1AA1F}");
-        internal const Guid FOLDERID_SamplePictures         = new Guid("{C4900540-2379-4C75-844B-64E6FAF8716B}");
-        internal const Guid FOLDERID_SamplePlaylists        = new Guid("{15CA69B3-30EE-49C1-ACE1-6B5EC372AFB5}");
-        internal const Guid FOLDERID_SampleVideos           = new Guid("{859EAD94-2E85-48AD-A71A-0969CB56A6CD}");
-        internal const Guid FOLDERID_SidebarDefaultParts    = new Guid("{7B396E54-9EC5-4300-BE0A-2482EBAE1A26}");
-        internal const Guid FOLDERID_ProgramFilesCommonX64  = new Guid("{6365D5A7-0F0D-45e5-87F6-0DA56B6A4F7D}");
-        internal const Guid FOLDERID_ProgramFilesX64        = new Guid("{6D809377-6AF0-444b-8957-A3773F02200E}");
-        internal const Guid FOLDERID_Public                 = new Guid("{DFDF76A2-C82A-4D63-906A-5644AC457385}");
-        internal const Guid FOLDERID_UserProfiles           = new Guid("{0762D272-C50A-4BB0-A382-697DCD729B80}");
-</STRIP>*/
+/*<
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
         // .NET Framework 4.0 and newer - all versions of windows ||| \public\sdk\inc\shlobj.h
         internal const int CSIDL_FLAG_CREATE                = 0x8000; // force folder creation in SHGetFolderPath
         internal const int CSIDL_FLAG_DONT_VERIFY           = 0x4000; // return an unverified folder path

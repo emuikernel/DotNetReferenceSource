@@ -202,22 +202,17 @@ namespace System.Windows.Documents
             DetachTextStore(false /* finalizer */);
 
             // Shut down IMM32.
-            if (_immComposition != null)
+            if (_immCompositionForDetach != null)
             {
-                // _immComposition comes from getting of the focus on the editor with the enabled IMM.
-                // _immComposition.OnDetach will remove the events handler and then detach editor.
-                _immComposition.OnDetach();
-                _immComposition = null;
-            }
-            else
-            {
-                // Make sure immComposition.OnDetach if there is the remaining ImmComposition
-                // that can be happened after getting the lost focus.
-                ImmComposition immComposition = ImmComposition.GetImmComposition(_uiScope);
-                if (immComposition != null)
+                ImmComposition immComposition;
+                if (_immCompositionForDetach.TryGetTarget(out immComposition))
                 {
-                    immComposition.OnDetach();
+                    // _immComposition comes from getting of the focus on the editor with the enabled IMM.
+                    // _immComposition.OnDetach will remove the events handler and then detach editor.
+                    immComposition.OnDetach(this);
                 }
+                _immComposition = null;
+                _immCompositionForDetach = null;
             }
 
             // detach fromm textview
@@ -298,7 +293,7 @@ namespace System.Windows.Documents
             {
                 return;
             }
-            
+
             if (_speller != null)
             {
                 CustomDictionarySources dictionarySources = (CustomDictionarySources)SpellCheck.GetCustomDictionaries(textBoxBase);
@@ -1738,7 +1733,12 @@ namespace System.Windows.Documents
 
                 if (This._immComposition != null)
                 {
+                    This._immCompositionForDetach = new WeakReference<ImmComposition>(This._immComposition);
                     This._immComposition.OnGotFocus(This);
+                }
+                else
+                {
+                    This._immCompositionForDetach = null;
                 }
             }
 
@@ -2078,6 +2078,9 @@ namespace System.Windows.Documents
 
         // ImmComposition implementation, used when _immEnabled.
         private ImmComposition _immComposition;
+
+        // Weak-ref to the most recent ImmComposition - used when detaching
+        private WeakReference<ImmComposition> _immCompositionForDetach;
 
         // Thread local storage for TextEditor and dependent classes.
         private static LocalDataStoreSlot _threadLocalStoreSlot = Thread.AllocateDataSlot();

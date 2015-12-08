@@ -2471,26 +2471,30 @@ namespace System.Windows.Controls
 
             // find the block containing the new item
             ItemBlock block = _itemMap.Next;
-            int offset = index;
-            while (block != _itemMap && offset >= block.ItemCount)
+            int offsetFromBlockStart = index;
+            int unrealizedItemsSkipped = 0;     // distance since last realized item
+            while (block != _itemMap && offsetFromBlockStart >= block.ItemCount)
             {
-                offset -= block.ItemCount;
+                offsetFromBlockStart -= block.ItemCount;
                 position.Index += block.ContainerCount;
+                unrealizedItemsSkipped = (block.ContainerCount > 0) ? 0 : unrealizedItemsSkipped + block.ItemCount;
                 block = block.Next;
             }
 
-            position.Offset = offset + 1;
+            position.Offset = unrealizedItemsSkipped + offsetFromBlockStart + 1;
+            // the position is now correct, except when pointing into a realized block;
+            // that case is fixed below
 
             // if it's an unrealized block, add the item by bumping the count
             UnrealizedItemBlock uib = block as UnrealizedItemBlock;
             if (uib != null)
             {
-                MoveItems(uib, offset, 1, uib, offset+1, 0);
+                MoveItems(uib, offsetFromBlockStart, 1, uib, offsetFromBlockStart+1, 0);
                 ++ uib.ItemCount;
             }
 
             // if the item can be added to a previous unrealized block, do so
-            else if ((offset == 0 || block == _itemMap) &&
+            else if ((offsetFromBlockStart== 0 || block == _itemMap) &&
                     ((uib = block.Prev as UnrealizedItemBlock) != null))
             {
                 ++ uib.ItemCount;
@@ -2504,10 +2508,10 @@ namespace System.Windows.Controls
 
                 // split the current realized block, if necessary
                 RealizedItemBlock rib;
-                if (offset > 0 && (rib = block as RealizedItemBlock) != null)
+                if (offsetFromBlockStart > 0 && (rib = block as RealizedItemBlock) != null)
                 {
                     RealizedItemBlock newBlock = new RealizedItemBlock();
-                    MoveItems(rib, offset, rib.ItemCount - offset, newBlock, 0, offset);
+                    MoveItems(rib, offsetFromBlockStart, rib.ItemCount - offsetFromBlockStart, newBlock, 0, offsetFromBlockStart);
                     newBlock.InsertAfter(rib);
                     position.Index += block.ContainerCount;
                     position.Offset = 1;

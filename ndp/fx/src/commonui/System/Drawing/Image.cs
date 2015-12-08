@@ -1083,7 +1083,7 @@ namespace System.Drawing {
 
                 int size = (int) Marshal.SizeOf(typeof(Guid));
 
-                IntPtr buffer = Marshal.AllocHGlobal(size*count);
+                IntPtr buffer = Marshal.AllocHGlobal(checked(size*count));
                 if (buffer == IntPtr.Zero) {
                     throw SafeNativeMethods.Gdip.StatusException(SafeNativeMethods.Gdip.OutOfMemory);
                 }

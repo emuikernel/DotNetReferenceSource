@@ -4456,6 +4456,46 @@ inline DWORD Tcp::ComputeNewTimeout(DWORD timeout, DWORD dwStart)
 	}
 }
 
+DWORD Tcp::ParallelOpen(__in ADDRINFOW *AddrInfoW, int timeout, DWORD dwStartTickCount)
+{
+	int timeleft = timeout;
+
+	if (INFINITE != timeout)
+	{
+		// Previous layers in SNI may have taken some of the quantum, potentially dropping below 0.
+		// If that happens here, set the initial value to 0. 
+		// 
+		// DEVNOTE: After this point, in this code path, timeout and timeleft are assumed to be a non-negative numbers.
+		//
+		if (timeout < 0)
+			timeout = 0;
+
+		timeleft = ComputeNewTimeout(timeout, dwStartTickCount);
+		// If we have timed out before we even initiated the TCP connections, ignore the timeout for now
+		// and set the remaining time to the minimum value.
+		if (0 == timeleft)
+		{
+			timeleft = MIN_PARALLEL_WAIT_TIME;
+		}
+		BidTraceU1(SNI_BID_TRACE_ON, SNI_TAG _T("timeout remaining: %d\n"), timeleft);
+	}
+
+	DWORD dwRet = SocketOpenParallel(AddrInfoW, timeleft);
+	// Should have a valid socket handle IFF SocketOpenParallel returned success.
+	Assert((ERROR_SUCCESS == dwRet && m_sock != INVALID_SOCKET) || (ERROR_SUCCESS != dwRet && m_sock == INVALID_SOCKET));
+	if (dwRet != ERROR_SUCCESS)
+	{
+		return dwRet;
+	}
+	// trace the remaining timeout (no need to adjust again after here, since we don't do anymore activities which are expected to consume a large amount of time.
+	if (INFINITE != timeout && SNI_BID_TRACE_ON)
+	{
+		timeleft = ComputeNewTimeout(timeout, dwStartTickCount);
+		BidTrace1(SNI_TAG _T("timeout remaining after successful connection: %d\n"), timeleft);
+	}
+	return dwRet;
+}
+
 DWORD Tcp::Open( 	SNI_Conn 		* pConn,
 					ProtElem 		* pProtElem, 
 					__out SNI_Provider 	** ppProv,
@@ -4522,40 +4562,24 @@ DWORD Tcp::Open( 	SNI_Conn 		* pConn,
 	}
 
 	dwRet = ERROR_SUCCESS;
-
-	if( pProtElem->Tcp.fParallel )
+	// When TransparentNetworkResolution:
+	// 1. Try first IP addr with 500ms timeout, if the server has more than 64 IP addrs, using sequential connection and original timeout 
+	//     store in pProtElem->Tcp.totalTimeout
+	// 2. Try parallel connection if first step failed
+	// 
+	bool fAddrInfoCountGreaterThan64 = false;
+	if (!pProtElem->Tcp.fParallel && (pProtElem->Tcp.transparentNetworkIPResolution == TransparentNetworkResolutionMode::SequentialMode || pProtElem->Tcp.transparentNetworkIPResolution == TransparentNetworkResolutionMode::ParallelMode))
 	{
-		if( INFINITE != timeout )
-		{
-			// Previous layers in SNI may have taken some of the quantum, potentially dropping below 0.
-			// If that happens here, set the initial value to 0. 
-			// 
-			// DEVNOTE: After this point, in this code path, timeout and timeleft are assumed to be a non-negative numbers.
-			//
-			if( timeout < 0 )
-				timeout = 0;
-			
-			timeleft = ComputeNewTimeout(timeout, dwStart);
-			// If we have timed out before we even initiated the TCP connections, ignore the timeout for now
-			// and set the remaining time to the minimum value.
-			if( 0 == timeleft )
-			{
-				timeleft = MIN_PARALLEL_WAIT_TIME;			
-			}
-			BidTraceU1( SNI_BID_TRACE_ON, SNI_TAG _T("timeout remaining: %d\n"), timeleft );
-		}
-		dwRet = pTcpProv->SocketOpenParallel(AddrInfoW, timeleft);
-		// Should have a valid socket handle IFF SocketOpenParallel returned success.
-		Assert( (ERROR_SUCCESS == dwRet && pTcpProv->m_sock != INVALID_SOCKET) || (ERROR_SUCCESS != dwRet && pTcpProv->m_sock == INVALID_SOCKET) );
-		if( dwRet != ERROR_SUCCESS )
+		fAddrInfoCountGreaterThan64 = (GetAddrCount(AddrInfoW) > 64);
+	}
+
+    if (pProtElem->Tcp.fParallel || (pProtElem->Tcp.transparentNetworkIPResolution == TransparentNetworkResolutionMode::ParallelMode && !fAddrInfoCountGreaterThan64))
+	{
+		Assert(!fAddrInfoCountGreaterThan64);
+		dwRet = pTcpProv->ParallelOpen(AddrInfoW, timeout, dwStart);
+		if (dwRet != ERROR_SUCCESS)
 		{
 			goto ErrorExit;
-		}
-		// trace the remaining timeout (no need to adjust again after here, since we don't do anymore activities which are expected to consume a large amount of time.
-		if( INFINITE != timeout && SNI_BID_TRACE_ON )
-		{
-			timeleft = ComputeNewTimeout(timeout, dwStart);
-			BidTrace1( SNI_TAG _T("timeout remaining after successful connection: %d\n"), timeleft );
 		}
 	}
 	else
@@ -4564,6 +4588,13 @@ DWORD Tcp::Open( 	SNI_Conn 		* pConn,
 		//to a old servers which don't listen on ipv6 addresses
 		ADDRINFOW *AIW;
 		int afs[] = {AF_INET, AF_INET6};
+		
+		// If fTransparentNetworkIPResolution and the address has more than 64 IP, open with sequential mode and reset timeout
+		// with the original timeout stored in SNI_CLIENT_CONSUMER_INFO
+		if (pProtElem->Tcp.transparentNetworkIPResolution == TransparentNetworkResolutionMode::SequentialMode && fAddrInfoCountGreaterThan64)
+		{
+			timeout = pProtElem->Tcp.totalTimeout;
+		}
 
 		for( int i = 0; i < sizeof(afs)/sizeof(int); i++ )
 		{
@@ -4608,6 +4639,14 @@ DWORD Tcp::Open( 	SNI_Conn 		* pConn,
 
 					break;			
 				}
+				
+                // When transparentNetworkIPResolution is Sequential, only try the first IP address
+                //
+				if (pProtElem->Tcp.transparentNetworkIPResolution == TransparentNetworkResolutionMode::SequentialMode && !fAddrInfoCountGreaterThan64)
+
+                {
+                    break;
+                }
 			}
 
 			//if AIW is 0, it means we couldn't connect yet
@@ -4621,7 +4660,7 @@ DWORD Tcp::Open( 	SNI_Conn 		* pConn,
 	FreeAddrInfoW( AddrInfoW );
 	AddrInfoW = NULL;
 
-	if( pTcpProv->m_sock == INVALID_SOCKET)
+	if( pTcpProv->m_sock == INVALID_SOCKET )
 	{
 		if( dwRet == ERROR_SUCCESS )
 		{
@@ -5547,7 +5586,7 @@ DWORD Tcp::Terminate()
 
 	// Cleanup Winsock
 	WSACleanup();
-
+	
 #ifndef SNI_BASED_CLIENT
 
 	if( g_hKernel32 )
@@ -6019,5 +6058,22 @@ DWORD Tcp::ShouldEnableSkipIOCompletion(__out BOOL* pfShouldEnable)
 	
 	BidTraceU1(SNI_BID_TRACE_ON, RETURN_TAG _T("%d{WINERR}\n"), dwRet);
 	return dwRet;
+}
+
+// Get the IP addr count
+UINT Tcp::GetAddrCount(const ADDRINFOW *AIW)
+{
+    DWORD dwAddresses = 0;
+    const ADDRINFOW *paiTemp = AIW;
+    for (; NULL != paiTemp; paiTemp = paiTemp->ai_next)
+    {
+        // Skip address families that we don't know how to use.
+        if ((AF_INET != paiTemp->ai_family && AF_INET6 != paiTemp->ai_family))
+            continue;
+
+        dwAddresses++;
+    }
+
+    return dwAddresses;
 }
 

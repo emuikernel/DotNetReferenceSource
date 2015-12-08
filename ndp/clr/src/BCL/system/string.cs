@@ -709,7 +709,7 @@ namespace System {
         // Returns the entire string as an array of characters.
         [System.Security.SecuritySafeCritical]  // auto-generated
         unsafe public char[] ToCharArray() {
-            // <STRIP> huge performance improvement for short strings by doing this </STRIP>
+            // <
             int length = Length;
             char[] chars = new char[length];
             if (length > 0)

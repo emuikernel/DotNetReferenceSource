@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Media;
 using MS.Utility;
@@ -426,6 +427,10 @@ namespace System.Windows.Input
                 _indexMouseTablet = indexMouseTablet;
             }
 
+            // DevDiv:1078091
+            // Any deferred tablet should be properly disposed of when applicable and
+            // removed from the list of deferred tablets.
+            DisposeDeferredTablets();
         }
 
 
@@ -598,8 +603,7 @@ namespace System.Windows.Input
         //  NOTE: This routine takes indexes that are in the TabletCollection range
         //        and not in the wisptis tablet index range.
         /// <SecurityNote>
-        ///     Critical: calls SecurityCritical code TabletDevice.Dispose.
-        ///               and StylusLogic.SelectStylusDevice
+        ///     Critical: calls SecurityCritical code TabletDevice.DisposeOrDeferDisposal.
         /// </SecurityNote>
         [SecurityCritical]
         void RemoveTablet(uint index)
@@ -618,15 +622,15 @@ namespace System.Windows.Input
 
             _tablets = tablets;
 
-            // Make sure we release any references to a stylus device that may
-            // have been removed
-            if (Tablet.CurrentTabletDevice == removeTablet)
+            // DevDiv:1078091
+            // Dispose the tablet unless there is input waiting
+            removeTablet.DisposeOrDeferDisposal();
+
+            // This is now a deferred disposal, move it to the deferred list
+            if (removeTablet.IsDisposalPending)
             {
-                StylusLogic.CurrentStylusLogic.SelectStylusDevice(null, null, true);
+                _deferredTablets.Add(removeTablet);
             }
-
-
-            removeTablet.Dispose();
         }
 
 
@@ -655,8 +659,7 @@ namespace System.Windows.Input
 
         /////////////////////////////////////////////////////////////////////
         /// <SecurityNote>
-        ///     Critical: calls into SecurityCritical code TabletDevice.Dispose.
-        ///               and StylusLogic.SelectStylusDevice
+        ///     Critical: calls into SecurityCritical code TabletDevice.DisposeOrDeferDisposal.
         /// </SecurityNote>
         [SecurityCritical]
         internal void DisposeTablets()
@@ -667,16 +670,49 @@ namespace System.Windows.Input
                 {
                     if (_tablets[iTablet] != null)
                     {
-                        // Make sure this stylus device is not the current one.
-                        if (Tablet.CurrentTabletDevice == _tablets[iTablet])
+                        TabletDevice removedTablet = _tablets[iTablet];
+
+                        // DevDiv:1078091
+                        // Dispose the tablet unless there is input waiting
+                        removedTablet.DisposeOrDeferDisposal();
+
+                        // This is now a deferred disposal, move it to the deferred list
+                        if (removedTablet.IsDisposalPending)
                         {
-                            StylusLogic.CurrentStylusLogic.SelectStylusDevice(null, null, true);
+                            _deferredTablets.Add(removedTablet);
                         }
-                        _tablets[iTablet].Dispose();
                     }
                 }
                 _tablets = null;
             }
+        }
+
+        /// <summary>
+        /// DevDiv:1078091
+        /// Dispose of and remove any tablets that had previously been deferred and
+        /// can now be disposed.
+        /// </summary>
+        /// <SecurityNote>
+        ///    Critical:  Calls into security critical code TabletDevice.DisposeOrDeferDisposal
+        /// </SecurityNote>
+        [SecurityCritical]
+        internal void DisposeDeferredTablets()
+        {
+            List<TabletDevice> tabletTemp = new List<TabletDevice>();
+
+            foreach (TabletDevice tablet in _deferredTablets)
+            {
+                // Attempt disposal again
+                tablet.DisposeOrDeferDisposal();
+
+                // If still deferred it was not disposed
+                if (tablet.IsDisposalPending)
+                {
+                    tabletTemp.Add(tablet);
+                }
+            }
+
+            _deferredTablets = tabletTemp;
         }
 
         /////////////////////////////////////////////////////////////////////
@@ -688,14 +724,27 @@ namespace System.Windows.Input
         [SecurityCritical]
         internal PenContext[] CreateContexts(IntPtr hwnd, PenContexts contexts)
         {
-            int c = Count;
+            int c = Count + _deferredTablets.Count;
+
             PenContext[] ctxs = new PenContext[c];
+
             int i = 0;
+
             foreach (TabletDevice tablet in _tablets)
             {
-                ctxs[i] = tablet.CreateContext(hwnd, contexts);
-                i++;
+                ctxs[i++] = tablet.CreateContext(hwnd, contexts);
             }
+
+            // DevDiv:1078091
+            // We need to re-enable contexts for anything that is marked
+            // as a pending disposal.  This is so we continue getting any
+            // Wisp messages that might be waiting to come over the shared
+            // memory channel.
+            foreach (TabletDevice tablet in _deferredTablets)
+            {
+                ctxs[i++] = tablet.CreateContext(hwnd, contexts);
+            }
+
             return ctxs;
         }
 
@@ -751,6 +800,17 @@ namespace System.Windows.Input
                     throw new ArgumentException(SR.Get(SRID.Stylus_IndexOutOfRange, index.ToString(System.Globalization.CultureInfo.InvariantCulture)), "index");
 
                 return _tablets[index];
+            }
+        }
+
+        /// <summary>
+        /// A list of tablets that have pending disposals
+        /// </summary>
+        internal List<TabletDevice> DeferredTablets
+        {
+            get
+            {
+                return _deferredTablets;
             }
         }
 
@@ -885,5 +945,6 @@ namespace System.Windows.Input
         uint                    _indexMouseTablet = UInt32.MaxValue;
         bool                    _inUpdateTablets;       // detect re-entrancy
         bool                    _hasUpdateTabletsBeenCalledReentrantly;
+        List<TabletDevice>      _deferredTablets = new List<TabletDevice>();
     }
 }

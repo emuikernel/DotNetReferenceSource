@@ -52,7 +52,9 @@ namespace System.Data.SqlClient
         static private readonly Dictionary<string, SqlColumnEncryptionKeyStoreProvider> _SystemColumnEncryptionKeyStoreProviders
             = new Dictionary<string, SqlColumnEncryptionKeyStoreProvider>(capacity: 1, comparer: StringComparer.OrdinalIgnoreCase)
         {
-            {SqlColumnEncryptionCertificateStoreProvider.ProviderName, new SqlColumnEncryptionCertificateStoreProvider()}
+            {SqlColumnEncryptionCertificateStoreProvider.ProviderName, new SqlColumnEncryptionCertificateStoreProvider()},
+            {SqlColumnEncryptionCngProvider.ProviderName, new SqlColumnEncryptionCngProvider()},
+            {SqlColumnEncryptionCspProvider.ProviderName, new SqlColumnEncryptionCspProvider()}
         };
 
         /// <summary>
@@ -234,6 +236,11 @@ namespace System.Data.SqlClient
         internal WindowsIdentity _lastIdentity;
         internal WindowsIdentity _impersonateIdentity;
         private int _reconnectCount;
+
+        // Transient Fault handling flag. This is needed to convey to the downstream mechanism of connection establishment, if Transient Fault handling should be used or not
+        // The downstream handling of Connection open is the same for idle connection resiliency. Currently we want to apply transient fault handling only to the connections opened
+        // using SqlConnection.Open() method. 
+        internal bool _applyTransientFaultHandling = false;
        
         public SqlConnection(string connectionString) : this(connectionString, null) {
         }
@@ -1423,6 +1430,8 @@ namespace System.Data.SqlClient
 
         private bool TryOpen(TaskCompletionSource<DbConnectionInternal> retry) {
             SqlConnectionString connectionOptions = (SqlConnectionString)ConnectionOptions;
+            
+            _applyTransientFaultHandling = (retry == null && connectionOptions != null && connectionOptions.ConnectRetryCount > 0 );
 
             if (connectionOptions != null &&
                 (connectionOptions.Authentication == SqlAuthenticationMethod.SqlPassword || connectionOptions.Authentication == SqlAuthenticationMethod.ActiveDirectoryPassword) &&
@@ -1949,6 +1958,7 @@ namespace System.Data.SqlClient
 
                 SqlConnectionString connectionOptions = SqlConnectionFactory.FindSqlConnectionOptions(key);
                 if (connectionOptions.IntegratedSecurity || connectionOptions.Authentication == SqlAuthenticationMethod.ActiveDirectoryIntegrated) {
+
                     throw SQL.ChangePasswordConflictsWithSSPI();
                 }
                 if (! ADP.IsEmpty(connectionOptions.AttachDBFilename)) {

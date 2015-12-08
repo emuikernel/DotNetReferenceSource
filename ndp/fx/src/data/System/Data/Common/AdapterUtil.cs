@@ -1845,6 +1845,7 @@ namespace System.Data.Common {
         internal const int DefaultCommandTimeout = 30;
         internal const int DefaultConnectionTimeout = DbConnectionStringDefaults.ConnectTimeout;
         internal const float FailoverTimeoutStep = 0.08F;    // fraction of timeout to use for fast failover connections
+        internal const int FirstTransparentAttemptTimeout = 500; // The first login attempt in  Transparent network IP Resolution 
 
         // security issue, don't rely upon static public readonly values - AS/URT 109635
         static internal readonly String StrEmpty = ""; // String.Empty

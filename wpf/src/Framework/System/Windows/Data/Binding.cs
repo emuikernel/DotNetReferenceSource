@@ -230,7 +230,7 @@ namespace System.Windows.Data
                 if (System.Windows.Threading.Dispatcher.CurrentDispatcher == null)
                     throw new InvalidOperationException();  // This is actually never called since CurrentDispatcher will throw if null.
 
-                Path = new PropertyPath(path);
+                Path = new PropertyPath(path, (object[])null);
             }
         }
 

@@ -15419,6 +15419,10 @@ namespace System.Windows.Forms
             {
                 if (this.vertScrollBar != null && this.vertScrollBar.Visible)
                 {
+                    int totalVisibleHeight = this.Rows.GetRowsHeight(DataGridViewElementStates.Visible);
+                    int totalVisibleFrozenHeight = this.Rows.GetRowsHeight(DataGridViewElementStates.Visible | DataGridViewElementStates.Frozen);
+                    this.vertScrollBar.Maximum = totalVisibleHeight - totalVisibleFrozenHeight;
+
                     this.vertScrollBar.Enabled = true;
                 }
                 if (this.horizScrollBar != null && this.horizScrollBar.Visible)
@@ -18488,7 +18492,10 @@ namespace System.Windows.Forms
                     PositionEditingControl(true, false, false);
                 }
 
-                UpdateMouseEnteredCell(null /*HitTestInfo*/, null /*MouseEventArgs*/);
+                if (this.IsHandleCreated)
+                {
+                    UpdateMouseEnteredCell(null /*HitTestInfo*/, null /*MouseEventArgs*/);
+                }
 
                 OnRowHeadersGlobalAutoSize(false /*expandingRows*/);
             }

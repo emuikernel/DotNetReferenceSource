@@ -601,6 +601,86 @@ namespace System.Transactions
             }
         }
 
+        /// <summary>
+        /// Gets the PromoterType value for the transaction.
+        /// </summary>
+        /// <value>
+        /// If the transaction has not yet been promoted and does not yet have a promotable single phase enlistment,
+        /// this property value will be Guid.Empty.
+        /// 
+        /// If the transaction has been promoted or has a promotable single phase enlistment, this will return the
+        /// promoter type specified by the transaction promoter.
+        /// 
+        /// If the transaction is, or will be, promoted to MSDTC, the value will be TransactionInterop.PromoterTypeDtc.
+        /// </value>
+        public Guid PromoterType
+        {
+            get
+            {
+                if (DiagnosticTrace.Verbose)
+                {
+                    MethodEnteredTraceRecord.Trace(SR.GetString(SR.TraceSourceLtm),
+                        "Transaction.get_PromoterType"
+                        );
+                }
+
+                if (Disposed)
+                {
+                    throw new ObjectDisposedException("Transaction");
+                }
+
+                lock (this.internalTransaction)
+                {
+                    return this.internalTransaction.promoterType;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the PromotedToken for the transaction.
+        /// 
+        /// If the transaction has not already been promoted, retrieving this value will cause promotion. Before retrieving the
+        /// PromotedToken, the Transaction.PromoterType value should be checked to see if it is a promoter type (Guid) that the
+        /// caller understands. If the caller does not recognize the PromoterType value, retreiving the PromotedToken doesn't
+        /// have much value because the caller doesn't know how to utilize it. But if the PromoterType is recognized, the
+        /// caller should know how to utilize the PromotedToken to communicate with the promoting distributed transaction
+        /// coordinator to enlist on the distributed transaction.
+        /// 
+        /// If the value of a transaction's PromoterType is TransactionInterop.PromoterTypeDtc, then that transaction's
+        /// PromotedToken will be an MSDTC-based TransmitterPropagationToken.
+        /// </summary>
+        /// <returns> 
+        /// The byte[] that can be used to enlist with the distributed transaction coordinator used to promote the transaction.
+        /// The format of the byte[] depends upon the value of Transaction.PromoterType.
+        /// </returns>
+        [System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Name = "FullTrust")]
+        public byte[] GetPromotedToken()
+        {
+            // We need to ask the current transaction state for the PromotedToken because depending on the state
+            // we may need to induce a promotion.
+            if (DiagnosticTrace.Verbose)
+            {
+                MethodEnteredTraceRecord.Trace(SR.GetString(SR.TraceSourceLtm),
+                    "Transaction.GetPromotedToken"
+                    );
+            }
+
+            if (Disposed)
+            {
+                throw new ObjectDisposedException("Transaction");
+            }
+
+            // We always make a copy of the promotedToken stored in the internal transaction.
+            byte[] internalPromotedToken;
+            lock (this.internalTransaction)
+            {
+                internalPromotedToken = this.internalTransaction.State.PromotedToken(this.internalTransaction);
+            }
+
+            byte[] toReturn = new byte[internalPromotedToken.Length];
+            Array.Copy(internalPromotedToken, toReturn, toReturn.Length);
+            return toReturn;
+        }
 
         [System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Name = "FullTrust")]
         public Enlistment EnlistDurable(
@@ -1136,10 +1216,50 @@ namespace System.Transactions
         }
 
 
+        /// <summary>
+        /// Create a promotable single phase enlistment that promotes to MSDTC.
+        /// </summary>
+        /// <param name="promotableSinglePhaseNotification">The object that implements the IPromotableSinglePhaseNotification interface.</param>
+        /// <returns>
+        /// True if the enlistment is successful.
+        /// 
+        /// False if the transaction already has a durable enlistment or promotable single phase enlistment or
+        /// if the transaction has already promoted. In this case, the caller will need to enlist in the transaction through other
+        /// means, such as Transaction.EnlistDurable or retreive the MSDTC export cookie or propagation token to enlist with MSDTC.
+        /// </returns>
         // We apparently didn't spell Promotable like FXCop thinks it should be spelled.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
         [System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Name = "FullTrust")]
         public bool EnlistPromotableSinglePhase(IPromotableSinglePhaseNotification promotableSinglePhaseNotification)
+        {
+            return this.EnlistPromotableSinglePhase(promotableSinglePhaseNotification, TransactionInterop.PromoterTypeDtc);
+        }
+
+        /// <summary>
+        /// Create a promotable single phase enlistment that promotes to a distributed transaction manager other than MSDTC.
+        /// </summary>
+        /// <param name="promotableSinglePhaseNotification">The object that implements the IPromotableSinglePhaseNotification interface.</param>
+        /// <param name="promoterType">
+        /// The promoter type Guid that identifies the format of the byte[] that is returned by the ITransactionPromoter.Promote
+        /// call that is implemented by the IPromotableSinglePhaseNotificationObject, and thus the promoter of the transaction.
+        /// </param>
+        /// <returns>
+        /// True if the enlistment is successful.
+        /// 
+        /// False if the transaction already has a durable enlistment or promotable single phase enlistment or
+        /// if the transaction has already promoted. In this case, the caller will need to enlist in the transaction through other
+        /// means.
+        /// 
+        /// If the Transaction.PromoterType matches the promoter type supported by the caller, then the
+        /// Transaction.PromotedToken can be retrieved and used to enlist directly with the identified distributed transaction manager.
+        ///
+        /// How the enlistment is created with the distributed transaction manager identified by the Transaction.PromoterType
+        /// is defined by that distributed transaction manager.
+        /// </returns>
+        // We apparently didn't spell Promotable like FXCop thinks it should be spelled.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly")]
+        [System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Name = "FullTrust")]
+        public bool EnlistPromotableSinglePhase(IPromotableSinglePhaseNotification promotableSinglePhaseNotification, Guid promoterType)
         {
             if (DiagnosticTrace.Verbose)
             {
@@ -1158,6 +1278,11 @@ namespace System.Transactions
                 throw new ArgumentNullException("promotableSinglePhaseNotification");
             }
 
+            if (promoterType == Guid.Empty)
+            {
+                throw new ArgumentException(SR.GetString(SR.PromoterTypeInvalid));
+            }
+
             if (this.complete)
             {
                 throw TransactionException.CreateTransactionCompletedException(SR.GetString(SR.TraceSourceLtm), this.DistributedTxId);
@@ -1167,7 +1292,7 @@ namespace System.Transactions
 
             lock (this.internalTransaction)
             {
-                succeeded = this.internalTransaction.State.EnlistPromotableSinglePhase(this.internalTransaction, promotableSinglePhaseNotification, this);
+                succeeded = this.internalTransaction.State.EnlistPromotableSinglePhase(this.internalTransaction, promotableSinglePhaseNotification, this, promoterType);
             }
 
             if (DiagnosticTrace.Verbose)
@@ -1239,10 +1364,59 @@ namespace System.Transactions
             }
         }
 
+        [System.Security.Permissions.PermissionSetAttribute(System.Security.Permissions.SecurityAction.LinkDemand, Name = "FullTrust")]
+        public void SetDistributedTransactionIdentifier(IPromotableSinglePhaseNotification promotableNotification,
+                                                        Guid distributedTransactionIdentifier)
+        {
+            if (DiagnosticTrace.Verbose)
+            {
+                MethodEnteredTraceRecord.Trace(SR.GetString(SR.TraceSourceLtm),
+                    "Transaction.SetDistributedTransactionIdentifier"
+                    );
+            }
+
+            if (Disposed)
+            {
+                throw new ObjectDisposedException("Transaction");
+            }
+
+            if (promotableNotification == null)
+            {
+                throw new ArgumentNullException("promotableNotification");
+            }
+
+            if (distributedTransactionIdentifier == Guid.Empty)
+            {
+                throw new ArgumentException("distributedTransactionIdentifier");
+            }
+
+            if (this.complete)
+            {
+                throw TransactionException.CreateTransactionCompletedException(SR.GetString(SR.TraceSourceLtm), this.DistributedTxId);
+            }
+
+            lock (this.internalTransaction)
+            {
+                this.internalTransaction.State.SetDistributedTransactionId(this.internalTransaction,
+                    promotableNotification,
+                    distributedTransactionIdentifier);
+
+                if (DiagnosticTrace.Verbose)
+                {
+                    MethodExitedTraceRecord.Trace(SR.GetString(SR.TraceSourceLtm),
+                        "Transaction.SetDistributedTransactionIdentifier"
+                        );
+                }
+                return;
+            }
+        }
+
         internal Oletx.OletxTransaction Promote()
         {
             lock (this.internalTransaction)
             {
+                // This method is only called when we expect to be promoting to MSDTC.
+                this.internalTransaction.ThrowIfPromoterTypeIsNotMSDTC();
                 this.internalTransaction.State.Promote(this.internalTransaction);
                 return this.internalTransaction.PromotedTransaction;
             }

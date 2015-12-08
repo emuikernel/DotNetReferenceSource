@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------------
 //
-// File: SpellerInterop.cs
+// File: NLGSpellerInterop.cs
 //
 // Description: Custom COM marshalling code and interfaces for interaction
 //              with the Natural Language Group's nl6 proofing engine.
@@ -11,7 +11,9 @@ namespace System.Windows.Documents
 {
     using System.Collections;
     using System.Runtime.InteropServices;
+    using MS.Internal;
     using MS.Win32;
+    using System.Globalization;
     using System.Security;
     using System.Security.Permissions;
     using System.IO;
@@ -21,7 +23,7 @@ namespace System.Windows.Documents
 
     // Custom COM marshalling code and interfaces for interaction
     // with the Natural Language Group's nl6 proofing engine.
-    internal class SpellerInterop : IDisposable
+    internal class NLGSpellerInterop : SpellerInteropBase
     {
         //------------------------------------------------------
         //
@@ -39,7 +41,7 @@ namespace System.Windows.Documents
         ///     TreatAsSafe: This function call takes no input parameters
         /// </SecurityNote>
         [SecurityCritical, SecurityTreatAsSafe]
-        internal SpellerInterop()
+        internal NLGSpellerInterop()
         {
             // Start the lifetime of Natural Language library
             UnsafeNlMethods.NlLoad();
@@ -70,8 +72,13 @@ namespace System.Windows.Documents
                 //
                 // Set nl properties.
                 //
-
                 _textChunk.put_ReuseObjects(true);
+                Mode = SpellerMode.None;
+
+                // 
+
+
+                MultiWordMode = false;
 
                 exceptionThrown = false;
             }
@@ -90,7 +97,7 @@ namespace System.Windows.Documents
             }
         }
 
-        ~SpellerInterop()
+        ~NLGSpellerInterop()
         {
             Dispose(false);
         }
@@ -99,19 +106,44 @@ namespace System.Windows.Documents
 
         //------------------------------------------------------
         //
-        //  Public Methods
+        //  IDispose Methods
         //
         //------------------------------------------------------
 
-        #region Public Methods
+        #region IDispose Methods
 
-        public void Dispose()
+        public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        #endregion Public Methods
+        /// <summary>
+        /// Internal interop resource cleanup
+        /// </summary>
+        /// <SecurityNote>
+        ///     Critical: This code calls into NlUnload, which elevates unmanaged code permission.
+        ///     TreatAsSafe: This function call takes no input memory block
+        /// </SecurityNote>
+        [SecurityCritical, SecurityTreatAsSafe]
+        protected override void Dispose(bool disposing)
+        {
+            if (_isDisposed)
+                throw new ObjectDisposedException(SR.Get(SRID.TextEditorSpellerInteropHasBeenDisposed));
+
+            if (_textChunk != null)
+            {
+                Marshal.ReleaseComObject(_textChunk);
+                _textChunk = null;
+            }
+
+            // Stop the lifetime of Natural Language library
+            UnsafeNlMethods.NlUnload();
+
+            _isDisposed = true;
+        }
+
+        #endregion IDispose Methods
 
         //------------------------------------------------------
         //
@@ -123,12 +155,11 @@ namespace System.Windows.Documents
 
         /// <SecurityNote>
         ///     Critical: This code calls into NlLoad, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function call sets the current speller locale, which is harmless.
         /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal void SetLocale(Int32 lcid)
+        [SecurityCritical]
+        internal override void SetLocale(CultureInfo culture)
         {
-            _textChunk.put_Locale(lcid);
+            _textChunk.put_Locale(culture.LCID);
         }
 
         // Sets an indexed option on the speller's TextContext.
@@ -137,7 +168,7 @@ namespace System.Windows.Documents
         /// sets TextContext's options based on untrusted input.
         /// </SecurityNote>
         [SecurityCritical]
-        internal void SetContextOption(string option, object value)
+        private void SetContextOption(string option, object value)
         {
             ITextContext textContext;
 
@@ -175,7 +206,7 @@ namespace System.Windows.Documents
         /// Critical - access ITextChunk and calls Critical SetInputArray() with untrusted params.
         /// </SecurityNote>
         [SecurityCritical]
-        internal int EnumTextSegments(char[] text, int count,
+        internal override int EnumTextSegments(char[] text, int count,
             EnumSentencesCallback sentenceCallback, EnumTextSegmentsCallback segmentCallback, object data)
         {
             int segmentCount = 0;
@@ -217,42 +248,21 @@ namespace System.Windows.Documents
 
                         result = EnumVariantNext(sentenceEnumerator, variant, fetched);
 
-                        if (result != NativeMethods.S_OK)
-                            break;
-                        if (fetched[0] == 0)
-                            break;
-
-                        SpellerInterop.ISentence sentence = (SpellerInterop.ISentence)variant.ToObject();
-                        try
+                        if ((result != NativeMethods.S_OK) || (fetched[0] == 0))
                         {
-                            int sentenceSegmentCount;
-                            sentence.get_Count(out sentenceSegmentCount);
+                            break;
+                        }
 
-                            segmentCount += sentenceSegmentCount;
+                        using (SpellerSentence sentence = new SpellerSentence((NLGSpellerInterop.ISentence)variant.ToObject()))
+                        {
+                            segmentCount += sentence.Segments.Count;
 
                             if (segmentCallback != null)
                             {
-                                //
                                 // Iterate over segments.
-                                //
-
-                                for (int i = 0; continueIteration && i < sentenceSegmentCount; i++)
+                                for (int i = 0; continueIteration && (i < sentence.Segments.Count); i++ )
                                 {
-                                    SpellerInterop.ITextSegment textSegment;
-
-                                    // Do a callback for this ITextSegment.
-                                    sentence.get_Item(i, out textSegment);
-                                    try
-                                    {
-                                        if (!segmentCallback(textSegment, data))
-                                        {
-                                            continueIteration = false;
-                                        }
-                                    }
-                                    finally
-                                    {
-                                        Marshal.ReleaseComObject(textSegment);
-                                    }
+                                    continueIteration = segmentCallback(sentence.Segments[i], data);
                                 }
                             }
 
@@ -261,10 +271,6 @@ namespace System.Windows.Documents
                             {
                                 continueIteration = sentenceCallback(sentence, data);
                             }
-                        }
-                        finally
-                        {
-                            Marshal.ReleaseComObject(sentence);
                         }
                     }
                     while (continueIteration);
@@ -284,190 +290,6 @@ namespace System.Windows.Documents
             return segmentCount;
         }
 
-        // Enumerates a segment's subsegments, making a callback on each iteration.
-        /// <SecurityNote>
-        /// Critical - accesses ITextChunk.
-        /// TreatAsSafe: Does not set any state.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static void EnumSubsegments(object textSegmentHandle, EnumTextSegmentsCallback segmentCallback, object data)
-        {
-            ITextSegment textSegment = (ITextSegment)textSegmentHandle;
-            int subSegmentCount;
-            bool result = true;
-
-            textSegment.get_Count(out subSegmentCount);
-
-            // Walk the subsegments, the error's in there somewhere.
-            for (int i = 0; result && i < subSegmentCount; i++)
-            {
-                ITextSegment subSegment;
-
-                textSegment.get_Item(i, out subSegment);
-                try
-                {
-                    result = segmentCallback(subSegment, data);
-                }
-                finally
-                {
-                    Marshal.ReleaseComObject(subSegment);
-                }
-            }
-        }
-
-        // Returns the final symbol offset of a sentence.
-        /// <SecurityNote>
-        ///     Critical: This code calls into NlLoad, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function is readonly, and returns safe data.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static int GetSentenceEndOffset(object sentenceHandle)
-        {
-            ISentence sentence = (ISentence)sentenceHandle;
-
-            int endOffset = -1;
-
-            int sentenceSegmentCount;
-            sentence.get_Count(out sentenceSegmentCount);
-
-            if (sentenceSegmentCount > 0)
-            {
-                ITextSegment textSegment;
-                STextRange sTextRange;
-
-                sentence.get_Item(sentenceSegmentCount - 1, out textSegment);
-                try
-                {
-                    textSegment.get_Range(out sTextRange);
-                }
-                finally
-                {
-                    Marshal.ReleaseComObject(textSegment);
-                }
-
-                endOffset = sTextRange.Start + sTextRange.Length;
-            }
-
-            return endOffset;
-        }
-
-        // Returns the subsegment count of a segment.
-        /// <SecurityNote>
-        ///     Critical: This code calls into NlLoad, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function is readonly, and returns safe data.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static int GetSegmentCount(object textSegmentHandle)
-        {
-            ITextSegment textSegment = (ITextSegment)textSegmentHandle;
-            int subSegmentCount;
-
-            textSegment.get_Count(out subSegmentCount);
-
-            return subSegmentCount;
-        }
-
-        // Returns the symbol offset and length of a segment.
-        /// <SecurityNote>
-        ///     Critical: This code calls into NlLoad, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function is readonly, and returns safe data.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static STextRange GetSegmentRange(object textSegmentHandle)
-        {
-            ITextSegment textSegment = (ITextSegment)textSegmentHandle;
-            STextRange sTextRange;
-
-            textSegment.get_Range(out sTextRange);
-
-            return sTextRange;
-        }
-
-        // Returns the role (error, etc.) of a segment.
-        /// <SecurityNote>
-        ///     Critical: This code calls into NlLoad, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function is readonly, and returns safe data.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static RangeRole GetSegmentRole(object textSegmentHandle)
-        {
-            ITextSegment textSegment = (ITextSegment)textSegmentHandle;
-            RangeRole role;
-
-            textSegment.get_Role(out role);
-
-            return role;
-        }
-
-        // Fills an array with suggestions matching a segment.
-        // suggestions may be null.
-        // If the segment has no suggestions (usually because it is not misspelled,
-        // but also possible for errors the engine cannot make sense of, or that are
-        // contained in sub-segments), this method returns false.
-        /// <SecurityNote>
-        /// Critical - it calls get_Suggestions(), which is Critical. it calls Marshal.PtrToStringUni, which LinkDemand's,
-        /// with trusted params.
-        /// TreatAsSafe - it calls it with a trusted variant out param.
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        internal static bool GetSuggestions(object textSegmentHandle, ArrayList suggestions)
-        {
-            ITextSegment textSegment = (ITextSegment)textSegmentHandle;
-            UnsafeNativeMethods.IEnumVariant variantEnumerator;
-
-            textSegment.get_Suggestions(out variantEnumerator);
-
-            if (variantEnumerator == null)
-            {
-                // nl6 will return null enum instead of an empty enum.
-                return false;
-            }
-
-            bool hasSuggestions = false;
-
-            try
-            {
-                NativeMethods.VARIANT variant = new NativeMethods.VARIANT();
-                int[] fetched = new int[1];
-
-                while (true)
-                {
-                    int result;
-
-                    variant.Clear();
-
-                    result = EnumVariantNext(variantEnumerator, variant, fetched);
-
-                    if (result != NativeMethods.S_OK)
-                        break;
-                    if (fetched[0] == 0)
-                        break;
-
-                    hasSuggestions = true;
-
-                    if (suggestions != null)
-                    {
-                        // Convert the VARIANT to string, and add it to our list.
-                        // There's some special magic here.  The VARIANT is VT_UI2/ByRef.
-                        // But under the hood it's really a raw WCHAR *.
-                        suggestions.Add(Marshal.PtrToStringUni(variant.data1.Value));
-                    }
-                    else
-                    {
-                        // Caller just wants to know if any suggestions are
-                        // available, no need to iterate further.
-                        break;
-                    }
-                }
-            }
-            finally
-            {
-                Marshal.ReleaseComObject(variantEnumerator);
-            }
-
-            return hasSuggestions;
-        }
-
         /// <summary>
         /// Unloads given custom dictionary
         /// </summary>
@@ -476,8 +298,11 @@ namespace System.Windows.Documents
         /// critical - works with critical _textChunk member
         /// </SecurityNote>
         [SecurityCritical]
-        internal void UnloadDictionary(ILexicon lexicon)
+        internal override void UnloadDictionary(object dictionary)
         {
+            ILexicon lexicon = dictionary as ILexicon;
+            Invariant.Assert(lexicon != null);
+
             ITextContext textContext = null;
             try
             {
@@ -504,7 +329,7 @@ namespace System.Windows.Documents
         /// critical - returns reference to internal wrapper to COM interface.
         /// </SecurityNote>
         [SecurityCritical]
-        internal ILexicon LoadDictionary(string lexiconFilePath)
+        internal override object LoadDictionary(string lexiconFilePath)
         {
             return AddLexicon(lexiconFilePath);
         }
@@ -537,7 +362,7 @@ namespace System.Windows.Documents
         /// 2. Asserts FileIOPermission to load file from specified locations.
         /// </SecurityNote>
         [SecurityCritical]
-        internal ILexicon LoadDictionary(Uri item, string trustedFolder)
+        internal override object LoadDictionary(Uri item, string trustedFolder)
         {
             // Assert neccessary security to load trusted files.
             new FileIOPermission(FileIOPermissionAccess.Read, trustedFolder).Assert();
@@ -558,7 +383,7 @@ namespace System.Windows.Documents
         /// Critical - uses security critical _textChunk
         /// </SecurityNote>
         [SecurityCritical]
-        internal void ReleaseAllLexicons()
+        internal override void ReleaseAllLexicons()
         {
             ITextContext textContext = null;
             try
@@ -586,53 +411,189 @@ namespace System.Windows.Documents
 
         }
 
+        /// <summary>
+        /// Sets the mode in which the spell-checker operates
+        /// We care about 3 different modes here: 
+        /// 
+        /// 1. Shallow spellchecking - i.e., wordbreaking +      spellchecking + NOT (suggestions)
+        /// 2. Deep spellchecking    - i.e., wordbreaking +      spellchecking +      suggestions
+        /// 3. Wordbreaking only     - i.e., wordbreaking + NOT (spellchcking) + NOT (suggestions)
+        /// </summary>
+        internal override SpellerMode Mode
+        {
+            /// <SecurityNote> 
+            /// Critical - Calls into SetContextOption
+            /// </SecurityNote>
+            [SecurityCritical]
+            set
+            {
+                _mode = value;
+
+                if (_mode.HasFlag(SpellerMode.SpellingErrors))
+                {
+                    SetContextOption("IsSpellChecking", true);
+
+                    if (_mode.HasFlag(SpellerMode.Suggestions))
+                    {
+                        SetContextOption("IsSpellVerifyOnly", false);
+                    }
+                    else
+                    {
+                        SetContextOption("IsSpellVerifyOnly", true);
+                    }
+                }
+                else if (_mode.HasFlag(SpellerMode.WordBreaking))
+                {
+                    SetContextOption("IsSpellChecking", false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If true, multi-word spelling errors would be detected
+        /// </summary>
+        internal override bool MultiWordMode
+        {
+            /// <SecurityNote> 
+            /// Critical - Calls into SetContextOption
+            /// </SecurityNote>
+            [SecurityCritical]
+            set
+            {
+                _multiWordMode = value;
+                SetContextOption("IsSpellSuggestingMWEs", _multiWordMode);
+            }
+        }
+
+        /// <summary>
+        /// Sets spelling reform mode
+        /// </summary>
+        /// <SecurityNote>
+        /// Critical - Calls into SetContextOption
+        /// </SecurityNote>
+        /// <param name="culture"></param>
+        /// <param name="spellingReform"></param>
+        [SecurityCritical]
+        internal override void SetReformMode(CultureInfo culture, SpellingReform spellingReform)
+        {
+            const int
+                BothPreAndPost = 0,
+                Prereform      = 1,
+                Postreform     = 2;
+
+            string option;
+
+            switch (culture.TwoLetterISOLanguageName)
+            {
+                case "de":
+                    option = "GermanReform";
+                    break;
+
+                case "fr":
+                    option = "FrenchReform";
+                    break;
+
+                default:
+                    option = null;
+                    break;
+            }
+
+            if (option != null)
+            {
+                switch (spellingReform)
+                {
+                    case SpellingReform.Prereform:
+                        SetContextOption(option, Prereform);
+                        break;
+
+                    case SpellingReform.Postreform:
+                        SetContextOption(option, Postreform);
+                        break;
+
+                    case SpellingReform.PreAndPostreform:
+                        if (option == "GermanReform")
+                        {
+                            // BothPreAndPost is disallowed for german -- the engine has undefined results.
+                            SetContextOption(option, Postreform);
+                        }
+                        else
+                        {
+                            SetContextOption(option, BothPreAndPost);
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if we have an engine capable of proofing the specified language.
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        internal override bool CanSpellCheck(CultureInfo culture)
+        {
+            bool canSpellCheck;
+
+            switch (culture.TwoLetterISOLanguageName)
+            {
+                case "en":
+                case "de":
+                case "fr":
+                case "es":
+                    canSpellCheck = true;
+                    break;
+
+                default:
+                    canSpellCheck = false;
+                    break;
+            }
+
+            return canSpellCheck;
+        }
+
         #endregion Internal methods
 
         //------------------------------------------------------
         //
-        //  Internal Types
+        //  Private Types
         //
         //------------------------------------------------------
 
-        #region Internal Types
+        #region Private Types
 
-        // Callback delegate for EnumTextSegments method.
-        internal delegate bool EnumSentencesCallback(object sentence, object data);
-
-        // Callback delegate for EnumTextSegments method.
-        internal delegate bool EnumTextSegmentsCallback(object textSegment, object data);
-
-        // typedef struct STextRange
-        //     {
-        //     long Start;
-        //     long Length;
-        //     } 	STextRange;
+        /// <summary>
+        /// ITextRange implementation compatible with NLG API's
+        ///  typedef struct STextRange
+        /// {
+        ///     long Start;
+        ///     long Length;
+        /// };
+        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        internal struct STextRange
+        private struct STextRange : SpellerInteropBase.ITextRange
         {
-            internal Int32 Start
+            #region SpellerInteropBase.ITextRange
+
+            public int Start
             {
                 get { return _start; }
             }
 
-            internal Int32 Length
+            public int Length
             {
                 get { return _length; }
             }
 
-            private readonly Int32 _start;
-            private readonly Int32 _length;
+            #endregion SpellerInteropBase.ITextRange
+
+            private readonly int _start;
+            private readonly int _length;
         }
 
-        internal enum SpellingReform
-        {
-            BothPreAndPost = 0,
-            Prereform = 1,
-            Postreform = 2,
-            NotSet = 3,
-        };
-
-        internal enum RangeRole
+        /// <summary>
+        /// RangeRole enum defined by NLG API's
+        /// </summary>
+        private enum RangeRole
         {
             ecrrSimpleSegment = 0,
             ecrrAlternativeForm = 1,
@@ -658,7 +619,444 @@ namespace System.Windows.Documents
             ecrrOutOfContext = 21,
         };
 
-        #endregion Internal Types
+        /// <summary>
+        /// Implementation of ISpellerSegment that manages the lifetime of 
+        /// an ITextSegment (NLG COM interface) object
+        /// </summary>
+        private class SpellerSegment : ISpellerSegment, IDisposable
+        {
+            #region Constructor 
+
+            public SpellerSegment(ITextSegment textSegment)
+            {
+                _textSegment = textSegment;
+            }
+
+            #endregion Constructor
+
+            #region Private Methods
+
+            /// <summary>
+            /// Enumerates spelling suggestions for this segment
+            /// <SecurityNote>
+            /// Critical - calls into COM API's
+            /// </SecurityNote>
+            /// </summary>
+            [SecurityCritical]
+            private void EnumerateSuggestions()
+            {
+                List<string> suggestions = new List<string>();
+
+                UnsafeNativeMethods.IEnumVariant variantEnumerator;
+
+                _textSegment.get_Suggestions(out variantEnumerator);
+
+                if (variantEnumerator == null)
+                {
+                    // nl6 will return null enum instead of an empty enum.
+                    _suggestions = suggestions.AsReadOnly();
+                    return;
+                }
+
+                try
+                {
+                    NativeMethods.VARIANT variant = new NativeMethods.VARIANT();
+                    int[] fetched = new int[1];
+
+                    while (true)
+                    {
+                        int result;
+
+                        variant.Clear();
+                        result = EnumVariantNext(variantEnumerator, variant, fetched);
+
+                        if ((result != NativeMethods.S_OK) || (fetched[0] == 0))
+                        {
+                            break;
+                        }
+
+                        // Convert the VARIANT to string, and add it to our list.
+                        // There's some special magic here.  The VARIANT is VT_UI2/ByRef.
+                        // But under the hood it's really a raw WCHAR *.
+                        suggestions.Add(Marshal.PtrToStringUni(variant.data1.Value));
+                    }
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(variantEnumerator);
+                }
+
+                _suggestions = suggestions.AsReadOnly();
+                return;
+            }
+
+            /// <summary>
+            /// Enumerates sub-segments of this segment
+            /// <SecurityNote>
+            /// Critical - Calls into COM API's
+            /// </SecurityNote>
+            /// </summary>
+            [SecurityCritical]
+            private void EnumerateSubSegments()
+            {
+                _textSegment.get_Count(out _subSegmentCount);
+
+                List<ISpellerSegment> subSegments = new List<ISpellerSegment>();
+
+                for (int i = 0; i < _subSegmentCount; i++)
+                {
+                    ITextSegment subSegment;
+                    _textSegment.get_Item(i, out subSegment);
+
+                    // subSegment COM object will get released by SpellerSegment's finalizer
+                    subSegments.Add(new SpellerSegment(subSegment));
+                }
+
+                _subSegments = subSegments.AsReadOnly();
+            }
+
+            #endregion
+
+            #region SpellerInteropBase.ISpellerSegment
+
+            /// <summary>
+            /// Returns a read-only list of sub-segments of this segment
+            /// </summary>
+            public IReadOnlyList<ISpellerSegment> SubSegments
+            {
+                /// <SecurityNote>
+                /// Critical - Calls into EnumerateSubSegments
+                /// Safe - Called by transparent methods in Speller, 
+                ///     and this method does not give out any criticals 
+                ///     resources (COM objects) to the caller.
+                /// </SecurityNote>
+                [SecuritySafeCritical]
+                get
+                {
+                    if (_subSegments == null)
+                    {
+                        EnumerateSubSegments();
+                    }
+
+                    return _subSegments;
+                }
+            }
+
+            /// <summary>
+            /// Identifies, by position, this segment in it's source sentence
+            /// </summary>
+            public ITextRange TextRange
+            {
+                /// <SecurityNote>
+                /// Critical - Calls into COM API's
+                /// Safe - Called by transparent methods in Speller, 
+                ///     and this method does not give out the critical 
+                ///     resource (the COM object) to the caller.
+                /// </SecurityNote>
+                [SecuritySafeCritical]
+                get
+                {
+                    if (_sTextRange == null)
+                    {
+                        STextRange sTextRange;
+                        _textSegment.get_Range(out sTextRange);
+
+                        _sTextRange = sTextRange;
+                    }
+
+                    return _sTextRange.Value;
+                }
+            }
+
+            /// <summary>
+            /// Generates spelling suggestions for this segment
+            /// If the segment has no suggestions (usually because it is not misspelled,
+            /// but also possible for errors the engine cannot make sense of, or that are
+            /// contained in sub-segments), this method returns an empty list
+            /// </summary>
+            public IReadOnlyList<string> Suggestions
+            {
+                /// <SecurityNote>
+                /// Critical - calls EnumerateSuggestions
+                /// Safe - Called by transparent methods in Speller, 
+                ///     and neither this method nor EnumerateSuggestions 
+                ///     gives out any critical resources (the COM objects) 
+                ///     to the caller.
+                /// </SecurityNote>
+                [SecuritySafeCritical]
+                get
+                {
+                    if (_suggestions == null)
+                    {
+                        EnumerateSuggestions();
+                    }
+
+                    return _suggestions;
+                }
+            }
+
+            /// <summary>
+            /// Checks whether this segment is free of spelling errors
+            /// </summary>
+            public bool IsClean 
+            {
+                /// <SecurityNote>
+                /// Critical - Calls RangeRole
+                /// Safe - Called by transparent methods in Speller, 
+                ///     and this method does not give out any critical 
+                ///     resources (COM objects) to the caller.
+                /// </SecurityNote>
+                [SecuritySafeCritical]
+                get
+                {
+                    return (RangeRole != RangeRole.ecrrIncorrect);
+                }
+            }
+
+            /// <summary>
+            /// Enumerates a segment's subsegments, making a callback on each iteration.
+            /// </summary>
+            /// <param name="segmentCallback"></param>
+            /// <param name="data"></param>
+            /// <SecurityNote>
+            /// Critical - Calls into SubSegments
+            /// Safe: Called by transparent callers in Speller
+            /// </SecurityNote>
+            [SecuritySafeCritical]
+            public void EnumSubSegments(EnumTextSegmentsCallback segmentCallback, object data)
+            {
+                bool result = true;
+
+                // Walk the subsegments, the error's in there somewhere.
+                for (int i = 0; result && (i < SubSegments.Count); i++)
+                {
+                    result = segmentCallback(SubSegments[i], data);
+                }
+            }
+
+
+            #endregion SpellerInteropBase.ISpellerSegment
+
+            #region IDisposable
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            /// <SecurityNote>
+            /// Critical - Calls Marshal.ReleaseComObject
+            /// Safe - Called by transparent methods Dispose() and the finalizer
+            /// </SecurityNote>
+            [SecuritySafeCritical]
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed)
+                {
+                    throw new ObjectDisposedException("NLGSpellerInterop.SpellerSegment");
+                }
+
+                if (_subSegments != null)
+                {
+                    foreach (SpellerSegment subSegment in _subSegments)
+                    {
+                        // Don't call Dispose(disposing) here. That will 
+                        // fail to suppress finalization of subsegment objects.
+                        subSegment.Dispose();
+                    }
+                    _subSegments = null;
+                }
+
+                if (_textSegment != null)
+                {
+                    Marshal.ReleaseComObject(_textSegment);
+                    _textSegment = null;
+                }
+
+                _disposed = true;
+            }
+
+            ~SpellerSegment()
+            {
+                Dispose(false);
+            }
+
+            #endregion
+
+            #region Public Properties
+
+            public RangeRole RangeRole
+            {
+                /// <SecurityNote>
+                /// Critical - calls into COM API's
+                /// </SecurityNote>
+                [SecurityCritical]
+                get
+                {
+                    if (_rangeRole == null)
+                    {
+                        RangeRole role;
+                        _textSegment.get_Role(out role);
+
+                        _rangeRole = role;
+                    }
+
+                    return _rangeRole.Value;
+                }
+            }
+
+            #endregion Public Properties
+
+            #region Private Fields
+
+            // SpellerInteropBase fields
+            private STextRange? _sTextRange = null;
+            private int _subSegmentCount;
+            private IReadOnlyList<ISpellerSegment> _subSegments = null;
+            private IReadOnlyList<string> _suggestions = null;
+
+            // SpellerSegment specific fields
+            private RangeRole? _rangeRole = null;
+            private ITextSegment _textSegment;
+
+            // IDisposable management
+            private bool _disposed = false;
+            
+            #endregion Private Fields
+        }
+
+        /// <summary>
+        /// Implementation of ISpellerSentence that manages the lifetime of
+        /// an ISentence (NLG COM interface) object
+        /// </summary>
+        private class SpellerSentence : ISpellerSentence, IDisposable
+        {
+            /// <summary>
+            /// Constructs a SpellerSentence object 
+            /// </summary>
+            /// <SecurityNote>
+            /// Critical - Calls into COM API's
+            /// </SecurityNote>
+            /// <param name="sentence"></param>
+            [SecurityCritical]
+            public SpellerSentence(ISentence sentence)
+            {
+                _disposed = false;
+
+                try
+                {
+                    int sentenceSegmentCount;
+                    sentence.get_Count(out sentenceSegmentCount);
+
+                    // Iterate over segments.
+                    List<ISpellerSegment> segments = new List<ISpellerSegment>();
+
+                    for (int i = 0; i < sentenceSegmentCount; i++)
+                    {
+                        NLGSpellerInterop.ITextSegment textSegment;
+                        sentence.get_Item(i, out textSegment);
+
+                        // SpellerSegment finalizer will take care of releasing the COM object
+                        segments.Add(new SpellerSegment(textSegment));
+                    }
+
+                    _segments = segments.AsReadOnly();
+
+                    Invariant.Assert(_segments.Count == sentenceSegmentCount);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(sentence);
+                }
+            }
+
+            #region SpellerInteropBase.ISpellerSentence
+
+            /// <summary>
+            /// Segments that this sentence is comprised of
+            /// </summary>
+            public IReadOnlyList<ISpellerSegment> Segments
+            {
+                get
+                {
+                    return _segments;
+                }
+            }
+
+            /// <summary>
+            /// Final symbol offset of a sentence.
+            /// </summary>
+            public int EndOffset 
+            {
+                get
+                {
+                    int endOffset = -1;
+
+                    if (Segments.Count > 0)
+                    {
+                        ITextRange textRange = Segments[Segments.Count - 1].TextRange;
+                        endOffset = textRange.Start + textRange.Length;
+                    }
+
+                    return endOffset;
+                }
+            }
+
+            #endregion SpellerInteropBase.ISpellerSentence
+
+            #region IDisposable
+
+            /// <SecurityNote>
+            /// Critical - Calls Dispose(true)
+            /// </SecurityNote>
+            [SecurityCritical]
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            /// <SecurityNote>
+            /// Critical - Calls SpellerSegment.Dispose
+            /// </SecurityNote>
+            [SecurityCritical]
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed)
+                {
+                    throw new ObjectDisposedException("NLGSpellerInterop.SpellerSentence");
+                }
+
+                if (_segments != null)
+                {
+                    foreach (SpellerSegment segment in _segments)
+                    {
+                        segment.Dispose();
+                    }
+
+                    _segments = null;
+                }
+
+                _disposed = true;                
+            }
+
+            ~SpellerSentence()
+            {
+                Dispose(false);
+            }
+
+            #endregion
+
+            #region Private Fields
+
+            private IReadOnlyList<ISpellerSegment> _segments;
+            private bool _disposed;
+
+            #endregion Private Fields
+        }
+
+        #endregion Private Types
 
         //------------------------------------------------------
         //
@@ -706,7 +1104,7 @@ namespace System.Windows.Documents
                 fileIOPermission.Demand();
                 hasDemand = true;
 
-                lexicon = SpellerInterop.CreateLexicon();
+                lexicon = NLGSpellerInterop.CreateLexicon();
                 lexicon.ReadFrom(lexiconFilePath);
                 _textChunk.get_Context(out textContext);
                 textContext.AddLexicon(lexicon);
@@ -740,31 +1138,6 @@ namespace System.Windows.Documents
         }
 
         #endregion ILexicon management methods
-
-        /// <summary>
-        /// Internal interop resource cleanup
-        /// </summary>
-        /// <SecurityNote>
-        ///     Critical: This code calls into NlUnload, which elevates unmanaged code permission.
-        ///     TreatAsSafe: This function call takes no input memory block
-        /// </SecurityNote>
-        [SecurityCritical, SecurityTreatAsSafe]
-        private void Dispose(bool disposing)
-        {
-            if (_isDisposed)
-                throw new ObjectDisposedException(SR.Get(SRID.TextEditorSpellerInteropHasBeenDisposed));
-
-            if (_textChunk != null)
-            {
-                Marshal.ReleaseComObject(_textChunk);
-                _textChunk = null;
-            }
-
-            // Stop the lifetime of Natural Language library
-            UnsafeNlMethods.NlUnload();
-
-            _isDisposed = true;
-        }
 
 
         // Returns an object exported from NaturalLanguage6.dll's class factory.
@@ -1883,6 +2256,12 @@ namespace System.Windows.Documents
 
         // True after this object has been disposed.
         private bool _isDisposed;
+
+        // Speller mode 
+        private SpellerMode _mode;
+
+        // Multi-word error checking mode
+        private bool _multiWordMode;
 
         // 333E6924-4353-4934-A7BE-5FB5BDDDB2D6
         private static readonly Guid CLSID_ITextContext = new Guid(0x333E6924, 0x4353, 0x4934, 0xA7, 0xBE, 0x5F, 0xB5, 0xBD, 0xDD, 0xB2, 0xD6);

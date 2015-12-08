@@ -891,6 +891,14 @@ namespace System.Windows.Controls
 
         #region Protected Methods
 
+        protected override void OnStylusSystemGesture(StylusSystemGestureEventArgs e)
+        {
+            // DevDiv:1139804
+            // Keep track of seeing a tap gesture so that we can use this information to 
+            // make decisions about panning.
+            _seenTapGesture = e.SystemGesture == SystemGesture.Tap;
+        }
+
         /// <summary>
         /// OnScrollChanged is an override called whenever scrolling state changes on this ScrollViewer.
         /// </summary>
@@ -1619,6 +1627,11 @@ namespace System.Windows.Controls
         protected override void OnManipulationStarting(ManipulationStartingEventArgs e)
         {
             _panningInfo = null;
+
+            // DevDiv:1139804
+            // When starting a new manipulation, clear out that we saw a tap
+            _seenTapGesture = false;
+
             PanningMode panningMode = PanningMode;
             if (panningMode != PanningMode.None)
             {
@@ -1727,7 +1740,20 @@ namespace System.Windows.Controls
                 else
                 {
                     bool cancelManipulation = false;
-                    if (_panningInfo.IsPanning)
+
+                    // DevDiv:1139804
+                    // High precision touch devices can trigger a panning manipulation
+                    // due to the low threshold we set for pan initiation.  This may be
+                    // undesirable since we may enter pan for what the system considers a
+                    // tap.  Panning should be contingent on a drag gesture as that is the 
+                    // most consistent with the system at large.  So if we have seen a tap
+                    // on our main input, we should cancel any panning.
+                    if (_seenTapGesture)
+                    {
+                        e.Cancel();
+                        _panningInfo = null;
+                    }
+                    else if (_panningInfo.IsPanning)
                     {
                         // Do the scrolling if we already started it.
                         ManipulateScroll(e);
@@ -2880,6 +2906,10 @@ namespace System.Windows.Controls
         //-------------------------------------------------------------------
 
         #region Private Fields
+
+        // DevDiv:1139804
+        // Tracks if the current main input to the ScrollViewer result in a Tap gesture
+        private bool _seenTapGesture = false;
 
         // Scrolling physical "line" metrics.
         internal const double _scrollLineDelta = 16.0;   // Default physical amount to scroll with one Up/Down/Left/Right key

@@ -596,13 +596,16 @@ namespace MS.Internal
                     {
                         cnsImports.Imports.Add(new CodeNamespaceImport(u));
                     }
-
-                    _usingNS.Clear();
-                    _usingNS = null;
                 }
 
                 //  } end SubClass
                 _ccRoot.CodeNS.Types.Add(_ccRoot.CodeClass);
+            }
+
+            if (_usingNS != null)
+            {
+                _usingNS.Clear();
+                _usingNS = null;
             }
 
             if (IsCompilingEntryPointClass)

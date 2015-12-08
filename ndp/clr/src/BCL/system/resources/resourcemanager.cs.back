@@ -732,7 +732,7 @@ namespace System.Resources {
             // method, so the entire idea of a security check written this way is ----.
             // So if we happen to return some resources in cases where we should really be
             // doing a demand for member access permissions, we're not overly concerned.
-            // <STRIP>I verified this with our CAS expert.  -- Brian, 2/11/2010</STRIP>
+            // <
             return InternalGetResourceSet(culture, createIfNotExists, tryParents);
         }
 
