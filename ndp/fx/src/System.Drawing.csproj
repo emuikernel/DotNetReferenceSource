@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{56c1ebe4-7318-40f7-a6b3-eced5deb84a0}</ProjectGuid>
+    <ProjectGuid>{b5fe567f-721f-4cd8-82d6-c4b23d278d2d}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>System.Drawing</AssemblyName>
@@ -20,15 +20,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\clr\src\bcl\mscorlib.csproj">
-      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
+      <Project>{67c368de-3511-4106-8749-000d91efd3fc}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="System.csproj">
-      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
+      <Project>{54e500cb-cdce-4405-9ac7-200d8982ccd8}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="Configuration\System.Configuration.csproj">
-      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
+      <Project>{d055238a-9098-47e9-8d76-70acbfa31ac3}</Project>
       <Name>System.Configuration</Name>
     </ProjectReference>
   </ItemGroup>
@@ -256,7 +256,6 @@
     <Compile Include="misc\DbgUtil.cs" />
     <Compile Include="misc\DebugHandleTracker.cs" />
     <Compile Include="misc\DpiHelper.cs" />
-    <Compile Include="misc\externdll.cs" />
     <Compile Include="misc\GDI\ApplyGraphicsProperties.cs" />
     <Compile Include="misc\GDI\DeviceContext.cs" />
     <Compile Include="misc\GDI\DeviceContextGraphicsMode.cs" />

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{a624a509-e440-4593-9d55-f3b56c136756}</ProjectGuid>
+    <ProjectGuid>{ad5cdb7e-95ed-4a7b-b4be-5d2e9933caea}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>UIAutomationClient</AssemblyName>
@@ -20,19 +20,19 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\ndp\clr\src\bcl\mscorlib.csproj">
-      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
+      <Project>{67c368de-3511-4106-8749-000d91efd3fc}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ndp\fx\src\System.csproj">
-      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
+      <Project>{54e500cb-cdce-4405-9ac7-200d8982ccd8}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\ndp\clr\src\managedlibraries\remoting\System.Runtime.Remoting.csproj">
-      <Project>{f480b357-4856-41cc-b431-3236089a07a6}</Project>
+      <Project>{532a385a-cad5-4877-94f7-f8632f22b228}</Project>
       <Name>System.Runtime.Remoting</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\WindowsBase.csproj">
-      <Project>{2fbfec40-d5b1-4297-92c7-f05be01f1962}</Project>
+      <Project>{f354ca4c-e299-457c-9226-7d1b35af65fb}</Project>
       <Name>WindowsBase</Name>
     </ProjectReference>
   </ItemGroup>
@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="..\..\..\Test\Common\FxCop\Suppression\UIAClient\CodeQuality.cs" />
     <Compile Include="..\..\Shared\MS\Win32\NativeMethodsSetLastError.cs" />
-    <Compile Include="..\..\Shared\RefAssemblyAttrs.cs" />
     <Compile Include="MS\Internal\Automation\Accessible.cs" />
     <Compile Include="MS\Internal\Automation\AutomationAttributeInfo.cs" />
     <Compile Include="MS\Internal\Automation\AutomationPatternInfo.cs" />

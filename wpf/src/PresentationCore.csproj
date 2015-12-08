@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">AnyCPU</Platform>
-    <ProjectGuid>{395e27ce-8277-441f-8dba-265dc9159132}</ProjectGuid>
+    <ProjectGuid>{1bbf6583-1a45-4b4f-8855-3d825380d72b}</ProjectGuid>
     <OutputPath>.</OutputPath>
     <OutputType>Library</OutputType>
     <AssemblyName>PresentationCore</AssemblyName>
@@ -20,27 +20,27 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ndp\clr\src\bcl\mscorlib.csproj">
-      <Project>{7c36d311-04e5-48ad-8d3f-f969b3e24ddd}</Project>
+      <Project>{67c368de-3511-4106-8749-000d91efd3fc}</Project>
       <Name>mscorlib</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\System.csproj">
-      <Project>{45b8d1e3-adb9-41bc-b6f4-de3c79a3d157}</Project>
+      <Project>{54e500cb-cdce-4405-9ac7-200d8982ccd8}</Project>
       <Name>System</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\Configuration\System.Configuration.csproj">
-      <Project>{32b059d5-61a1-47d6-9bd6-6bdc8660cfad}</Project>
+      <Project>{d055238a-9098-47e9-8d76-70acbfa31ac3}</Project>
       <Name>System.Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ndp\fx\src\Xml\System.Xml.csproj">
-      <Project>{de666f01-fb7c-4239-a4b1-91741ed0c421}</Project>
+      <Project>{7eccbad4-f184-4260-b750-d5c802c948d8}</Project>
       <Name>System.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="UIAutomation\UIAutomationClient\UIAutomationClient.csproj">
-      <Project>{a624a509-e440-4593-9d55-f3b56c136756}</Project>
+      <Project>{ad5cdb7e-95ed-4a7b-b4be-5d2e9933caea}</Project>
       <Name>UIAutomationClient</Name>
     </ProjectReference>
     <ProjectReference Include="WindowsBase.csproj">
-      <Project>{2fbfec40-d5b1-4297-92c7-f05be01f1962}</Project>
+      <Project>{f354ca4c-e299-457c-9226-7d1b35af65fb}</Project>
       <Name>WindowsBase</Name>
     </ProjectReference>
   </ItemGroup>
@@ -545,7 +545,6 @@
     <Compile Include="Core\CSharp\System\Windows\Interop\OperatingSystemVersionCheck.cs" />
     <Compile Include="Core\CSharp\System\Windows\LayoutManager.cs" />
     <Compile Include="Core\CSharp\System\Windows\LocalizabilityAttribute.cs" />
-    <Compile Include="Core\CSharp\System\Windows\LocalizationCategory.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\IAddChild.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\IProvidePropertyFallback.cs" />
     <Compile Include="Core\CSharp\System\Windows\Markup\XamlSerializerUtil.cs" />
@@ -1239,7 +1238,6 @@
     <Compile Include="Core\CSharp\System\Windows\Media3D\Viewport3DVisual.cs" />
     <Compile Include="Core\CSharp\System\Windows\Media3D\Visual3D.cs" />
     <Compile Include="Core\CSharp\System\Windows\Media3D\Visual3DCollection.cs" />
-    <Compile Include="Core\CSharp\System\Windows\Modifiability.cs" />
     <Compile Include="Core\CSharp\System\Windows\MouseCaptureWithinProperty.cs" />
     <Compile Include="Core\CSharp\System\Windows\MouseOverProperty.cs" />
     <Compile Include="Core\CSharp\System\Windows\Navigation\BaseUriHelper.cs" />
@@ -1247,7 +1245,6 @@
     <Compile Include="Core\CSharp\System\Windows\PresentationSource.cs" />
     <Compile Include="Core\CSharp\System\Windows\QueryContinueDragEventArgs.cs" />
     <Compile Include="Core\CSharp\System\Windows\QueryContinueDragEventHandler.cs" />
-    <Compile Include="Core\CSharp\System\Windows\Readability.cs" />
     <Compile Include="Core\CSharp\System\Windows\ReadOnlyPropertyMetadata.cs" />
     <Compile Include="Core\CSharp\System\Windows\Resources\AssemblyAssociatedContentFileAttribute.cs" />
     <Compile Include="Core\CSharp\System\Windows\ReverseInheritProperty.cs" />
@@ -1334,7 +1331,6 @@
     <Compile Include="Shared\MS\Win32\SafeSystemMetrics.cs" />
     <Compile Include="Shared\MS\Win32\UnsafeNativeMethodsCompiler.cs" />
     <Compile Include="Shared\MS\Win32\WinInet.cs" />
-    <Compile Include="Shared\RefAssemblyAttrs.cs" />
     <Compile Include="Shared\System\Windows\Ink\KnownIds.cs" />
     <Compile Include="Shared\System\Windows\Interop\OperatingSystemVersion.cs" />
     <Compile Include="Shared\System\Windows\Interop\OSVersionHelper.cs" />
