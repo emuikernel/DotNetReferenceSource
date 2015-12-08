@@ -265,6 +265,8 @@ _Check_return_ _CRTIMP int __cdecl iswspace(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswspace_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswpunct(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswpunct_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP int __cdecl iswblank(_In_ wint_t _C);
+_Check_return_ _CRTIMP int __cdecl _iswblank_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswalnum(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswalnum_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswprint(_In_ wint_t _C);
@@ -433,6 +435,7 @@ _CRTIMP int __cdecl _wsystem(_In_opt_z_ const wchar_t * _Command);
 #define iswxdigit(_c)   ( iswctype(_c,_HEX) )
 #define iswspace(_c)    ( iswctype(_c,_SPACE) )
 #define iswpunct(_c)    ( iswctype(_c,_PUNCT) )
+#define iswblank(_c)    ( iswctype(_c,_BLANK) )
 #define iswalnum(_c)    ( iswctype(_c,_ALPHA|_DIGIT) )
 #define iswprint(_c)    ( iswctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
 #define iswgraph(_c)    ( iswctype(_c,_PUNCT|_ALPHA|_DIGIT) )
@@ -446,6 +449,7 @@ _CRTIMP int __cdecl _wsystem(_In_opt_z_ const wchar_t * _Command);
 #define _iswxdigit_l(_c,_p)   ( iswctype(_c,_HEX) )
 #define _iswspace_l(_c,_p)    ( iswctype(_c,_SPACE) )
 #define _iswpunct_l(_c,_p)    ( iswctype(_c,_PUNCT) )
+#define _iswblank_l(_c,_p)    ( iswctype(_c,_BLANK) )
 #define _iswalnum_l(_c,_p)    ( iswctype(_c,_ALPHA|_DIGIT) )
 #define _iswprint_l(_c,_p)    ( iswctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
 #define _iswgraph_l(_c,_p)    ( iswctype(_c,_PUNCT|_ALPHA|_DIGIT) )
@@ -695,12 +699,16 @@ _Check_return_opt_ _CRTIMP int __cdecl wprintf_s(_In_z_ _Printf_format_string_ c
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 _Check_return_ _CRTIMP int __cdecl _scwprintf(_In_z_ _Printf_format_string_ const wchar_t * _Format, ...);
 _Check_return_opt_ _CRTIMP int __cdecl vfwprintf(_Inout_ FILE * _File, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
+_Check_return_opt_ _CRTIMP int __cdecl vfwscanf(_Inout_ FILE * _File, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 #if __STDC_WANT_SECURE_LIB__
 _Check_return_opt_ _CRTIMP int __cdecl vfwprintf_s(_Inout_ FILE * _File, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
+_Check_return_opt_ _CRTIMP int __cdecl vfwscanf_s(_Inout_ FILE * _File, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 _Check_return_opt_ _CRTIMP int __cdecl vwprintf(_In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
+_Check_return_opt_ _CRTIMP int __cdecl vwscanf(_In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 #if __STDC_WANT_SECURE_LIB__
 _Check_return_opt_ _CRTIMP int __cdecl vwprintf_s(_In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
+_Check_return_opt_ _CRTIMP int __cdecl vwscanf_s(_In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 
 #if __STDC_WANT_SECURE_LIB__
@@ -709,8 +717,11 @@ _CRTIMP_ALTERNATIVE int __cdecl swprintf_s(_Out_writes_z_(_SizeInWords) wchar_t 
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_1_ARGLIST(int, swprintf_s, vswprintf_s, _Post_z_ wchar_t, _Dest, _In_z_ _Printf_format_string_ const wchar_t *, _Format)
 #if __STDC_WANT_SECURE_LIB__
 _CRTIMP_ALTERNATIVE int __cdecl vswprintf_s(_Out_writes_z_(_SizeInWords) wchar_t * _Dst, _In_ size_t _SizeInWords, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
+_Check_return_opt_ _CRTIMP_ALTERNATIVE int __cdecl vswscanf_s(_Out_writes_z_(_SizeInWords) wchar_t * _Dst, _In_ size_t _SizeInWords, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 #endif  /* __STDC_WANT_SECURE_LIB__ */
 __DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(int, vswprintf_s, _Post_z_ wchar_t, _Dest, _In_z_ _Printf_format_string_ const wchar_t *, _Format, va_list, _Args)
+__DEFINE_CPP_OVERLOAD_SECURE_FUNC_0_2(int, vswscanf_s, _Post_z_ wchar_t, _Dest, _In_z_ _Printf_format_string_ const wchar_t *, _Format, va_list, _Args)
+_Check_return_opt_ _CRTIMP int __cdecl vswscanf(const wchar_t * _srcBuf, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
 
 _Check_return_opt_ _CRTIMP int __cdecl _swprintf_c(_Out_writes_z_(_SizeInWords) wchar_t * _DstBuf, _In_ size_t _SizeInWords, _In_z_ _Printf_format_string_ const wchar_t * _Format, ...);
 _Check_return_opt_ _CRTIMP int __cdecl _vswprintf_c(_Out_writes_z_(_SizeInWords) wchar_t * _DstBuf, _In_ size_t _SizeInWords, _In_z_ _Printf_format_string_ const wchar_t * _Format, va_list _ArgList);
@@ -897,8 +908,16 @@ _Check_return_ _CRTIMP double __cdecl wcstod(_In_z_ const wchar_t * _Str, _Out_o
 _Check_return_ _CRTIMP double __cdecl _wcstod_l(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP long   __cdecl wcstol(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix);
 _Check_return_ _CRTIMP long   __cdecl _wcstol_l(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t **_EndPtr, int _Radix, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP long long __cdecl wcstoll(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix);
+_Check_return_ _CRTIMP long long __cdecl _wcstoll_l(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP unsigned long __cdecl wcstoul(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix);
 _Check_return_ _CRTIMP unsigned long __cdecl _wcstoul_l(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t **_EndPtr, int _Radix, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP unsigned long long __cdecl wcstoull(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix);
+_Check_return_ _CRTIMP unsigned long long __cdecl _wcstoull_l(_In_z_ const wchar_t *_Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, int _Radix, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP long double __cdecl wcstold(_In_z_ const wchar_t * _Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr);
+_Check_return_ _CRTIMP long double __cdecl _wcstold_l(_In_z_ const wchar_t * _Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP float __cdecl wcstof(_In_z_ const wchar_t * _Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr);
+_Check_return_ _CRTIMP float __cdecl _wcstof_l(_In_z_ const wchar_t * _Str, _Out_opt_ _Deref_post_z_ wchar_t ** _EndPtr, _In_opt_ _locale_t _Locale);
 
 #ifdef _CRT_USE_WINAPI_FAMILY_DESKTOP_APP
 
@@ -929,6 +948,8 @@ _Check_return_ _CRTIMP int __cdecl _wtoi(_In_z_ const wchar_t *_Str);
 _Check_return_ _CRTIMP int __cdecl _wtoi_l(_In_z_ const wchar_t *_Str, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP long __cdecl _wtol(_In_z_ const wchar_t *_Str);
 _Check_return_ _CRTIMP long __cdecl _wtol_l(_In_z_ const wchar_t *_Str, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP long long __cdecl _wtoll(_In_z_ const wchar_t *_Str);
+_Check_return_ _CRTIMP long long __cdecl _wtoll_l(_In_z_ const wchar_t *_Str, _In_opt_ _locale_t _Locale);
 
 _Check_return_wat_ _CRTIMP errno_t __cdecl _i64tow_s(_In_ __int64 _Val, _Out_writes_z_(_SizeInWords) wchar_t * _DstBuf, _In_ size_t _SizeInWords, _In_ int _Radix);
 _CRTIMP _CRT_INSECURE_DEPRECATE(_i64tow_s) wchar_t * __cdecl _i64tow(_In_ __int64 _Val, _Pre_notnull_ _Post_z_ wchar_t * _DstBuf, _In_ int _Radix);

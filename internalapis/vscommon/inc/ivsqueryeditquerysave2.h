@@ -159,7 +159,7 @@ EXTERN_C const IID IID_IVsQueryEditQuerySave2;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
-    MIDL_INTERFACE("53474C4D-5984-11d3-a606-005004775ab1")
+    MIDL_INTERFACE("53544C4D-5984-11d3-a606-005004775ab1")
     IVsQueryEditQuerySave2 : public IUnknown
     {
     public:

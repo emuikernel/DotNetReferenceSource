@@ -100,7 +100,7 @@ EXTERN_C const IID IID_IVsSccManager2;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
-    MIDL_INTERFACE("53474C4D-B927-4320-B9DA-13D2CB3EA93B")
+    MIDL_INTERFACE("53544C4D-B927-4320-B9DA-13D2CB3EA93B")
     IVsSccManager2 : public IUnknown
     {
     public:

@@ -91,7 +91,7 @@ EXTERN_C const IID IID_IVsSccProject2;
 
 #if defined(__cplusplus) && !defined(CINTERFACE)
     
-    MIDL_INTERFACE("53474C4D-AC92-49AC-9172-603E01FA483A")
+    MIDL_INTERFACE("53544C4D-AC92-49AC-9172-603E01FA483A")
     IVsSccProject2 : public IUnknown
     {
     public:

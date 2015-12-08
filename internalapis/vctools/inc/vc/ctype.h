@@ -132,6 +132,8 @@ _Check_return_ _CRT_JIT_INTRINSIC _CRTIMP int __cdecl isspace(_In_ int _C);
 _Check_return_ _CRTIMP int __cdecl _isspace_l(_In_ int _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl ispunct(_In_ int _C);
 _Check_return_ _CRTIMP int __cdecl _ispunct_l(_In_ int _C, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP int __cdecl isblank(_In_ int _C);
+_Check_return_ _CRTIMP int __cdecl _isblank_l(_In_ int _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRT_JIT_INTRINSIC _CRTIMP int __cdecl isalnum(_In_ int _C);
 _Check_return_ _CRTIMP int __cdecl _isalnum_l(_In_ int _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl isprint(_In_ int _C);
@@ -173,6 +175,8 @@ _Check_return_ _CRTIMP int __cdecl iswspace(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswspace_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswpunct(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswpunct_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
+_Check_return_ _CRTIMP int __cdecl iswblank(_In_ wint_t _C);
+_Check_return_ _CRTIMP int __cdecl _iswblank_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswalnum(_In_ wint_t _C);
 _Check_return_ _CRTIMP int __cdecl _iswalnum_l(_In_ wint_t _C, _In_opt_ _locale_t _Locale);
 _Check_return_ _CRTIMP int __cdecl iswprint(_In_ wint_t _C);
@@ -267,6 +271,7 @@ _CRTIMP int __cdecl _chvalidator(_In_ int _Ch, _In_ int _Mask);
 #define isxdigit(_c)    (MB_CUR_MAX > 1 ? _isctype(_c,_HEX)   : __chvalidchk(_c, _HEX))
 #define isspace(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_SPACE) : __chvalidchk(_c, _SPACE))
 #define ispunct(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_PUNCT) : __chvalidchk(_c, _PUNCT))
+#define isblank(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_BLANK) : __chvalidchk(_c, _BLANK))
 #define isalnum(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_ALPHA|_DIGIT) : __chvalidchk(_c, (_ALPHA|_DIGIT)))
 #define isprint(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) : __chvalidchk(_c, (_BLANK|_PUNCT|_ALPHA|_DIGIT)))
 #define isgraph(_c)     (MB_CUR_MAX > 1 ? _isctype(_c,_PUNCT|_ALPHA|_DIGIT) : __chvalidchk(_c, (_PUNCT|_ALPHA|_DIGIT)))
@@ -294,6 +299,7 @@ _CRTIMP int __cdecl _chvalidator_l(_In_opt_ _locale_t, _In_ int _Ch, _In_ int _M
 #define _isxdigit_l(_Char, _Locale)     _ischartype_l(_Char, _HEX, _Locale)
 #define _isspace_l(_Char, _Locale)      _ischartype_l(_Char, _SPACE, _Locale)
 #define _ispunct_l(_Char, _Locale)      _ischartype_l(_Char, _PUNCT, _Locale)
+#define _isblank_l(_Char, _Locale)      _ischartype_l(_Char, _BLANK, _Locale)
 #define _isalnum_l(_Char, _Locale)      _ischartype_l(_Char, _ALPHA|_DIGIT, _Locale)
 #define _isprint_l(_Char, _Locale)      _ischartype_l(_Char, _BLANK|_PUNCT|_ALPHA|_DIGIT, _Locale)
 #define _isgraph_l(_Char, _Locale)      _ischartype_l(_Char, _PUNCT|_ALPHA|_DIGIT, _Locale)
@@ -321,6 +327,7 @@ _CRTIMP int __cdecl _chvalidator_l(_In_opt_ _locale_t, _In_ int _Ch, _In_ int _M
 #define iswxdigit(_c)   ( iswctype(_c,_HEX) )
 #define iswspace(_c)    ( iswctype(_c,_SPACE) )
 #define iswpunct(_c)    ( iswctype(_c,_PUNCT) )
+#define iswblank(_c)    ( iswctype(_c,_BLANK) )
 #define iswalnum(_c)    ( iswctype(_c,_ALPHA|_DIGIT) )
 #define iswprint(_c)    ( iswctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
 #define iswgraph(_c)    ( iswctype(_c,_PUNCT|_ALPHA|_DIGIT) )
@@ -334,6 +341,7 @@ _CRTIMP int __cdecl _chvalidator_l(_In_opt_ _locale_t, _In_ int _Ch, _In_ int _M
 #define _iswxdigit_l(_c,_p)   ( iswctype(_c,_HEX) )
 #define _iswspace_l(_c,_p)    ( iswctype(_c,_SPACE) )
 #define _iswpunct_l(_c,_p)    ( iswctype(_c,_PUNCT) )
+#define _iswblank_l(_c,_p)    ( iswctype(_c,_BLANK) )
 #define _iswalnum_l(_c,_p)    ( iswctype(_c,_ALPHA|_DIGIT) )
 #define _iswprint_l(_c,_p)    ( iswctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
 #define _iswgraph_l(_c,_p)    ( iswctype(_c,_PUNCT|_ALPHA|_DIGIT) )

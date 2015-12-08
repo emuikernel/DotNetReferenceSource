@@ -62,7 +62,9 @@ void PageHeap::StaticInit()
 
         OSVERSIONINFO osvi;
         osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+#pragma warning ( disable : 4996 )
         BOOL ok = GetVersionEx(&osvi);
+#pragma warning ( default : 4996 )
         VSASSERT(ok, "Invalid");
         reliableCommit = ok && osvi.dwMajorVersion >= 5;
     }

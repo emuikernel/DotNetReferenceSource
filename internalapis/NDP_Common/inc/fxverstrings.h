@@ -1,32 +1,16 @@
 #ifndef VER_PRODUCTNAME_STR
-    #if defined(SILVERLIGHT)
-        #if defined(CSC_INVOKED)
-            #if defined(PPTARGET_VB)
-                #define VER_PRODUCTNAME_STR      ("Microsoft" + Microsoft.VisualBasic.ChrW(174) + " Silverlight")
-            #elif defined(PPTARGET_CS) || defined(PPTARGET_JS) || defined(FEATURE_PAL)
-                #define VER_PRODUCTNAME_STR      "Microsoft\u00AE Silverlight"
-            #else
-                #error Unknown language when defining VER_PRODUCTNAME_STR!
-            #endif
-        #elif defined(PLIST_INVOKED)
-            #define VER_PRODUCTNAME Microsoft® Silverlight
+    #if defined(CSC_INVOKED)
+        #if defined(PPTARGET_VB)
+            #define VER_PRODUCTNAME_STR      ("Microsoft" + Microsoft.VisualBasic.ChrW(174) + " .NET Framework")
+        #elif defined(PPTARGET_CS) || defined(PPTARGET_JS) || defined(FEATURE_PAL)
+            #define VER_PRODUCTNAME_STR      "Microsoft\u00AE .NET Framework"
         #else
-            #define VER_PRODUCTNAME_STR      L"Microsoft\256 Silverlight"
+            #error Unknown language when defining VER_PRODUCTNAME_STR!
         #endif
+    #elif defined(PLIST_INVOKED)
+        #define VER_PRODUCTNAME Microsoft® .NET Framework
     #else
-        #if defined(CSC_INVOKED)
-            #if defined(PPTARGET_VB)
-                #define VER_PRODUCTNAME_STR      ("Microsoft" + Microsoft.VisualBasic.ChrW(174) + " .NET Framework")
-            #elif defined(PPTARGET_CS) || defined(PPTARGET_JS) || defined(FEATURE_PAL)
-                #define VER_PRODUCTNAME_STR      "Microsoft\u00AE .NET Framework"
-            #else
-                #error Unknown language when defining VER_PRODUCTNAME_STR!
-            #endif
-        #elif defined(PLIST_INVOKED)
-            #define VER_PRODUCTNAME Microsoft® .NET Framework
-        #else
-            #define VER_PRODUCTNAME_STR      L"Microsoft\256 .NET Framework"
-        #endif
+        #define VER_PRODUCTNAME_STR      L"Microsoft\256 .NET Framework"
     #endif
 #endif
 

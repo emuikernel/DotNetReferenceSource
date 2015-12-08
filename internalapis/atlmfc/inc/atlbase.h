@@ -5545,101 +5545,101 @@ public:
 // Operations
 public:
 	ATL_DEPRECATED("CRegKey::SetValue(DWORD, TCHAR *valueName) has been superseded by CRegKey::SetDWORDValue")
-	LONG SetValue(
+	LSTATUS SetValue(
 		_In_ DWORD dwValue,
 		_In_opt_z_ LPCTSTR lpszValueName);
 
 	ATL_DEPRECATED("CRegKey::SetValue(TCHAR *value, TCHAR *valueName) has been superseded by CRegKey::SetStringValue and CRegKey::SetMultiStringValue")
-	LONG SetValue(
+	LSTATUS SetValue(
 		_In_z_ LPCTSTR lpszValue,
 		_In_opt_z_ LPCTSTR lpszValueName = NULL,
 		_In_ bool bMulti = false,
 		_In_ int nValueLen = -1);
-	LONG SetValue(
+	LSTATUS SetValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_ DWORD dwType,
 		_In_opt_ const void* pValue,
 		_In_ ULONG nBytes) throw();
-	LONG SetGUIDValue(
+	LSTATUS SetGUIDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_ REFGUID guidValue) throw();
-	LONG SetBinaryValue(
+	LSTATUS SetBinaryValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_opt_ const void* pValue,
 		_In_ ULONG nBytes) throw();
-	LONG SetDWORDValue(
+	LSTATUS SetDWORDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_ DWORD dwValue) throw();
-	LONG SetQWORDValue(
+	LSTATUS SetQWORDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_ ULONGLONG qwValue) throw();
-	LONG SetStringValue(
+	LSTATUS SetStringValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_opt_z_ LPCTSTR pszValue,
 		_In_ DWORD dwType = REG_SZ) throw();
-	LONG SetMultiStringValue(
+	LSTATUS SetMultiStringValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_In_z_ LPCTSTR pszValue) throw();
 
 	ATL_DEPRECATED("CRegKey::QueryValue(DWORD, TCHAR *valueName) has been superseded by CRegKey::QueryDWORDValue")
-	LONG QueryValue(
+	LSTATUS QueryValue(
 		_Out_ DWORD& dwValue,
 		_In_opt_z_ LPCTSTR lpszValueName);
 
 	ATL_DEPRECATED("CRegKey::QueryValue(TCHAR *value, TCHAR *valueName) has been superseded by CRegKey::QueryStringValue and CRegKey::QueryMultiStringValue")
-	LONG QueryValue(
+	LSTATUS QueryValue(
 		_Out_writes_to_opt_(*pdwCount, *pdwCount) LPTSTR szValue,
 		_In_opt_z_ LPCTSTR lpszValueName,
 		_Inout_ DWORD* pdwCount);
-	LONG QueryValue(
+	LSTATUS QueryValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_opt_ DWORD* pdwType,
 		_Out_opt_ void* pData,
 		_Inout_ ULONG* pnBytes) throw();
-	LONG QueryGUIDValue(
+	LSTATUS QueryGUIDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_ GUID& guidValue) throw();
-	LONG QueryBinaryValue(
+	LSTATUS QueryBinaryValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_opt_ void* pValue,
 		_Inout_opt_ ULONG* pnBytes) throw();
-	LONG QueryDWORDValue(
+	LSTATUS QueryDWORDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_ DWORD& dwValue) throw();
-	LONG QueryQWORDValue(
+	LSTATUS QueryQWORDValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_ ULONGLONG& qwValue) throw();
-	LONG QueryStringValue(
+	LSTATUS QueryStringValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_writes_to_opt_(*pnChars, *pnChars) LPTSTR pszValue,
 		_Inout_ ULONG* pnChars) throw();
-	LONG QueryMultiStringValue(
+	LSTATUS QueryMultiStringValue(
 		_In_opt_z_ LPCTSTR pszValueName,
 		_Out_writes_to_opt_(*pnChars, *pnChars) LPTSTR pszValue,
 		_Inout_ ULONG* pnChars) throw();
 
 	// Get the key's security attributes.
-	LONG GetKeySecurity(
+	LSTATUS GetKeySecurity(
 		_In_ SECURITY_INFORMATION si,
 		_Out_opt_ PSECURITY_DESCRIPTOR psd,
 		_Inout_ LPDWORD pnBytes) throw();
 	// Set the key's security attributes.
-	LONG SetKeySecurity(
+	LSTATUS SetKeySecurity(
 		_In_ SECURITY_INFORMATION si,
 		_In_ PSECURITY_DESCRIPTOR psd) throw();
 
-	LONG SetKeyValue(
+	LSTATUS SetKeyValue(
 		_In_z_ LPCTSTR lpszKeyName,
 		_In_opt_z_ LPCTSTR lpszValue,
 		_In_opt_z_ LPCTSTR lpszValueName = NULL) throw();
-	static LONG WINAPI SetValue(
+	static LSTATUS WINAPI SetValue(
 		_In_ HKEY hKeyParent,
 		_In_z_ LPCTSTR lpszKeyName,
 		_In_opt_z_ LPCTSTR lpszValue,
 		_In_opt_z_ LPCTSTR lpszValueName = NULL);
 
 	// Create a new registry key (or open an existing one).
-	LONG Create(
+	LSTATUS Create(
 		_In_ HKEY hKeyParent,
 		_In_z_ LPCTSTR lpszKeyName,
 		_In_opt_z_ LPTSTR lpszClass = REG_NONE,
@@ -5648,35 +5648,35 @@ public:
 		_In_opt_ LPSECURITY_ATTRIBUTES lpSecAttr = NULL,
 		_Out_opt_ LPDWORD lpdwDisposition = NULL) throw();
 	// Open an existing registry key.
-	LONG Open(
+	LSTATUS Open(
 		_In_ HKEY hKeyParent,
 		_In_opt_z_ LPCTSTR lpszKeyName,
 		_In_ REGSAM samDesired = KEY_READ | KEY_WRITE) throw();
 	// Close the registry key.
-	LONG Close() throw();
+	LSTATUS Close() throw();
 	// Flush the key's data to disk.
-	LONG Flush() throw();
+	LSTATUS Flush() throw();
 
 	// Detach the CRegKey object from its HKEY.  Releases ownership.
 	HKEY Detach() throw();
 	// Attach the CRegKey object to an existing HKEY.  Takes ownership.
 	void Attach(_In_ HKEY hKey) throw();
 
-	// Enumerate the subkeys of the key.
-	LONG EnumKey(
+	// Enumerate the subkeys of the key.   
+	LSTATUS EnumKey(
 		_In_ DWORD iIndex,
 		_Out_writes_to_(*pnNameLength, *pnNameLength) _Post_z_ LPTSTR pszName,
 		_Inout_ LPDWORD pnNameLength,
 		_Out_opt_ FILETIME* pftLastWriteTime = NULL) throw();
-	LONG NotifyChangeKeyValue(
+	LSTATUS NotifyChangeKeyValue(
 		_In_ BOOL bWatchSubtree,
 		_In_ DWORD dwNotifyFilter,
 		_In_ HANDLE hEvent,
 		_In_ BOOL bAsync = TRUE) throw();
 
-	LONG DeleteSubKey(_In_z_ LPCTSTR lpszSubKey) throw();
-	LONG RecurseDeleteKey(_In_z_ LPCTSTR lpszKey) throw();
-	LONG DeleteValue(_In_z_ LPCTSTR lpszValue) throw();
+	LSTATUS DeleteSubKey(_In_z_ LPCTSTR lpszSubKey) throw();
+	LSTATUS RecurseDeleteKey(_In_z_ LPCTSTR lpszKey) throw();
+	LSTATUS DeleteValue(_In_z_ LPCTSTR lpszValue) throw();
 };
 
 inline CRegKey::CRegKey(_In_opt_ CAtlTransactionManager* pTM) throw() :
@@ -5738,7 +5738,7 @@ inline void CRegKey::Attach(_In_ HKEY hKey) throw()
 	m_pTM = NULL;
 }
 
-inline LONG CRegKey::DeleteSubKey(_In_z_ LPCTSTR lpszSubKey) throw()
+inline LSTATUS CRegKey::DeleteSubKey(_In_z_ LPCTSTR lpszSubKey) throw()
 {
 	ATLASSUME(m_hKey != NULL);
 
@@ -5779,13 +5779,13 @@ inline LONG CRegKey::DeleteSubKey(_In_z_ LPCTSTR lpszSubKey) throw()
 	return RegDeleteKey(m_hKey, lpszSubKey);
 }
 
-inline LONG CRegKey::DeleteValue(_In_z_ LPCTSTR lpszValue) throw()
+inline LSTATUS CRegKey::DeleteValue(_In_z_ LPCTSTR lpszValue) throw()
 {
 	ATLASSUME(m_hKey != NULL);
 	return RegDeleteValue(m_hKey, (LPTSTR)lpszValue);
 }
 
-inline LONG CRegKey::Close() throw()
+inline LSTATUS CRegKey::Close() throw()
 {
 	LONG lRes = ERROR_SUCCESS;
 	if (m_hKey != NULL)
@@ -5797,14 +5797,14 @@ inline LONG CRegKey::Close() throw()
 	return lRes;
 }
 
-inline LONG CRegKey::Flush() throw()
+inline LSTATUS CRegKey::Flush() throw()
 {
 	ATLASSUME(m_hKey != NULL);
 
 	return ::RegFlushKey(m_hKey);
 }
 
-inline LONG CRegKey::EnumKey(
+inline LSTATUS CRegKey::EnumKey(
 	_In_ DWORD iIndex,
 	_Out_writes_to_(*pnNameLength, *pnNameLength) _Post_z_ LPTSTR pszName,
 	_Inout_ LPDWORD pnNameLength,
@@ -5821,7 +5821,7 @@ inline LONG CRegKey::EnumKey(
 	return ::RegEnumKeyEx(m_hKey, iIndex, pszName, pnNameLength, NULL, NULL, NULL, pftLastWriteTime);
 }
 
-inline LONG CRegKey::NotifyChangeKeyValue(
+inline LSTATUS CRegKey::NotifyChangeKeyValue(
 	_In_ BOOL bWatchSubtree,
 	_In_ DWORD dwNotifyFilter,
 	_In_ HANDLE hEvent,
@@ -5833,7 +5833,7 @@ inline LONG CRegKey::NotifyChangeKeyValue(
 	return ::RegNotifyChangeKeyValue(m_hKey, bWatchSubtree, dwNotifyFilter, hEvent, bAsync);
 }
 
-inline LONG CRegKey::Create(
+inline LSTATUS CRegKey::Create(
 	_In_ HKEY hKeyParent,
 	_In_z_ LPCTSTR lpszKeyName,
 	_In_opt_z_ LPTSTR lpszClass,
@@ -5848,11 +5848,12 @@ inline LONG CRegKey::Create(
 	LONG lRes = m_pTM != NULL ?
 		m_pTM->RegCreateKeyEx(hKeyParent, lpszKeyName, 0, lpszClass, dwOptions, samDesired, lpSecAttr, &hKey, &dw) :
 		RegCreateKeyEx(hKeyParent, lpszKeyName, 0, lpszClass, dwOptions, samDesired, lpSecAttr, &hKey, &dw);
-	if (lpdwDisposition != NULL)
-		*lpdwDisposition = dw;
 	if (lRes == ERROR_SUCCESS)
 	{
-		lRes = Close();
+    	if (lpdwDisposition != NULL)
+		    *lpdwDisposition = dw;
+
+        lRes = Close();
 		m_hKey = hKey;
 #if WINVER >= 0x0501
 		m_samWOW64 = samDesired & (KEY_WOW64_32KEY | KEY_WOW64_64KEY);
@@ -5861,7 +5862,7 @@ inline LONG CRegKey::Create(
 	return lRes;
 }
 
-inline LONG CRegKey::Open(
+inline LSTATUS CRegKey::Open(
 	_In_ HKEY hKeyParent,
 	_In_opt_z_ LPCTSTR lpszKeyName,
 	_In_ REGSAM samDesired) throw()
@@ -5885,7 +5886,7 @@ inline LONG CRegKey::Open(
 
 #pragma warning(push)  // disable 4996
 #pragma warning(disable: 4996)
-inline LONG CRegKey::QueryValue(
+inline LSTATUS CRegKey::QueryValue(
 	_Out_ DWORD& dwValue,
 	_In_opt_z_ LPCTSTR lpszValueName)
 {
@@ -5893,15 +5894,16 @@ inline LONG CRegKey::QueryValue(
 	DWORD dwCount = sizeof(DWORD);
 	LONG lRes = RegQueryValueEx(m_hKey, lpszValueName, NULL, &dwType,
 		(LPBYTE)&dwValue, &dwCount);
+    _Analysis_assume_((lRes!=ERROR_SUCCESS) || (dwType == REG_DWORD));
 	ATLASSERT((lRes!=ERROR_SUCCESS) || (dwType == REG_DWORD));
 	ATLASSERT((lRes!=ERROR_SUCCESS) || (dwCount == sizeof(DWORD)));
-	if (dwType != REG_DWORD)
+	if (lRes == ERROR_SUCCESS && dwType != REG_DWORD)
 		return ERROR_INVALID_DATA;
 	return lRes;
 }
 
-ATLPREFAST_SUPPRESS(6053 6385 6386)
-inline LONG CRegKey::QueryValue(
+ATLPREFAST_SUPPRESS(6053 6103 6385 6386)
+inline LSTATUS CRegKey::QueryValue(
 	_Out_writes_to_opt_(*pdwCount, *pdwCount) LPTSTR pszValue,
 	_In_opt_z_ LPCTSTR lpszValueName,
 	_Inout_ DWORD* pdwCount)
@@ -5911,7 +5913,7 @@ inline LONG CRegKey::QueryValue(
 	LONG lRes = RegQueryValueEx(m_hKey, lpszValueName, NULL, &dwType, (LPBYTE)pszValue, pdwCount);
 	ATLASSERT((lRes!=ERROR_SUCCESS) || (dwType == REG_SZ) ||
 			 (dwType == REG_MULTI_SZ) || (dwType == REG_EXPAND_SZ));
-	if (pszValue != NULL)
+	if (lRes == ERROR_SUCCESS && pszValue != NULL)
 	{
 		if(*pdwCount>0)
 		{
@@ -5950,7 +5952,7 @@ inline LONG CRegKey::QueryValue(
 ATLPREFAST_UNSUPPRESS()
 #pragma warning(pop)  // disable 4996
 
-inline LONG CRegKey::QueryValue(
+inline LSTATUS CRegKey::QueryValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_opt_ DWORD* pdwType,
 	_Out_opt_ void* pData,
@@ -5961,7 +5963,7 @@ inline LONG CRegKey::QueryValue(
 	return( ::RegQueryValueEx(m_hKey, pszValueName, NULL, pdwType, static_cast< LPBYTE >( pData ), pnBytes) );
 }
 
-inline LONG CRegKey::QueryDWORDValue(
+inline LSTATUS CRegKey::QueryDWORDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_ DWORD& dwValue) throw()
 {
@@ -5981,7 +5983,7 @@ inline LONG CRegKey::QueryDWORDValue(
 
 	return ERROR_SUCCESS;
 }
-inline LONG CRegKey::QueryQWORDValue(
+inline LSTATUS CRegKey::QueryQWORDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_ ULONGLONG& qwValue) throw()
 {
@@ -6025,7 +6027,7 @@ inline LONG CRegKey::QueryBinaryValue(
 
 ATLPREFAST_SUPPRESS(6053)
 /* prefast noise VSW 496818 */
-inline LONG CRegKey::QueryStringValue(
+inline LSTATUS CRegKey::QueryStringValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_writes_to_opt_(*pnChars, *pnChars) LPTSTR pszValue,
 	_Inout_ ULONG* pnChars) throw()
@@ -6077,7 +6079,7 @@ ATLPREFAST_UNSUPPRESS()
 
 ATLPREFAST_SUPPRESS(6053 6054 6386)
 /* prefast noise VSW 496818 */
-inline LONG CRegKey::QueryMultiStringValue(
+inline LSTATUS CRegKey::QueryMultiStringValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_writes_to_opt_(*pnChars, *pnChars) LPTSTR pszValue,
 	_Inout_ ULONG* pnChars) throw()
@@ -6110,7 +6112,7 @@ inline LONG CRegKey::QueryMultiStringValue(
 }
 ATLPREFAST_UNSUPPRESS()
 
-inline LONG CRegKey::QueryGUIDValue(
+inline LSTATUS CRegKey::QueryGUIDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_Out_ GUID& guidValue) throw()
 {
@@ -6146,7 +6148,7 @@ inline LONG CRegKey::QueryGUIDValue(
 	return ERROR_SUCCESS;
 }
 
-inline LONG WINAPI CRegKey::SetValue(
+inline LSTATUS WINAPI CRegKey::SetValue(
 	_In_ HKEY hKeyParent,
 	_In_z_ LPCTSTR lpszKeyName,
 	_In_opt_z_ LPCTSTR lpszValue,
@@ -6160,7 +6162,7 @@ inline LONG WINAPI CRegKey::SetValue(
 	return lRes;
 }
 
-inline LONG CRegKey::SetKeyValue(
+inline LSTATUS CRegKey::SetKeyValue(
 	_In_z_ LPCTSTR lpszKeyName,
 	_In_opt_z_ LPCTSTR lpszValue,
 	_In_opt_z_ LPCTSTR lpszValueName) throw()
@@ -6175,7 +6177,7 @@ inline LONG CRegKey::SetKeyValue(
 
 #pragma warning(push)  // disable 4996
 #pragma warning(disable: 4996)
-inline LONG CRegKey::SetValue(
+inline LSTATUS CRegKey::SetValue(
 	_In_ DWORD dwValue,
 	_In_opt_z_ LPCTSTR pszValueName)
 {
@@ -6183,7 +6185,7 @@ inline LONG CRegKey::SetValue(
 	return SetDWORDValue(pszValueName, dwValue);
 }
 
-inline LONG CRegKey::SetValue(
+inline LSTATUS CRegKey::SetValue(
 	_In_z_ LPCTSTR lpszValue,
 	_In_opt_z_ LPCTSTR lpszValueName,
 	_In_ bool bMulti,
@@ -6205,7 +6207,7 @@ inline LONG CRegKey::SetValue(
 }
 #pragma warning(pop)  // disable 4996
 
-inline LONG CRegKey::SetValue(
+inline LSTATUS CRegKey::SetValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_ DWORD dwType,
 	_In_opt_ const void* pValue,
@@ -6215,7 +6217,7 @@ inline LONG CRegKey::SetValue(
 	return ::RegSetValueEx(m_hKey, pszValueName, 0, dwType, static_cast<const BYTE*>(pValue), nBytes);
 }
 
-inline LONG CRegKey::SetBinaryValue(
+inline LSTATUS CRegKey::SetBinaryValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_opt_ const void* pData,
 	_In_ ULONG nBytes) throw()
@@ -6224,7 +6226,7 @@ inline LONG CRegKey::SetBinaryValue(
 	return ::RegSetValueEx(m_hKey, pszValueName, 0, REG_BINARY, reinterpret_cast<const BYTE*>(pData), nBytes);
 }
 
-inline LONG CRegKey::SetDWORDValue(
+inline LSTATUS CRegKey::SetDWORDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_ DWORD dwValue) throw()
 {
@@ -6232,7 +6234,7 @@ inline LONG CRegKey::SetDWORDValue(
 	return ::RegSetValueEx(m_hKey, pszValueName, 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dwValue), sizeof(DWORD));
 }
 
-inline LONG CRegKey::SetQWORDValue(
+inline LSTATUS CRegKey::SetQWORDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_ ULONGLONG qwValue) throw()
 {
@@ -6240,7 +6242,7 @@ inline LONG CRegKey::SetQWORDValue(
 	return ::RegSetValueEx(m_hKey, pszValueName, 0, REG_QWORD, reinterpret_cast<const BYTE*>(&qwValue), sizeof(ULONGLONG));
 }
 
-inline LONG CRegKey::SetStringValue(
+inline LSTATUS CRegKey::SetStringValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_opt_z_ LPCTSTR pszValue,
 	_In_ DWORD dwType) throw()
@@ -6252,7 +6254,7 @@ inline LONG CRegKey::SetStringValue(
 	return ::RegSetValueEx(m_hKey, pszValueName, 0, dwType, reinterpret_cast<const BYTE*>(pszValue), (static_cast<DWORD>(_tcslen(pszValue))+1)*sizeof(TCHAR));
 }
 
-inline LONG CRegKey::SetMultiStringValue(
+inline LSTATUS CRegKey::SetMultiStringValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_z_ LPCTSTR pszValue) throw()
 {
@@ -6279,7 +6281,7 @@ inline LONG CRegKey::SetMultiStringValue(
 		nBytes);
 }
 
-inline LONG CRegKey::SetGUIDValue(
+inline LSTATUS CRegKey::SetGUIDValue(
 	_In_opt_z_ LPCTSTR pszValueName,
 	_In_ REFGUID guidValue) throw()
 {
@@ -6298,7 +6300,7 @@ inline LONG CRegKey::SetGUIDValue(
 	return SetStringValue(pszValueName, lpstr);
 }
 
-inline LONG CRegKey::GetKeySecurity(
+inline LSTATUS CRegKey::GetKeySecurity(
 	_In_ SECURITY_INFORMATION si,
 	_Out_opt_ PSECURITY_DESCRIPTOR psd,
 	_Inout_ LPDWORD pnBytes) throw()
@@ -6309,7 +6311,7 @@ inline LONG CRegKey::GetKeySecurity(
 	return ::RegGetKeySecurity(m_hKey, si, psd, pnBytes);
 }
 
-inline LONG CRegKey::SetKeySecurity(
+inline LSTATUS CRegKey::SetKeySecurity(
 	_In_ SECURITY_INFORMATION si,
 	_In_ PSECURITY_DESCRIPTOR psd) throw()
 {
@@ -6319,7 +6321,7 @@ inline LONG CRegKey::SetKeySecurity(
 	return ::RegSetKeySecurity(m_hKey, si, psd);
 }
 
-inline LONG CRegKey::RecurseDeleteKey(_In_z_ LPCTSTR lpszKey) throw()
+inline LSTATUS CRegKey::RecurseDeleteKey(_In_z_ LPCTSTR lpszKey) throw()
 {
 	CRegKey key;
 	LONG lRes = key.Open(m_hKey, lpszKey, KEY_READ | KEY_WRITE | m_samWOW64);
@@ -6406,7 +6408,8 @@ inline HRESULT CComModule::RegisterAppId(_In_z_ LPCTSTR pAppId)
 		DWORD dwFLen = ::GetModuleFileName(GetModuleInstance(), szModule1, MAX_PATH);
 		if ( dwFLen != 0 && dwFLen != MAX_PATH )
 		{
-			if (::GetFullPathName(szModule1, MAX_PATH, szModule2, &pszFileName) != 0)
+            DWORD dwRet = ::GetFullPathName(szModule1, MAX_PATH, szModule2, &pszFileName);
+			if (dwRet != 0 && dwRet < MAX_PATH)
 			{
 				CRegKey keyAppIDEXE;
 				if ( (lRet = keyAppIDEXE.Create(keyAppID, pszFileName, REG_NONE, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE)) == ERROR_SUCCESS)
@@ -6480,7 +6483,8 @@ inline HRESULT CComModule::UnregisterAppId(_In_z_ LPCTSTR pAppId)
 		DWORD dwFLen = ::GetModuleFileName(GetModuleInstance(), szModule1, MAX_PATH);
 		if ( dwFLen != 0 && dwFLen != MAX_PATH )
 		{
-			if (::GetFullPathName(szModule1, MAX_PATH, szModule2, &pszFileName) != 0)
+            DWORD dwRet = ::GetFullPathName(szModule1, MAX_PATH, szModule2, &pszFileName);
+			if (dwRet != 0 && dwRet < MAX_PATH)
 			{
 				if ((lRet = keyAppID.RecurseDeleteKey(pAppId)) != ERROR_SUCCESS)
 				{
@@ -6734,7 +6738,7 @@ inline HRESULT WINAPI CComModule::UpdateRegistryClass(
 	return UnregisterClassHelper(clsid, lpszProgID, lpszVerIndProgID);
 }
 
-ATLPREFAST_SUPPRESS(6386)
+ATLPREFAST_SUPPRESS(6102 6386)
 inline HRESULT WINAPI CComModule::RegisterClassHelper(
 	_In_ const CLSID& clsid,
 	_In_opt_z_ LPCTSTR lpszProgID,

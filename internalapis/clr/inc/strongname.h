@@ -141,16 +141,33 @@ SNAPI StrongNameSignatureGenerationEx(LPCWSTR     wszFilePath,        // [in] va
                                       ULONG      *pcbSignatureBlob,
                                       DWORD       dwFlags);           // [in] modifer flags; see below
 
-#ifdef FEATURE_PLATFORM_ASSEMBLY_ALLOWLIST                                      
-SNAPI StrongNameSetPlatformSignatureSequence(LPCWSTR     wszFilePath,  // [in] valid path to the PE file for the assembly)
-                                             DWORD       flags);       // [in] flags detailing which parts of the signature to apply
-SNAPI StrongNameHasPlatformSignatureSequence(LPCWSTR     wszFilePath);  // [in] valid path to the PE file for the assembly)
-
-
-#endif // FEATURE_PLATFORM_ASSEMBLY_ALLOWLIST
 #define SN_SIGN_ALL_FILES   0x00000001      // Rehash all linked modules as well as resigning the manifest
 #define SN_TEST_SIGN        0x00000002      // Test sign the assembly
 #define SN_ECMA_SIGN        0x00000004      // Sign the assembly treating the input key as the real ECMA key
+
+// Digest signing support
+
+// Generate the digest of an input assembly, which can be signed with StrongNameDigestSign
+SNAPI StrongNameDigestGenerate(_In_z_ LPCWSTR                                       wszFilePath,        // [in] valid path to the PE file for the assembly
+                               _Outptr_result_bytebuffer_(*pcbDigestBlob) BYTE**    ppbDigestBlob,      // [out] digest of the assembly, free with StrongNameFreeBuffer
+                               _Out_  ULONG*                                        pcbDigestBlob,      // [out] number of bytes in the assembly digest
+                               DWORD                                                dwFlags);           // [in] modifier flags (see StrongNameSignatureGenerationEx)
+
+// Sign an the digest of an assembly calculated by StrongNameDigestGenerate
+SNAPI StrongNameDigestSign(_In_opt_z_ LPCWSTR                                   wszKeyContainer,        // [in] desired key container name (optional)
+                           _In_reads_bytes_opt_(cbKeyBlob) BYTE*                pbKeyBlob,              // [in] public/private key blob (optional)
+                           ULONG                                                cbKeyBlob,
+                           _In_reads_bytes_(cbDigestBlob) BYTE*                 pbDigestBlob,           // [in] digest blob, from StrongNameDigestGenerate
+                           ULONG                                                cbDigestBlob,
+                           DWORD                                                hashAlgId,              // [in] algorithm id of the hash al----htm used with pbDigestBlob
+                           _Outptr_result_bytebuffer_(*pcbSignatureBlob) BYTE** ppbSignatureBlob,       // [out] signature blob, freed with StrongNameFreeBuffer
+                           _Out_ ULONG*                                         pcbSignatureBlob,
+                           DWORD                                                dwFlags);               // [in] modifier flags (see StrongNameSignatureGenerationEx)
+
+// Embed a digest signature generated with StrongNameDigestSign into an assembly
+SNAPI StrongNameDigestEmbed(_In_z_ LPCWSTR                          wszFilePath,                        // [in] valid path to the PE file for the assembly to update
+                            _In_reads_bytes_(cbSignatureBlob) BYTE* pbSignatureBlob,                    // [in] signature blob for the assembly
+                            ULONG                                   cbSignatureBlob);
 
 // Create a strong name token from an assembly file.
 SNAPI StrongNameTokenFromAssembly(LPCWSTR   wszFilePath,            // [in] valid path to the PE file for the assembly
@@ -202,22 +219,11 @@ SNAPI StrongNameSignatureVerificationFromImage(BYTE     *pbBase,             // 
 #define SN_INFLAG_ADMIN_ACCESS   0x00000004     // cache protects assembly from all but admin access
 #define SN_INFLAG_USER_ACCESS    0x00000008     // cache protects user's assembly from other users
 #define SN_INFLAG_ALL_ACCESS     0x00000010     // cache provides no access restriction guarantees
-#ifdef FEATURE_PLATFORM_ASSEMBLY_ALLOWLIST 
-#define SN_INFLAG_GAC_ASSEMBLY   0x00000020     // Flag that indicates the assembly is from the "GAC"
-#define SN_INFLAG_MAPPED_PEFILE  0x00000040     // Flag that indicates the assembly PE File is memory-mapped (not flat)
-#define SN_INFLAG_RELOCATED_PEFILE  0x00000080  // Flag that indicates the assembly PE File is memory-mapped (not flat) and relocated
-#define SN_INFLAG_CORECLR_SKIP_VERIFY_FOR_TRUSTED 0x00000100// Flag that indicates we skip verification for GAC sourced CoreCLR assemblies
-#endif // FEATURE_PLATFORM_ASSEMBLY_ALLOWLIST 
+
 #define SN_INFLAG_RUNTIME        0x80000000     // internal debugging use only 
 
 #define SN_OUTFLAG_WAS_VERIFIED  0x00000001     // set to false if verify succeeded due to registry settings
 #define SN_OUTFLAG_MICROSOFT_SIGNATURE 0x00000002 // set if the public key corresponds to SN_THE_KEY
-
-#ifdef FEATURE_STRONGNAME_TESTKEY_ALLOWED
-#define SN_OUTFLAG_TESTKEY_SIGNATURE 0x00000004 // set if the public key corresponds to SN_THE_TESTKEY
-#endif // FEATURE_STRONGNAME_TESTKEY_ALLOWED
-#define SN_OUTFLAG_SILVERLIGHT_PLATFORM_SIGNATURE 0x00000008 // set if the public key corresponds to the Silverlight Platform key
-#define SN_OUTFLAG_SILVERLIGHT_SIGNATURE 0x00000010 // set if the public key corresponds to the Silverlight key
 
 // Verify that two assemblies differ only by signature blob.
 SNAPI StrongNameCompareAssemblies(LPCWSTR   wszAssembly1,           // [in] file name of first assembly

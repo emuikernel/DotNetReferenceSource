@@ -178,15 +178,8 @@ DEPRECATED_CLR_STDAPI_(void)   CoEEShutDownCOM(void);
 #define MAIN_CLR_MODULE_NAME_W        L"coreclr"
 #define MAIN_CLR_MODULE_NAME_A         "coreclr"
 
-#ifndef __APPLE__
 #define MAIN_CLR_DLL_NAME_W           MAKEDLLNAME_W(MAIN_CLR_MODULE_NAME_W)
 #define MAIN_CLR_DLL_NAME_A           MAKEDLLNAME_A(MAIN_CLR_MODULE_NAME_A)
-#else // !__APPLE__
-// CoreCLR module is a bundle rather than a dynamic library on Mac and these binaries have no extension.
-#define MAIN_CLR_DLL_NAME_W           L"CoreCLR"
-#define MAIN_CLR_DLL_NAME_A           "CoreCLR"
-#endif // !__APPLE__
-
 
 #else //FEATURE_MAIN_CLR_MODULE_USES_CORE_NAME
 
@@ -203,13 +196,8 @@ DEPRECATED_CLR_STDAPI_(void)   CoEEShutDownCOM(void);
 #define MSCOREE_SHIM_W              MAIN_CLR_DLL_NAME_W
 #define MSCOREE_SHIM_A               MAIN_CLR_DLL_NAME_A
 #else
-#ifndef FEATURE_PAL
 #define MSCOREE_SHIM_W                L"mscoree.dll"
 #define MSCOREE_SHIM_A                "mscoree.dll"
-#else // !FEATURE_PAL
-#define MSCOREE_SHIM_W                MAKEDLLNAME_W(L"sscoree")
-#define MSCOREE_SHIM_A                MAKEDLLNAME_A("sscoree")
-#endif // !FEATURE_PAL
 #endif // FEATURE_CORECLR
 
 #define SWITCHOUT_HANDLE_VALUE ((HANDLE)(LONG_PTR)-2)
@@ -2056,7 +2044,7 @@ typedef enum
 // We need a version that is FORCEINLINE on retail and NOINLINE on debug
 
 #ifndef DEBUG_NOINLINE
-#if defined(_DEBUG) && !defined(FEATURE_PAL)
+#if defined(_DEBUG)
 #define DEBUG_NOINLINE __declspec(noinline)
 #else
 #define DEBUG_NOINLINE
@@ -2234,11 +2222,7 @@ inline ULONG CorSigUncompressData(      // return number of bytes of that compre
 
 
 #if !defined(SELECTANY)
-    #if !defined(FEATURE_PAL)
-        #define SELECTANY extern __declspec(selectany)
-    #else
-        #define SELECTANY
-    #endif
+    #define SELECTANY extern __declspec(selectany)
 #endif
 
 SELECTANY const mdToken g_tkCorEncodeToken[4] ={mdtTypeDef, mdtTypeRef, mdtTypeSpec, mdtBaseType};

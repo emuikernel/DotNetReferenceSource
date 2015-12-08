@@ -1563,7 +1563,9 @@ public:
                         
                     if (FAILED(hr))
                     {
+ATLPREFAST_SUPPRESS(6102)
                         ::SysFreeString(m_str);
+ATLPREFAST_UNSUPPRESS()
                         m_str = NULL;
                     }
                 }
@@ -3097,8 +3099,10 @@ _Check_return_ inline HRESULT CComVariant::ReadFromStream(
     ULONG cbRead = 0;
 
     hr = pStream->Read(&vtRead, sizeof(VARTYPE), &cbRead);
+ATLPREFAST_SUPPRESS(6102)
     if (hr == S_FALSE || (cbRead != sizeof(VARTYPE) && hr == S_OK))
         hr = E_FAIL;
+ATLPREFAST_UNSUPPRESS()
     if (FAILED(hr))
         return hr;
     if (vtExpected != VT_EMPTY && vtRead != vtExpected)

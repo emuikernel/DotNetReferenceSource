@@ -796,7 +796,7 @@ void CodeGenerator::UpdateLineTable
             VbThrow(HrMake(ERRID_CodegenError));
         }
         unsigned long size = (unsigned long)(m_pltblEnd - m_pltblLineTbl)*sizeof(LINETBL);
-        if (size + 10*sizeof(LINETBL) < size)
+        if (size + 10*static_cast<unsigned long>(sizeof(LINETBL)) < size)
         {
             VbThrow(HrMake(ERRID_CodegenError));
         }
@@ -2158,7 +2158,7 @@ BYTE *pbImage
 // Allocates space for the line table. The size of the line numbers and
 // offsets is assumed to be 4 bytes (unsigned long).
 //============================================================================
-
+#pragma optimize( "", off)
 MethodDebugInfo *CodeGenerator::CreateLineTable
 (
     CSingleList<MethodDebugInfo> *pMethodDebugInfoList,
@@ -2200,6 +2200,7 @@ MethodDebugInfo *CodeGenerator::CreateLineTable
 
     return pMethodDebugInfo;
 }
+#pragma optimize( "", on)
 
 //============================================================================
 // Adds a new (line#, offset) pair to the line table.

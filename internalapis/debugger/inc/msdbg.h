@@ -1243,7 +1243,7 @@ extern "C"{
 /* [local] */ 
 
 #ifndef _BASETSD_H_
-typedef unsigned __int64 POINTER_64_INT;
+typedef unsigned long POINTER_64_INT;
 
 #pragma once
 typedef signed char INT8;
@@ -1306,17 +1306,17 @@ typedef /* [custom][public] */ unsigned __int3264 ULONG_PTR;
 
 typedef /* [public] */ unsigned __int3264 *PULONG_PTR;
 
-typedef __int64 SHANDLE_PTR;
+typedef unsigned short UHALF_PTR;
 
-typedef unsigned __int64 HANDLE_PTR;
+typedef unsigned short *PUHALF_PTR;
 
-typedef unsigned int UHALF_PTR;
+typedef short HALF_PTR;
 
-typedef unsigned int *PUHALF_PTR;
+typedef short *PHALF_PTR;
 
-typedef int HALF_PTR;
+typedef long SHANDLE_PTR;
 
-typedef int *PHALF_PTR;
+typedef unsigned long HANDLE_PTR;
 
 typedef ULONG_PTR SIZE_T;
 

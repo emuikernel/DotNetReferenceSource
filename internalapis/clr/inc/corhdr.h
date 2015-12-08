@@ -1801,6 +1801,14 @@ typedef enum CorAttributeTargets
 #define FRIEND_ACCESS_ALLOWED_ATTRIBUTE_TYPE     "System.Runtime.CompilerServices.FriendAccessAllowedAttribute"
 #define FRIEND_ACCESS_ALLOWED_SIG               {IMAGE_CEE_CS_CALLCONV_DEFAULT_HASTHIS, 0, ELEMENT_TYPE_VOID}
 
+#define SUBJECT_ASSEMBLY_TYPE_W                 L"System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute"
+#define SUBJECT_ASSEMBLY_TYPE                    "System.Runtime.CompilerServices.IgnoresAccessChecksToAttribute"
+#define SUBJECT_ASSEMBLY_SIG                    {IMAGE_CEE_CS_CALLCONV_DEFAULT_HASTHIS, 1, ELEMENT_TYPE_VOID, ELEMENT_TYPE_STRING}
+
+#define DISABLED_PRIVATE_REFLECTION_TYPE_W      L"System.Runtime.CompilerServices.DisablePrivateReflectionAttribute"
+#define DISABLED_PRIVATE_REFLECTION_TYPE         "System.Runtime.CompilerServices.DisablePrivateReflectionAttribute"
+#define DISABLED_PRIVATE_REFLECTION_SIG         {IMAGE_CEE_CS_CALLCONV_DEFAULT_HASTHIS, 0, ELEMENT_TYPE_VOID}
+
 #define DEFAULTDOMAIN_STA_TYPE_W                L"System.STAThreadAttribute"
 #define DEFAULTDOMAIN_STA_TYPE                   "System.STAThreadAttribute"
 #define DEFAULTDOMAIN_STA_SIG                   {IMAGE_CEE_CS_CALLCONV_DEFAULT_HASTHIS, 0, ELEMENT_TYPE_VOID}
@@ -1813,13 +1821,8 @@ typedef enum CorAttributeTargets
 #define DEFAULTDOMAIN_LOADEROPTIMIZATION_TYPE    "System.LoaderOptimizationAttribute"
 #define DEFAULTDOMAIN_LOADEROPTIMIZATION_SIG    {IMAGE_CEE_CS_CALLCONV_DEFAULT_HASTHIS, 1, ELEMENT_TYPE_VOID, ELEMENT_TYPE_I1}
 
-#if !defined(FEATURE_CORECLR) //TP disabled on CoreCLR.
-#define TARGETEDPATCHBAND_W                     L"System.Runtime.AssemblyTargetedPatchBandAttribute"
-#define TARGETEDPATCHBAND                        "System.Runtime.AssemblyTargetedPatchBandAttribute"
-#endif
-
-#define TARGETEDPATCHOPTOUT_W                   L"System.Runtime.TargetedPatchingOptOutAttribute"
-#define TARGETEDPATCHOPTOUT                      "System.Runtime.TargetedPatchingOptOutAttribute"
+#define NONVERSIONABLE_TYPE_W                   L"System.Runtime.Versioning.NonVersionableAttribute"
+#define NONVERSIONABLE_TYPE                      "System.Runtime.Versioning.NonVersionableAttribute"
 
 // Keep in [....] with CompilationRelaxations.cs
 typedef enum CompilationRelaxationsEnum
@@ -1846,7 +1849,7 @@ typedef enum NGenHintEnum
     NGenEager               = 0x0001, // NGen at install time
     NGenLazy                = 0x0002, // NGen after install time
     NGenNever               = 0x0003  // Assembly should not be ngened      
-};
+} NGenHintEnum;
 
 typedef enum LoadHintEnum
 {
@@ -1855,7 +1858,7 @@ typedef enum LoadHintEnum
     LoadAlways              = 0x0001, // Dependency is always loaded
     LoadSometimes           = 0x0002, // Dependency is sometimes loaded
     LoadNever               = 0x0003  // Dependency is never loaded
-};
+} LoadHintEnum;
 
 #define DEFAULTDEPENDENCY_TYPE_W                L"System.Runtime.CompilerServices.DefaultDependencyAttribute"
 #define DEFAULTDEPENDENCY_TYPE                  "System.Runtime.CompilerServices.DefaultDependencyAttribute"
@@ -1904,7 +1907,7 @@ typedef enum NativeTypeArrayFlags
 {
     ntaSizeParamIndexSpecified = 0x0001,
     ntaReserved                = 0xfffe      // All the reserved bits.
-};
+} NativeTypeArrayFlags;
 
 //
 // Opaque types for security properties and values.

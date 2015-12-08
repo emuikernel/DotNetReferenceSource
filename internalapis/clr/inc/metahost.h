@@ -3,7 +3,7 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0601 */
+ /* File created by MIDL compiler version 8.00.0603 */
 /* @@MIDL_FILE_HEADING(  ) */
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
@@ -96,6 +96,13 @@ typedef interface ICLRStrongName2 ICLRStrongName2;
 #endif 	/* __ICLRStrongName2_FWD_DEFINED__ */
 
 
+#ifndef __ICLRStrongName3_FWD_DEFINED__
+#define __ICLRStrongName3_FWD_DEFINED__
+typedef interface ICLRStrongName3 ICLRStrongName3;
+
+#endif 	/* __ICLRStrongName3_FWD_DEFINED__ */
+
+
 #ifndef __ICLRMetaHost_FWD_DEFINED__
 #define __ICLRMetaHost_FWD_DEFINED__
 typedef interface ICLRMetaHost ICLRMetaHost;
@@ -172,6 +179,7 @@ EXTERN_GUID(CLSID_CLRDebugging, 0xbacc578d, 0xfbdd, 0x48a4, 0x96, 0x9f, 0x2, 0xd
 EXTERN_GUID(IID_ICLRRuntimeInfo, 0xBD39D1D2, 0xBA2F, 0x486a, 0x89, 0xB0, 0xB4, 0xB0, 0xCB, 0x46, 0x68, 0x91);
 EXTERN_GUID(IID_ICLRStrongName, 0x9FD93CCF, 0x3280, 0x4391, 0xB3, 0xA9, 0x96, 0xE1, 0xCD, 0xE7, 0x7C, 0x8D);
 EXTERN_GUID(IID_ICLRStrongName2, 0xC22ED5C5, 0x4B59, 0x4975, 0x90, 0xEB, 0x85, 0xEA, 0x55, 0xC0, 0x06, 0x9B);
+EXTERN_GUID(IID_ICLRStrongName3, 0x22c7089b, 0xbbd3, 0x414a, 0xb6, 0x98, 0x21, 0x0f, 0x26, 0x3f, 0x1f, 0xed);
 EXTERN_GUID(CLSID_CLRDebuggingLegacy, 0xDF8395B5, 0xA4BA, 0x450b, 0xA7, 0x7C, 0xA9, 0xA4, 0x77, 0x62, 0xC5, 0x20);
 EXTERN_GUID(CLSID_CLRProfiling, 0xbd097ed8, 0x733e, 0x43fe, 0x8e, 0xd7, 0xa9, 0x5f, 0xf9, 0xa8, 0x44, 0x8c);
 EXTERN_GUID(IID_ICLRProfiling, 0xb349abe3, 0xb56f, 0x4689, 0xbf, 0xcd, 0x76, 0xbf, 0x39, 0xd8, 0x88, 0xea);
@@ -1594,6 +1602,132 @@ EXTERN_C const IID IID_ICLRStrongName2;
 #endif 	/* __ICLRStrongName2_INTERFACE_DEFINED__ */
 
 
+#ifndef __ICLRStrongName3_INTERFACE_DEFINED__
+#define __ICLRStrongName3_INTERFACE_DEFINED__
+
+/* interface ICLRStrongName3 */
+/* [object][local][helpstring][version][uuid] */ 
+
+
+EXTERN_C const IID IID_ICLRStrongName3;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("22c7089b-bbd3-414a-b698-210f263f1fed")
+    ICLRStrongName3 : public IUnknown
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE StrongNameDigestGenerate( 
+            /* [in] */ LPCWSTR wszFilePath,
+            /* [out] */ BYTE **ppbDigestBlob,
+            /* [out] */ ULONG *pcbDigestBlob,
+            /* [in] */ DWORD dwFlags) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE StrongNameDigestSign( 
+            /* [in] */ LPCWSTR wszKeyContainer,
+            /* [size_is][in] */ BYTE *pbKeyBlob,
+            /* [in] */ ULONG cbKeyBlob,
+            /* [size_is][in] */ BYTE *pbDigestBlob,
+            /* [in] */ ULONG cbDigestBlob,
+            /* [in] */ DWORD hashAlgId,
+            /* [out] */ BYTE **ppbSignatureBlob,
+            /* [out] */ ULONG *pcbSignatureBlob,
+            /* [in] */ DWORD dwFlags) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE StrongNameDigestEmbed( 
+            /* [in] */ LPCWSTR wszFilePath,
+            /* [size_is][in] */ BYTE *pbSignatureBlob,
+            /* [in] */ ULONG cbSignatureBlob) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ICLRStrongName3Vtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ICLRStrongName3 * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ICLRStrongName3 * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ICLRStrongName3 * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *StrongNameDigestGenerate )( 
+            ICLRStrongName3 * This,
+            /* [in] */ LPCWSTR wszFilePath,
+            /* [out] */ BYTE **ppbDigestBlob,
+            /* [out] */ ULONG *pcbDigestBlob,
+            /* [in] */ DWORD dwFlags);
+        
+        HRESULT ( STDMETHODCALLTYPE *StrongNameDigestSign )( 
+            ICLRStrongName3 * This,
+            /* [in] */ LPCWSTR wszKeyContainer,
+            /* [size_is][in] */ BYTE *pbKeyBlob,
+            /* [in] */ ULONG cbKeyBlob,
+            /* [size_is][in] */ BYTE *pbDigestBlob,
+            /* [in] */ ULONG cbDigestBlob,
+            /* [in] */ DWORD hashAlgId,
+            /* [out] */ BYTE **ppbSignatureBlob,
+            /* [out] */ ULONG *pcbSignatureBlob,
+            /* [in] */ DWORD dwFlags);
+        
+        HRESULT ( STDMETHODCALLTYPE *StrongNameDigestEmbed )( 
+            ICLRStrongName3 * This,
+            /* [in] */ LPCWSTR wszFilePath,
+            /* [size_is][in] */ BYTE *pbSignatureBlob,
+            /* [in] */ ULONG cbSignatureBlob);
+        
+        END_INTERFACE
+    } ICLRStrongName3Vtbl;
+
+    interface ICLRStrongName3
+    {
+        CONST_VTBL struct ICLRStrongName3Vtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ICLRStrongName3_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ICLRStrongName3_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ICLRStrongName3_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ICLRStrongName3_StrongNameDigestGenerate(This,wszFilePath,ppbDigestBlob,pcbDigestBlob,dwFlags)	\
+    ( (This)->lpVtbl -> StrongNameDigestGenerate(This,wszFilePath,ppbDigestBlob,pcbDigestBlob,dwFlags) ) 
+
+#define ICLRStrongName3_StrongNameDigestSign(This,wszKeyContainer,pbKeyBlob,cbKeyBlob,pbDigestBlob,cbDigestBlob,hashAlgId,ppbSignatureBlob,pcbSignatureBlob,dwFlags)	\
+    ( (This)->lpVtbl -> StrongNameDigestSign(This,wszKeyContainer,pbKeyBlob,cbKeyBlob,pbDigestBlob,cbDigestBlob,hashAlgId,ppbSignatureBlob,pcbSignatureBlob,dwFlags) ) 
+
+#define ICLRStrongName3_StrongNameDigestEmbed(This,wszFilePath,pbSignatureBlob,cbSignatureBlob)	\
+    ( (This)->lpVtbl -> StrongNameDigestEmbed(This,wszFilePath,pbSignatureBlob,cbSignatureBlob) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ICLRStrongName3_INTERFACE_DEFINED__ */
+
+
 
 #ifndef __CLRMetaHost_LIBRARY_DEFINED__
 #define __CLRMetaHost_LIBRARY_DEFINED__
@@ -1612,14 +1746,14 @@ EXTERN_C const IID IID_ICLRStrongName2;
 EXTERN_C const IID LIBID_CLRMetaHost;
 #endif /* __CLRMetaHost_LIBRARY_DEFINED__ */
 
-/* interface __MIDL_itf_metahost_0000_0009 */
+/* interface __MIDL_itf_metahost_0000_0010 */
 /* [local] */ 
 
 #endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 
-extern RPC_IF_HANDLE __MIDL_itf_metahost_0000_0009_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_metahost_0000_0009_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_metahost_0000_0010_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_metahost_0000_0010_v0_0_s_ifspec;
 
 /* Additional Prototypes for ALL interfaces */
 

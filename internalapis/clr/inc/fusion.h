@@ -3,7 +3,7 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 8.00.0601 */
+ /* File created by MIDL compiler version 8.00.0603 */
 /* @@MIDL_FILE_HEADING(  ) */
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
@@ -108,7 +108,6 @@ extern "C"{
 
 
 
-
 typedef /* [public] */ 
 enum __MIDL___MIDL_itf_fusion_0000_0000_0001
     {
@@ -130,6 +129,7 @@ enum _tagPEKIND
         peIA64	= 0x3,
         peAMD64	= 0x4,
         peARM	= 0x5,
+        peARM64	= 0x6,
         peInvalid	= 0xffffffff
     } 	PEKIND;
 
